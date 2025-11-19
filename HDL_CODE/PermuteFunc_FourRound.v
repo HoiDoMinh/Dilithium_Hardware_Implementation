@@ -1,0 +1,22 @@
+
+module PermuteFunc_FourRound(Ain,  Aout, round);
+
+    input [1599:0] Ain;
+    output [1599:0]  Aout;
+    input [2:0] round;
+
+    wire [1599:0] A1;
+    wire [1599:0] A2;
+    wire [1599:0] A3;
+	 
+	 wire [4:0] round0 = 4*round;
+	 wire [4:0] round1 = 4*round + 1;
+	 wire [4:0] round2 = 4*round + 2;
+	 wire [4:0] round3 = 4*round + 3;
+	 
+    PermuteFunction_oneRound PermuteFunction_oneRound_u0(.Ain(Ain), .Aout(A1),          .round(round0));
+    PermuteFunction_oneRound PermuteFunction_oneRound_u1(.Ain(A1),      .Aout(A2),          .round(round1));
+    PermuteFunction_oneRound PermuteFunction_oneRound_u2(.Ain(A2),      .Aout(A3),          .round(round2));
+    PermuteFunction_oneRound PermuteFunction_oneRound_u3(.Ain(A3),      .Aout(Aout),  .round(round3));
+
+endmodule

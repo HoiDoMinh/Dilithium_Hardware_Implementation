@@ -1,0 +1,210 @@
+
+module keccak_absorb #(
+    parameter in_len = 32
+) (
+    input clock,
+    input reset,
+    input start,
+    input [1599:0] s_in,
+    input [31:0] pos,
+    input [31:0] r,
+    input [in_len * 8 - 1:0] in,
+    input [63:0] inlen,
+    output [1599:0] s_out,
+    output reg [31:0] i,
+    output reg done
+);
+
+  wire [7:0] in_t[0:in_len - 1];
+  wire [63:0] sin_t[0:24];
+  wire [63:0] s_permute_t[0:24];
+  reg [63:0] s[0:24];
+
+  wire [1599:0] s_permute;
+
+  reg [63:0] inlen_reg;
+  reg [31:0] pos_reg;
+  reg start_permute;
+  wire done_permute;
+
+  generate
+    genvar x;
+    for (x = 0; x < 25; x = x + 1) begin
+      assign sin_t[x] = s_in[64*x+63:64*x];
+      assign s_permute_t[x] = s_permute[64*x+63:64*x];
+    end
+  endgenerate
+
+  generate
+    for (x = 0; x < in_len; x = x + 1) begin
+      assign in_t[x] = in[8*x+7:8*x];
+    end
+  endgenerate
+
+  generate
+    for (x = 0; x < 25; x = x + 1) begin
+      assign s_out[64*x+63:64*x] = s[x];
+    end
+  endgenerate
+
+  KeccakF1600_StatePermute KeccakF1600_StatePermute (
+      .Ain  (s_out),
+      .Aout (s_permute),
+      .clk  (clock),
+      .reset(reset),
+      .start(start_permute),
+      .done (done_permute)
+  );
+
+  reg [8:0] index;
+  reg [5:0] in_index;
+
+  localparam SIZE = 4;
+  localparam IDLE = 4'd0, PRE_RD_INP = 4'd1, RD_INP = 4'd2;
+
+  reg [SIZE-1:0] state;
+  reg [SIZE-1:0] next_state;
+  //fsm change state
+  always @(posedge clock) begin
+    if (reset == 1'b1) begin
+      state <= IDLE;
+    end else begin
+      state <= next_state;
+    end
+  end
+
+  always @(*) begin
+    case (state)
+      IDLE: begin
+        done = 0;
+        start_permute = 0;
+        next_state = PRE_RD_INP;
+      end
+      PRE_RD_INP: begin
+        done = 0;
+        start_permute = 0;
+        if (start == 1'b1) begin
+          next_state = RD_INP;
+        end else begin
+          next_state = PRE_RD_INP;
+        end
+      end
+      RD_INP: begin
+        done = 0;
+        start_permute = 0;
+        next_state = 3;
+      end
+      3: begin
+        done = 0;
+        start_permute = 0;
+        next_state = 4;
+      end
+      4: begin
+        done = 0;
+        start_permute = 0;
+        if (index < 25) next_state = 3;
+        else next_state = 5;
+      end
+      5: begin
+        done = 0;
+        start_permute = 0;
+        if (pos_reg + inlen_reg >= r) next_state = 6;
+        else next_state = 10;
+      end
+      6: begin
+        done = 0;
+        start_permute = 0;
+        if (index < r) next_state = 6;
+        else next_state = 7;
+      end
+      7: begin
+        done = 0;
+        start_permute = 1;
+        next_state = 8;
+      end
+      8: begin
+        done = 0;
+        start_permute = 1;
+        if (done_permute) begin
+          next_state = 9;
+        end else begin
+          next_state = 8;
+        end
+      end
+      9: begin
+        done = 0;
+        start_permute = 0;
+        next_state = 10;
+      end
+      10: begin
+        done = 0;
+        next_state = 11;
+        start_permute = 0;
+      end
+      11: begin
+        done = 0;
+        start_permute = 0;
+        if (index < pos_reg + inlen) next_state = 10;
+        else next_state = 12;
+      end
+      12: begin
+        done = 1;
+        start_permute = 0;
+        if (~start) next_state = 0;
+        else next_state = 12;
+      end
+    endcase
+  end
+
+  always @(posedge clock) begin
+    case (state)
+      RD_INP: begin
+        index <= 0;
+        in_index <= 0;
+      end
+      3: begin
+        s[index] <= sin_t[index];
+        index <= index + 1;
+      end
+      4: begin
+        if (~(index < 25)) begin
+          inlen_reg <= inlen;
+          pos_reg   <= pos;
+        end
+      end
+      5: begin
+        index <= pos_reg;
+        in_index <= 0;
+      end
+      6:
+      if (index < r) begin
+        s[index/8] <= s[index/8] ^ (in_t[in_index] << (8 * (index % 8)));
+        index <= index + 1;
+        in_index <= in_index + 1;
+      end
+      7: begin
+        inlen_reg <= inlen_reg - (r - pos_reg);
+        index <= 0;
+      end
+      8:
+      if (done_permute) begin
+        s[index] <= s_permute_t[index];
+        index <= index + 1;
+      end
+      9:
+      if (~(index < 25)) begin
+        pos_reg <= 0;
+        index   <= 0;
+      end
+      10: begin
+        s[index/8] <= s[index/8] ^ (in_t[in_index] << (8 * (index % 8)));
+        index <= index + 1;
+        in_index <= in_index + 1;
+      end
+      11: begin
+        if (~(index < pos_reg + inlen)) i <= index;
+      end
+    endcase
+  end
+
+endmodule

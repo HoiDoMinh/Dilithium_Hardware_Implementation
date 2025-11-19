@@ -1,0 +1,105 @@
+`timescale 1ns / 1ps
+module tb_SHAKE_256;
+    
+    // Signals
+    reg clock, reset, start;
+    reg [255:0] seed_in;
+    wire [1023:0] data_out;
+    wire done;
+    
+    // Instantiate DUT
+    SHAKE_256 uut (
+        .clock(clock),
+        .reset(reset),
+        .start(start),
+        .seed_in(seed_in),
+        .data_out(data_out),
+        .done(done)
+    );
+    
+    // Clock generation: 10ns period (100MHz)
+    always #5 clock = ~clock;
+    
+    // Task  reset module
+    task reset_module;
+        begin
+            reset = 1;
+            start = 0;
+            #20;
+            rst_n = 0;
+            #20;
+        end
+    endtask
+    
+    // Task run test
+    task run_test;
+        input [255:0] test_seed;
+        input [8*50:1] test_name;
+        begin
+            $display("\n=== %s ===", test_name);
+            $display("Input seed = %h", test_seed);
+            
+            // Reset tr??c m?i test
+            reset_module();
+            
+            // Load seed và start
+            seed_in = test_seed;
+            #10;
+            start = 1; 
+            #10; 
+            start = 0;
+            
+            // ??i done
+            wait(done == 1'b1);
+            #10; 
+            
+            // In k?t qu?
+            $display("Output = %h", data_out);
+            $display("  K     = %h", data_out[1023:768]);
+            $display("  rho'  = %h", data_out[767:256]);
+            $display("  rho   = %h", data_out[255:0]);
+            
+            #50;
+        end
+    endtask
+    
+    // Test sequence
+    initial begin
+        // Initialize
+        clock = 0; 
+        reset = 1; 
+        start = 0; 
+        seed_in = 0;
+        
+        // Initial reset
+        #20; 
+        reset = 0;
+        #30;
+        // Run all tests
+        run_test(256'h0, "Test 1:");
+        
+        run_test(256'hFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF, 
+                 "Test 2: All Ones");
+        
+        run_test({32{8'hAA}}, "Test 3:");
+        
+        run_test(256'h0102030405060708090A0B0C0D0E0F101112131415161718191A1B1C1D1E1F20, 
+                 "Test 4:");
+        
+        run_test(256'h123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0,
+                 "Test 5:");
+        
+        run_test(256'h5555555555555555555555555555555555555555555555555555555555555555,
+                 "Test 6:");
+        $display("\n All Tests Completed \n");
+        $finish;
+    end
+    
+    // Timeout watchdog
+    initial begin
+        #500000; 
+        $display("\n[ERROR] Timeout!");
+        $finish;
+    end
+  
+endmodule

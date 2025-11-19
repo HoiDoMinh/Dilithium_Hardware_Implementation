@@ -1,0 +1,37 @@
+
+module randombytes #(
+    parameter IN_LEN = 32   // (32 bytes = 256 bits)
+)(
+    input  logic clk,
+    input  logic rst_n,
+    input  logic start,
+    output logic [IN_LEN*8-1:0] zeta_out,
+    output logic random_done
+);
+
+    // B? sinh pseudo-random (s? d?ng Linear Feedback Shift Register - LFSR)
+    logic [7:0] lfsr;
+    integer i;
+
+    always_ff @(posedge clk or negedge rst_n) begin
+        if(!rst_n) begin
+            zeta_out    <= '0;
+            random_done <= 0;
+            lfsr        <= 8'hA5;
+        end 
+        else begin
+            if(start) begin
+                for(i = 0; i < IN_LEN; i = i + 1) begin
+                    // LFSR 8-bit feedback t?o s? gi? ng?u nhiên
+                    lfsr <= {lfsr[6:0], lfsr[7] ^ lfsr[5] ^ lfsr[4] ^ lfsr[3]};
+                    zeta_out[i*8 +: 8] <= lfsr;
+                end
+                random_done <= 1;
+            end 
+            else begin
+                random_done <= 0;
+            end
+        end
+    end
+
+endmodule

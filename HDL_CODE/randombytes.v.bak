@@ -1,0 +1,6 @@
+module randombytes #(parameter in_len = 32)(
+    output [in_len * 8 - 1:0] random_out
+    );
+    
+    assign random_out = 256'h73a815baac24edde55e84e1a1eb85b3214368c4eeefff21fe1cb25eb7067941f;
+endmodule

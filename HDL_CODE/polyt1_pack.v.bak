@@ -1,0 +1,29 @@
+
+module polyt1_pack(
+    input  [8191:0] a_in,   // 256 coeff × 32 bit 
+    output [2559:0] r_out
+    );
+
+    localparam N = 256;
+
+    generate
+        genvar i;
+        for (i = 0; i < N/4; i = i + 1) begin : pack_loop
+            
+            // lay 4 coeff 10-bit
+            wire [9:0] a0 = a_in[32*(4*i)   + 9 : 32*(4*i)];
+            wire [9:0] a1 = a_in[32*(4*i+1) + 9 : 32*(4*i+1)];
+            wire [9:0] a2 = a_in[32*(4*i+2) + 9 : 32*(4*i+2)];
+            wire [9:0] a3 = a_in[32*(4*i+3) + 9 : 32*(4*i+3)];
+
+            // xuat 5 byte
+            assign r_out[8*(5*i+0) + 7 : 8*(5*i+0)] =  a0[7:0];
+            assign r_out[8*(5*i+1) + 7 : 8*(5*i+1)] = (a0 >> 8) | (a1 << 2);
+            assign r_out[8*(5*i+2) + 7 : 8*(5*i+2)] = (a1 >> 6) | (a2 << 4);
+            assign r_out[8*(5*i+3) + 7 : 8*(5*i+3)] = (a2 >> 4) | (a3 << 6);
+            assign r_out[8*(5*i+4) + 7 : 8*(5*i+4)] =  a3 >> 2;
+
+        end
+    endgenerate
+
+endmodule

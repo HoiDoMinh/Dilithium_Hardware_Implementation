@@ -1,0 +1,65 @@
+#if 0
+#include <stdio.h>
+#include <stdint.h>
+#include <string.h>
+#include "params.h"
+#include "poly.h"
+
+//in seed dưới dạng hex
+void print_seed_hex(const uint8_t seed[SEEDBYTES]) {
+    printf("seed_in = ");
+    for (int i = SEEDBYTES - 1; i >= 0; i--) {
+        printf("%02x", seed[i]);
+    }
+    printf("\n");
+}
+
+//in polynomial dưới dạng hex (Verilog output)
+void print_poly_hex(const poly *a) {
+    printf("a_out = \n");
+    int count = 0;
+    for (int i = N-1; i >= 0; i--) {
+        uint32_t coeff = (uint32_t)a->coeffs[i];
+        printf("%08x", coeff);
+
+        count++;
+
+        if (count % 16 == 0) {
+            printf("\n");
+        }
+    }
+    if (count % 16 != 0) {
+        printf("\n");
+    }
+    printf("\n");
+}
+void hex_string_to_bytes(const char *hex_str, uint8_t *bytes, size_t byte_len) {
+    for (size_t i = 0; i < byte_len; i++) {
+        sscanf(hex_str + 2*i, "%2hhx", &bytes[i]);
+    }
+}
+int main(void) {
+    poly a;
+    uint8_t seed[SEEDBYTES];
+    uint16_t nonce;
+
+    memset(seed, 0, SEEDBYTES);
+    const char*seed_hex = "0102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f20";
+    hex_string_to_bytes(seed_hex, seed, 32);
+    // Các byte còn lại = 0
+
+    nonce = 0x36;
+
+    print_seed_hex(seed);
+    printf("nonce = %04x\n", nonce);
+    // Gọi hàm poly_uniform
+    poly_uniform(&a, seed, nonce);
+
+    // In kết quả
+    print_poly_hex(&a);
+    for (int i = 0; i < 10; i++) {
+        printf("a[%3d] = %8d (0x%08x)\n", i, a.coeffs[i], (uint32_t)a.coeffs[i]);
+    }
+    return 0;
+}
+#endif

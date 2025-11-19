@@ -1,0 +1,86 @@
+
+
+module KeccakF1600_StatePermute (
+    Ain,
+    Aout,
+    clk,
+    reset,
+    start,
+    done
+);
+
+  input [1599:0] Ain;
+  output [1599:0] Aout;
+  input clk, reset, start;
+  output reg done;
+
+  reg [1599:0] regA;
+  reg [2:0] round;
+
+  localparam SIZE = 3;
+  localparam IDLE = 3'd0, PRE_RD_INP = 3'd1, RD_INP = 3'd2;
+
+  reg [SIZE-1:0] state;
+  reg [SIZE-1:0] next_state = IDLE;
+  //fsm change state
+  always @(posedge clk) begin
+    begin
+      if (reset) state <= IDLE;
+      else state <= next_state;
+    end
+  end
+
+  always @(*) begin
+    case (state)
+      IDLE: begin
+        done = 0;
+        next_state = PRE_RD_INP;
+      end
+      PRE_RD_INP: begin
+        done = 0;
+        if (start == 1'b1) begin
+          next_state = RD_INP;
+        end else begin
+          next_state = PRE_RD_INP;
+        end
+      end
+      RD_INP: begin
+        done = 0;
+        next_state = 3;
+      end
+      3:
+      if (round < 3'b101) begin
+        next_state = 3;
+      end else next_state = 4;
+      4: begin
+        done = 1;
+        if (~start) next_state = 0;
+        else next_state = 4;
+      end
+    endcase
+  end
+
+  always @(posedge clk) begin
+    case (state)
+      RD_INP: begin
+        regA  <= Ain;
+        round <= 3'b0;
+      end
+      3:
+      if (round < 3'b101) begin
+        regA  <= Aout;
+        round <= round + 1;
+      end
+      4: begin
+
+      end
+    endcase
+  end
+
+  PermuteFunc_FourRound PermuteFunc_FourRound_u0 (
+      .Ain  (regA),
+      .Aout (Aout),
+      .round(round)
+  );
+
+endmodule

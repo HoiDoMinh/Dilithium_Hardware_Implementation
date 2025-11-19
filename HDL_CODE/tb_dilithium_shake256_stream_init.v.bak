@@ -1,0 +1,48 @@
+
+`timescale 1ns/1ps
+module tb_dilithium_shake256_stream_init;
+    reg clock;
+    reg rtr;
+    reg reset;
+    reg [511:0] linear_seed;
+    reg [15:0] nonce;
+    wire [1599:0] linear_state_s;
+    wire [31:0] state_pos;
+    wire rts;
+
+dilithium_shake256_stream_init dut(
+    .clock(clock),
+    .rtr(rtr),
+    .reset(reset),
+    .linear_seed(linear_seed),
+    .nonce(nonce),
+    .linear_state_s(linear_state_s),
+    .state_pos(state_pos),
+    .rts(rts)
+);
+#always #5 clock = ~clock;
+initial begin
+clock =0;reset=1;rtr=0;
+linear_seed = 512'h   ;
+#20;reset=0;
+#20;rtr=1;
+wait(rts==1);
+$display("linear_seed= ",linear_seed);
+
+
+
+
+
+
+
+
+
+#200;$finish;
+
+
+
+
+
+end
+    
+endmodule

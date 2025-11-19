@@ -1,0 +1,80 @@
+`timescale 1ns / 1ps
+
+module tb_montgomery_reduce_32bit;
+
+    reg clock;
+    reg reset;
+    reg start;
+    reg signed [63:0] a;
+    wire done;
+    wire signed [31:0] t;
+
+    montgomery_reduce_32bit dut (
+        .clock(clock),
+        .reset(reset),
+        .start(start),
+        .a(a),
+        .done(done),
+        .t(t)
+    );
+    
+    initial clock = 0;
+    always #5 clock = ~clock;
+    
+    // Task 
+    task run_test;
+        input signed [63:0] test_value;
+        begin
+            reset = 1;
+            start = 0;
+            a = 0;
+            #20;  
+            
+            reset = 0;
+            #10;  
+            
+            a = test_value;
+            start = 1;
+            #10; 
+            start = 0;  
+            
+            // Ch? k?t qu? (RTS = 1)
+            wait(done == 1);
+            #1;
+            $display("a=%20d -> t=%11d ", test_value, t);
+            
+            #20;  
+        end
+    endtask
+    
+
+    initial begin
+        reset = 1;
+        start = 0;
+        a = 0;
+        #30;
+        reset = 0;
+        #10;
+        
+        // Ch?y các test case
+	run_test(64'd0); 
+	run_test(64'd1); 
+        run_test(-64'sd1);                           
+        run_test(64'd9223372036854775807);           
+        run_test(-64'sd9223372036854775808);         
+        run_test(64'd2147483647);                    
+        run_test(-64'sd2147483648);                
+	run_test(64'd8589934592);  
+	run_test(-64'sd8589934592);  
+	run_test(64'd123456789);  
+	run_test(-64'sd123456789);            
+        run_test(64'd4294967296);   
+	run_test(64'd4294967295);  
+	run_test(-64'sd4294967295);   
+	                   
+        #50;
+        $finish;
+    end
+    
+    
+endmodule

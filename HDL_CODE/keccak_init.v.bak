@@ -1,0 +1,16 @@
+
+module keccak_init(
+    output [1599:0] s
+    );
+    
+    wire [63:0] s_temp [0:24];
+    
+    generate
+        genvar x;
+		for (x = 0; x < 25; x = x + 1) begin
+		    assign s_temp[x] = 0;
+		    assign s[64 * x + 63:64 * x] = s_temp[x];
+		end
+	endgenerate
+	
+endmodule

@@ -1,0 +1,294 @@
+
+module crypto_sign_keypair (
+    input clock,
+    input reset,
+    input start_keygen,
+    output done_keygen,
+    output [15615:0] pk,   //public key (1952 bytes ? 1952*8 = 15616 bit)
+    output [32255:0] sk    //secret key (4032 bytes ? 4032*8 = 32256 bit)
+);
+
+  localparam K = 6;
+  localparam L = 5;
+
+  wire [271:0] randombytes_temp;  //34byte
+  wire [1023:0] seedbuf_shaked;
+
+  wire [255:0] rho_temp;
+  wire [511:0] rhoprime_temp;
+  wire [255:0] key_temp;
+  wire [511:0] tr_temp;
+
+  wire signed [65535:0] mat1_temp;
+  wire signed [65535:0] mat2_temp;
+  wire signed [65535:0] mat3_temp;
+  wire signed [49151:0] mat4_temp;
+
+  wire [15:0] nonce_polyvecl_uniform_eta = 0;
+  wire [15:0] nonce_polyveck_uniform_eta = L;
+
+  wire signed [40959:0] s1_temp;
+  wire signed [49151:0] s2_temp;
+  wire signed [40959:0] s1hat;
+
+  //done signal
+  wire done_shake_1;
+  wire done_shake_2;
+
+  wire done_polyvecl_uniform_eta;
+  wire done_polyveck_uniform_eta;
+
+  wire done_polyvec_matrix_expand;
+  wire done_polyvecl_ntt;
+  wire done_polyvec_matrix_pointwise_montgomery;
+  wire done_polyveck_invntt;
+
+  wire signed [49151:0] t1;
+  wire signed [49151:0] t1_reduced;
+  wire signed [49151:0] t1_invntt;
+  wire signed [49151:0] t1_added;
+  wire signed [49151:0] t1_caddqed;
+  wire signed [49151:0] t0;
+  wire signed [49151:0] t1_power2round;
+
+
+  assign done_keygen = done_shake_2;  // block cuoi cung
+  //randombytes #(.in_len(32)) randombytes (.random_out(randombytes_temp[255:0]));
+  //assign randombytes_temp[255:0] = 256'h6cb904fd193372ca57ec0a8164f83d49ee17db2c908a6fb2415dc80377af129e;
+  //assign randombytes_temp[255:0] = 256'h3cf04f5a8e187122cd0b5099aa332f7d906c01fe1144d9a30e551988ccf37a12;
+  //assign randombytes_temp[255:0] = 256'hbc9a78563412ffeeddccbbaafedcba9876543210efcdab8967452301efbeadde;
+  //assign randombytes_temp[255:0] = 256'h78695a4b3c2d1e0f1032547698badcfeffeeddccbbaa99887766554433221100; 
+  assign randombytes_temp[255:0] = 256'h00f187396a5c4d2f117e99c0bba956103cde89f4023064770dacee914217b35e;
+  assign randombytes_temp[263:256] = K;  // Byte 32
+  assign randombytes_temp[271:264] = L;  // Byte 33
+
+  localparam outlen_shake_1 = 1023;
+  localparam len_shake_1 = 272;
+
+
+  SHAKE256 #(
+      .r(1088),
+      .c(512),
+      .outlen(outlen_shake_1),
+      .len(len_shake_1)
+  ) shake256_1 (
+      .in(randombytes_temp),
+      .reset(reset),
+      .clk(clock),
+      .SHAKEout(seedbuf_shaked),
+      .start(start_keygen),
+      .done(done_shake_1)
+  );
+
+  wire [1023:0] seedbuf_shaked_inverse; //dao nguoc 128 bytes
+
+  generate
+    genvar x;
+    for (x = 0; x < 128; x = x + 1) begin
+      assign seedbuf_shaked_inverse[8 * x + 7:8 * x] = seedbuf_shaked[8 * (127 - x) + 7:8 * (127 - x)];
+    end
+  endgenerate
+
+  assign rho_temp = seedbuf_shaked_inverse[255:0];
+  assign rhoprime_temp = seedbuf_shaked_inverse[767:256];
+  assign key_temp = seedbuf_shaked_inverse[1023:768];
+
+  // expand matrix A tu rho
+  polyvec_matrix_expand polyvec_matrix_expand (
+      .clock (clock),
+      .reset (reset),
+      .start (done_shake_1),
+      .rho_in(rho_temp),
+      .mat1  (mat1_temp),
+      .mat2  (mat2_temp),
+      .mat3  (mat3_temp),
+      .mat4  (mat4_temp),
+      .done  (done_polyvec_matrix_expand)
+  );
+  //sinh s1 tu rhoprime
+  polyvecl_uniform_eta polyvecl_uniform_eta (
+      .clock(clock),
+      .reset(reset),
+      .start(done_shake_1),
+      .nonce(nonce_polyvecl_uniform_eta),
+      .seed (rhoprime_temp),
+      .v_out(s1_temp),
+      .done (done_polyvecl_uniform_eta)
+  );
+ //sinh s2 tu rhoprime
+  polyveck_uniform_eta polyveck_uniform_eta (
+      .clock(clock),
+      .reset(reset),
+      .start(done_shake_1),
+      .nonce(nonce_polyveck_uniform_eta),
+      .seed (rhoprime_temp),
+      .v_out(s2_temp),
+      .done (done_polyveck_uniform_eta)
+  );
+
+  wire [40959:0] s1_inverse;
+  //b[0] = a[255]  ,b[1] = a[254],s...
+  generate
+    genvar y;
+    for (x = 0; x < L; x = x + 1) begin
+      for (y = 0; y < 256; y = y + 1) begin
+        assign s1_inverse[8192 * x + 32 * y + 31:8192 * x + 32 * y] = s1_temp[8192 * x + 32 * (255 - y) + 31:8192 * x + 32 * (255 - y)];
+      end  
+    end
+  endgenerate
+
+  polyvecl_ntt polyvecl_ntt (
+      .clock(clock),
+      .reset(reset),
+      .start(done_polyvecl_uniform_eta),
+      .v_in (s1_inverse),
+      .v_out(s1hat),
+      .done (done_polyvecl_ntt)
+  );
+
+  wire [40959:0] s1hat_inverse;
+
+  generate
+    for (x = 0; x < L; x = x + 1) begin
+      for (y = 0; y < 256; y = y + 1) begin
+        assign s1hat_inverse[8192 * x + 32 * y + 31:8192 * x + 32 * y] = s1hat[8192 * x + 32 * (255 - y) + 31:8192 * x + 32 * (255 - y)];
+      end
+    end
+  endgenerate
+  // t1 = matrix A * vector s1 (NTT)
+  polyvec_matrix_pointwise_montgomery polyvec_matrix_pointwise_montgomery (
+      .clock(clock),
+      .reset(reset),
+      .start(done_polyvecl_uniform_eta & done_polyvec_matrix_expand),
+      .v_in (s1hat_inverse),
+      .mat1 (mat1_temp),
+      .mat2 (mat2_temp),
+      .mat3 (mat3_temp),
+      .mat4 (mat4_temp),
+      .t_out(t1),
+      .done (done_polyvec_matrix_pointwise_montgomery)
+  );
+  //reduce A*s1
+  polyveck_reduce polyveck_reduce (
+      .v_in (t1),
+      .v_out(t1_reduced)
+  );
+
+  wire [49151:0] t1_reduced_inverse;
+
+  generate
+    for (x = 0; x < K; x = x + 1) begin
+      for (y = 0; y < 256; y = y + 1) begin
+        assign t1_reduced_inverse[8192 * x + 32 * y + 31:8192 * x + 32 * y] = t1_reduced[8192 * x + 32 * (255 - y) + 31:8192 * x + 32 * (255 - y)];
+      end
+    end
+  endgenerate
+  //inv NTT (A*s1) t1<=a*s1;
+  polyveck_invntt_tomont polyveck_invntt_tomont (
+      .clock(clock),
+      .reset(reset),
+      .start(done_polyvec_matrix_pointwise_montgomery),
+      .v_in (t1_reduced_inverse),
+      .v_out(t1_invntt),
+      .done (done_polyveck_invntt)
+  );
+
+  wire [49151:0] t1_invntt_inverse;
+
+  generate
+    for (x = 0; x < K; x = x + 1) begin
+      for (y = 0; y < 256; y = y + 1) begin
+        assign t1_invntt_inverse[8192 * x + 32 * y + 31:8192 * x + 32 * y] = t1_invntt[8192 * x + 32 * (255 - y) + 31:8192 * x + 32 * (255 - y)];
+      end
+    end
+  endgenerate
+  //t<=t+s2; (t1=A*s1+s2)
+  polyveck_add polyveck_add (
+      .v_in (t1_invntt_inverse),
+      .u_in (s2_temp),
+      .w_out(t1_added)
+  );
+
+  polyveck_caddq polyveck_caddq (
+      .v_in (t1_added),
+      .v_out(t1_caddqed)
+  );
+  //power2round t1 =  (t1,t0)
+  polyveck_power2round polyveck_power2round (
+      .v_in  (t1_caddqed),
+      .v0_out(t0),
+      .v1_out(t1_power2round)
+  );
+  //pack_pk(pk, rho, &t1);
+  pack_pk pack_pk (
+      .rho_in(rho_temp),
+      .t1_in (t1_power2round),
+      .pk_out(pk)
+  );
+  //tr = H(rho,t1)
+  localparam outlen_shake_2 = 511;
+  localparam len_shake_2 = 15616;
+
+  SHAKE256 #(
+      .r(1088),
+      .c(512),
+      .outlen(outlen_shake_2),
+      .len(len_shake_2)
+  ) shake256_2 (
+      .in(pk),
+      .reset(reset),
+      .clk(clock),
+      .start(done_polyveck_invntt),
+      .SHAKEout(tr_temp),
+      .done(done_shake_2)
+  );
+  wire [511:0] tr_inversed;
+  generate
+    for (x = 0; x < 64; x = x + 1) begin
+      assign tr_inversed[8*x+7:8*x] = tr_temp[8*(63-x)+7:8*(63-x)];
+    end
+  endgenerate
+  //pack_sk(sk, rho, tr, key, &t0, &s1, &s2);
+  pack_sk pack_sk (
+      .rho_in(rho_temp),
+      .key_in(key_temp),
+      .tr_in (tr_inversed),
+      .t0_in (t0),
+      .s1_in (s1_temp),
+      .s2_in (s2_temp),
+      .sk_out(sk)
+  );
+
+  localparam SIZE = 3;
+  localparam IDLE = 3'd0, PRE_RD_INP = 3'd1, RD_INP = 3'd2;
+
+  reg [SIZE-1:0] state;
+  reg [SIZE-1:0] next_state;
+
+  always @(posedge clock) begin
+    if (reset == 1'b1) begin
+      state <= IDLE;
+    end else begin
+      state <= next_state;
+    end
+  end
+
+  always @(*) begin
+    case (state)
+      IDLE: begin
+        next_state = PRE_RD_INP;
+      end
+      PRE_RD_INP: begin
+        if (start_keygen == 1'b1) begin
+          next_state = RD_INP;
+        end else begin
+          next_state = PRE_RD_INP;
+        end
+      end
+      RD_INP: begin
+      end
+    endcase
+  end
+
+endmodule
+

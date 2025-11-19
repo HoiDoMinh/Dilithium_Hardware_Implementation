@@ -1,0 +1,95 @@
+#if 0
+#include <stdio.h>
+#include <stdint.h>
+#include <string.h>
+#include "sign.h"
+#include "params.h"
+#include "packing.h"
+#include "polyvec.h"
+#include "poly.h"
+#include "randombytes.h"
+#include "fips202.h"
+
+void print_bytes_hex(const char *label, const void *buf, size_t len) {
+    const uint8_t *bytes = buf;
+    printf("%s (hex)\n", label);
+    for (size_t i = 0; i < len; i++) {
+        printf("%02x ", bytes[i]);
+        if ((i % 52) == 51) printf("\n");
+    }
+    printf("\n");
+}
+
+void print_verilog_input_hex(const char *name, const uint8_t *buf, size_t len) {
+    printf("%s[%zu:0] = %zu'h", name, len*8 - 1, len*8);
+    for (ssize_t i = len - 1; i >= 0; i--) {
+        printf("%02x", buf[i]);
+    }
+    printf(";\n");
+}
+void print_bytes_hex_inverse(const char *label, const void *buf, size_t len) {
+    const uint8_t *bytes = buf;
+    printf("%s (hex)\n", label);
+    for (ssize_t i = (ssize_t)len - 1; i >= 0; i--) {
+        printf("%02x ", bytes[i]);
+        if ((i % 52) == 51) printf("\n");
+    }
+    printf("\n");
+}
+
+int main(void) {
+	uint8_t seedbuf[2*SEEDBYTES + CRHBYTES];
+	const uint8_t *rho, *rhoprime, *key;
+    /*uint8_t input_seed[SEEDBYTES+1] = {
+        0x9e, 0x12, 0xaf, 0x77, 0x03, 0xc8, 0x5d, 0x41,
+        0xb2, 0x6f, 0x8a, 0x90, 0x2c, 0xdb, 0x17, 0xee,
+        0x49, 0x3d, 0xf8, 0x64, 0x81, 0x0a, 0xec, 0x57,
+        0xca, 0x72, 0x33, 0x19, 0xfd, 0x04, 0xb9, 0x6c
+    };
+    uint8_t input_seed[SEEDBYTES] = {
+        0x12, 0x7a, 0xf3, 0xcc, 0x88, 0x19, 0x55, 0x0e,
+        0xa3, 0xd9, 0x44, 0x11, 0xfe, 0x01, 0x6c, 0x90,
+        0x7d, 0x2f, 0x33, 0xaa, 0x99, 0x50, 0x0b, 0xcd,
+        0x22, 0x71, 0x18, 0x8e, 0x5a, 0x4f, 0xf0, 0x3c
+    };
+    uint8_t input_seed[SEEDBYTES] = {
+        0xde, 0xad, 0xbe, 0xef, 0x01, 0x23, 0x45, 0x67,
+        0x89, 0xab, 0xcd, 0xef, 0x10, 0x32, 0x54, 0x76,
+        0x98, 0xba, 0xdc, 0xfe, 0xaa, 0xbb, 0xcc, 0xdd,
+        0xee, 0xff, 0x12, 0x34, 0x56, 0x78, 0x9a, 0xbc
+    };
+    uint8_t input_seed[SEEDBYTES] = {
+        0x00, 0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77,
+        0x88, 0x99, 0xaa, 0xbb, 0xcc, 0xdd, 0xee, 0xff,
+        0xfe, 0xdc, 0xba, 0x98, 0x76, 0x54, 0x32, 0x10,
+        0x0f, 0x1e, 0x2d, 0x3c, 0x4b, 0x5a, 0x69, 0x78
+    };*/
+    uint8_t input_seed[SEEDBYTES] = {
+        0x5e, 0xb3, 0x17, 0x42, 0x91, 0xee, 0xac, 0x0d,
+        0x77, 0x64, 0x30, 0x02, 0xf4, 0x89, 0xde, 0x3c,
+        0x10, 0x56, 0xa9, 0xbb, 0xc0, 0x99, 0x7e, 0x11,
+        0x2f, 0x4d, 0x5c, 0x6a, 0x39, 0x87, 0xf1, 0x00
+    };
+
+    memcpy(seedbuf, input_seed, SEEDBYTES);
+    seedbuf[SEEDBYTES]   = K;
+    seedbuf[SEEDBYTES+1] = L;
+
+    /* Print initial random seed (32 bytes) */
+    print_bytes_hex("Random Seed", seedbuf, SEEDBYTES+2);
+    print_verilog_input_hex("Random Seed",seedbuf,SEEDBYTES+2);
+
+    shake256(seedbuf, 2*SEEDBYTES + CRHBYTES, seedbuf, SEEDBYTES+2);
+
+    print_bytes_hex("Seed after SHAKE256", seedbuf, sizeof(seedbuf));
+    rho = seedbuf;
+    rhoprime = rho + SEEDBYTES;
+    key = rhoprime + CRHBYTES;
+
+    /* Print rho, rhoprime, key */
+    print_bytes_hex("rho", rho, SEEDBYTES);
+    print_bytes_hex("rhoprime", rhoprime, CRHBYTES);
+    print_bytes_hex("key", key, SEEDBYTES);
+    return 0;
+}
+#endif

@@ -1,0 +1,15 @@
+
+module freeze(
+	input signed [31:0] a,
+	output signed [31:0] a_out
+);
+wire signed [31:0] a_t,a_reduced;
+assign a_t = a;
+reduce32 reduce32(
+	.a(a_t),.t(a_reduced)
+);
+caddq caddq(
+	.a(a_reduced),.a_out(a_out)
+
+);
+endmodule 

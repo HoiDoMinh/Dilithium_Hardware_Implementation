@@ -1,0 +1,58 @@
+
+module keccak_round_function (
+    input  wire [1599:0] state_in,
+    input  wire [4:0] round_index,
+    output wire [1599:0] state_out
+);
+
+    // Intermediate states
+    wire [1599:0] after_theta;
+    wire [1599:0] after_rho_pi;
+    wire [1599:0] after_xi_iota;
+    
+    // Round constants (RC) for each round
+    wire [63:0] round_constants [0:23];
+    
+    assign round_constants[0]  = 64'h0000000000000001;
+    assign round_constants[1]  = 64'h0000000000008082;
+    assign round_constants[2]  = 64'h800000000000808A;
+    assign round_constants[3]  = 64'h8000000080008000;
+    assign round_constants[4]  = 64'h000000000000808B;
+    assign round_constants[5]  = 64'h0000000080000001;
+    assign round_constants[6]  = 64'h8000000080008081;
+    assign round_constants[7]  = 64'h8000000000008009;
+    assign round_constants[8]  = 64'h000000000000008A;
+    assign round_constants[9]  = 64'h0000000000000088;
+    assign round_constants[10] = 64'h0000000080008009;
+    assign round_constants[11] = 64'h000000008000000A;
+    assign round_constants[12] = 64'h000000008000808B;
+    assign round_constants[13] = 64'h800000000000008B;
+    assign round_constants[14] = 64'h8000000000008089;
+    assign round_constants[15] = 64'h8000000000008003;
+    assign round_constants[16] = 64'h8000000000008002;
+    assign round_constants[17] = 64'h8000000000000080;
+    assign round_constants[18] = 64'h000000000000800A;
+    assign round_constants[19] = 64'h800000008000000A;
+    assign round_constants[20] = 64'h8000000080008081;
+    assign round_constants[21] = 64'h8000000000008080;
+    assign round_constants[22] = 64'h0000000080000001;
+    assign round_constants[23] = 64'h8000000080008008;
+    
+    Theta theta_inst (
+        .Ain(state_in),
+        .Aout(after_theta)
+    );
+    RhoAndPi rho_pi_inst (
+        .Ain(after_theta),
+        .Bout(after_rho_pi)
+    );
+    
+    XiIota xi_iota_inst (
+        .Bin(after_rho_pi),
+        .Aout(after_xi_iota),
+        .RC(round_constants[round_index])
+    );
+    
+    assign state_out = after_xi_iota;
+
+endmodule

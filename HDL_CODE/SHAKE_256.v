@@ -1,0 +1,120 @@
+module SHAKE_256 #(
+    parameter INPUT_LEN = 256,    
+    parameter OUTPUT_LEN = 1024   
+)(
+    input  wire clock,
+    input  wire reset,
+    input  wire start,
+    input  wire [INPUT_LEN-1:0] seed_in,
+    output reg  [OUTPUT_LEN-1:0] data_out,
+    output reg  done
+);
+    //Keccak parameters
+    localparam RATE_BITS  = 1088;
+    localparam STATE_BITS = 1600;
+    localparam NUM_ROUNDS = 24;
+    
+    //FSM states
+    localparam IDLE = 0, INIT = 1, ABSORB = 2, PERMUTE = 3, SQUEEZE = 4, DONE_ST = 5;
+    reg [3:0] state;
+    
+    reg [STATE_BITS-1:0] keccak_state;
+    wire [STATE_BITS-1:0] keccak_state_permuted;
+    reg [4:0] round_counter;
+    reg [10:0] output_bits_count;
+    reg [OUTPUT_LEN-1:0] output_buffer;
+    reg [RATE_BITS-1:0] padded_input;
+    
+    integer i;
+    
+    // input padding
+    always @(*) begin
+        padded_input = {RATE_BITS{1'b0}};
+        
+        // Byte swap input: convert big-endian to little-endian
+        for (i = 0; i < INPUT_LEN/8; i = i + 1) begin
+            padded_input[i*8 +: 8] = seed_in[(INPUT_LEN/8-1-i)*8 +: 8];
+        end
+        
+        padded_input[INPUT_LEN +: 8] = 8'h1F;    // Domain separator
+        padded_input[RATE_BITS-1] = 1'b1;        // Delimiter
+    end
+    
+    //main FSM
+    always @(posedge clock or negedge reset) begin
+        if (reset) begin
+            state <= IDLE;
+            keccak_state <= 0;
+            round_counter <= 0;
+            output_bits_count <= 0;
+            output_buffer <= 0;
+            done <= 0;
+            data_out <= 0;
+        end
+        else begin
+            case (state)
+                IDLE: begin
+                    done <= 0;
+                    output_bits_count <= 0;  
+                    if (start) state <= INIT;
+                end
+                
+                INIT: begin
+                    keccak_state <= 0;
+                    state <= ABSORB;
+                end
+                
+                ABSORB: begin
+                    keccak_state[RATE_BITS-1:0] <= keccak_state[RATE_BITS-1:0] ^ padded_input;
+                    round_counter <= 0;
+                    state <= PERMUTE;
+                end
+                
+                PERMUTE: begin
+                    if (round_counter < NUM_ROUNDS) begin
+                        keccak_state <= keccak_state_permuted;
+                        round_counter <= round_counter + 1;
+                    end else state <= SQUEEZE;
+                end
+                
+                SQUEEZE: begin
+                    if (output_bits_count < OUTPUT_LEN) begin
+                        if (output_bits_count + RATE_BITS <= OUTPUT_LEN) begin
+                            output_buffer[output_bits_count +: RATE_BITS] <= keccak_state[RATE_BITS-1:0];
+                            output_bits_count <= output_bits_count + RATE_BITS;
+                        end else begin
+                            for (i = 0; i < OUTPUT_LEN - output_bits_count; i = i + 1)
+                                output_buffer[output_bits_count + i] <= keccak_state[i];
+                            output_bits_count <= OUTPUT_LEN;
+                        end
+                        if (output_bits_count + RATE_BITS < OUTPUT_LEN) begin
+                            round_counter <= 0;
+                            state <= PERMUTE;
+                        end else state <= DONE_ST;
+                    end else state <= DONE_ST;
+                end
+                
+                DONE_ST: begin
+                    done <= 1;
+                    
+  
+                    for (i = 0; i < OUTPUT_LEN/8; i = i + 1) begin
+                        data_out[i*8 +: 8] <= output_buffer[(OUTPUT_LEN/8-1-i)*8 +: 8];
+                    end
+                    
+                    if (!start) state <= IDLE;
+                end
+                
+                default: state <= IDLE;
+            endcase
+        end
+    end
+    
+    
+    keccak_round_function keccak_round_inst (
+        .state_in(keccak_state),
+        .round_index(round_counter),
+        .state_out(keccak_state_permuted)
+    );
+    
+endmodule

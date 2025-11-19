@@ -1,0 +1,66 @@
+module tb_polyt1_pack;
+    reg  [8191:0] a_in; 
+    wire [2559:0] r_out;
+
+polyt1_pack dut(
+.a_in(a_in),   
+.r_out(r_out) 
+);
+     wire [7:0] a_in_t [1023:0];
+     wire [7:0] r_out_t [319:0];
+     generate
+		  genvar x;
+		  for (x = 0; x < 1024; x = x + 1) begin
+			  assign a_in_t[x] = a_in[8 * x + 7:8 * x];
+		  end
+     endgenerate
+
+     generate
+		 
+		  for (x = 0; x < 320; x = x + 1) begin
+			  assign r_out_t[x] = r_out[8 * x + 7:8 * x];
+		  end
+     endgenerate
+	
+    // Task
+
+    task run_test;
+        input[8191:0] test_value;
+        begin
+            $display("a=%20d -> t=%11d ", test_value, t);
+            
+            #20;  
+        end
+    endtask
+    
+
+    initial begin
+        reset = 1;
+        start = 0;
+        a = 0;
+        #30;
+        reset = 0;
+        #10;
+        
+        // Ch?y các test case
+	run_test(64'd0); 
+	run_test(64'd1); 
+        run_test(-64'sd1);                           
+        run_test(64'd9223372036854775807);           
+        run_test(-64'sd9223372036854775808);         
+        run_test(64'd2147483647);                    
+        run_test(-64'sd2147483648);                
+	run_test(64'd8589934592);  
+	run_test(-64'sd8589934592);  
+	run_test(64'd123456789);  
+	run_test(-64'sd123456789);            
+        run_test(64'd4294967296);   
+	run_test(64'd4294967295);  
+	run_test(-64'sd4294967295);   
+	                   
+        #50;
+        $finish;
+    end
+
+
+endmodule 

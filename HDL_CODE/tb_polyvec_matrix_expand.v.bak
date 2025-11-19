@@ -1,0 +1,112 @@
+`timescale 1ns / 1ps
+`include "byte_and_print.vh"
+
+module tb_polyvec_matrix_expand;
+    reg clock;
+    reg reset;
+    reg start;  
+    wire done; 
+
+    reg [255:0] rho_in;
+    integer i;
+    
+    wire signed [65535:0] mat1;
+    wire signed [65535:0] mat2;
+    wire signed [65535:0] mat3;
+    wire signed [49151:0] mat4;
+
+    polyvec_matrix_expand uut (
+        .clock(clock),
+        .reset(reset),
+        .start(start),
+        .rho_in(rho_in),
+        .mat1(mat1),
+        .mat2(mat2),
+        .mat3(mat3),
+        .mat4(mat4),
+        .done(done)
+    );
+    
+    wire [7:0] rho_in_t [0:31];  
+    wire [7:0] mat1_t [0:8191];    // 8192 bytes
+    wire [7:0] mat2_t [0:8191];
+    wire [7:0] mat3_t [0:8191];
+    wire [7:0] mat4_t [0:6143];
+    
+    `BYTE_ASSIGN_GEN(in,    32,   rho_in, rho_in_t)
+    `BYTE_ASSIGN_GEN(mat1,  8192, mat1,   mat1_t)
+    `BYTE_ASSIGN_GEN(mat2,  8192, mat2,   mat2_t)
+    `BYTE_ASSIGN_GEN(mat3,  8192, mat3,   mat3_t)
+    `BYTE_ASSIGN_GEN(mat4,  6144, mat4,   mat4_t)
+    
+    // Clock
+    always #5 clock = ~clock;
+    
+    // Reset task
+    task do_reset;
+    begin
+        reset = 1;
+        start = 0;
+        rho_in = 0;
+        #50;
+        reset = 0;
+        #20;
+    end
+    endtask
+    
+    // Test task
+    task run_test;
+        input [255:0] rho;
+    begin
+        do_reset();
+        rho_in = rho;        // n?p input
+        #10;
+        start = 1; 
+        #10;
+        start = 0;
+        
+        wait(done == 1);
+        #10;
+        
+        `PRINT_HEX_ARRAY("SEED RHO input", rho_in_t, 32)
+        `PRINT_HEX_ARRAY("  mat1 ", mat1_t, 8192)  
+        `PRINT_HEX_ARRAY("  mat2 ", mat2_t, 8192)
+        `PRINT_HEX_ARRAY("  mat3 ", mat3_t, 8192)
+        `PRINT_HEX_ARRAY("  mat4 ", mat4_t, 6144)
+ 
+        
+        $display("\n");
+        #40;
+    end
+    endtask
+    
+    // Initial
+    initial begin
+        clock = 0; 
+        reset = 1; 
+        start = 0; 
+        rho_in = 0;
+        
+        #50;
+        reset = 0;
+        #30;
+        
+        // Test case 1
+        //run_test(256'h6cb904fd193372ca57ec0a8164f83d49ee17db2c908a6fb2415dc80377af129e);
+        //run_test(256'h3cf04f5a8e187122cd0b5099aa332f7d906c01fe1144d9a30e551988ccf37a12);
+	run_test(256'hbc9a78563412ffeeddccbbaafedcba9876543210efcdab8967452301efbeadde);
+	//run_test(256'h256'h6cb904fd193372ca57ec0a8164f83d49ee17db2c908a6fb2415dc80377af129e);
+	//run_test(256'h256'h6cb904fd193372ca57ec0a8164f83d49ee17db2c908a6fb2415dc80377af129e);
+        
+        #100;
+        $finish;
+    end
+    
+    // Timeout
+    initial begin
+        #2000000000;
+        $display("\n[ERROR] SIMULATION TIMEOUT!\n");
+        $finish;
+    end
+    
+endmodule

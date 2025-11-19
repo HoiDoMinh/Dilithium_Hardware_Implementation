@@ -1,0 +1,50 @@
+
+module pack_sk(
+    input [255:0] rho_in,
+    input [255:0] key_in,
+    input [255:0] tr_in,
+    input [49151:0] t0_in,
+    input [40959:0] s1_in,
+    input [49151:0] s2_in,
+    output [29183:0] sk_out
+    );
+    
+    localparam K = 6;
+    localparam L = 5;
+    localparam POLYETA_PACKEDBYTES = 96;
+    
+    assign sk_out[255:0] = rho_in;
+    assign sk_out[511:256] = key_in;
+    assign sk_out[767:512] = tr_in;
+    
+    wire [L*1024-1:0] polyeta_pack_s1;   // 5*1024 = 5120 bit
+    
+    generate
+        genvar i;
+        for (i = 0; i < L; i = i + 1) begin
+             polyeta_pack polyeta_pack_1(.a_in(s1_in[8192 * i + 8191:8192 * i]), .r_out(polyeta_pack_s1[1024*i + 1023 : 1024*i]));
+	    end
+    endgenerate
+
+    assign sk_out[4607:768] = polyeta_pack_s1;
+    
+    wire [K*1024-1:0] polyeta_pack_s2;   // 6*1024 = 6144 bit
+    generate
+        for (i = 0; i < K; i = i + 1) begin
+             polyeta_pack polyeta_pack_2(.a_in(s2_in[8192 * i + 8191:8192 * i]), .r_out(polyeta_pack_s2[1024*i + 1023 : 1024*i]));
+	    end
+    endgenerate
+
+    assign sk_out[9215:4608] = polyeta_pack_s2; 
+
+    wire [19967:0] polyet0_pack;
+    
+    generate
+        for (i = 0; i < K; i = i + 1) begin
+             polyt0_pack polyt0_pack_1(.a_in(t0_in[8192 * i + 8191:8192 * i]), .r_out(polyet0_pack[3328 * i + 3327:3328 * i]));
+	    end
+    endgenerate
+    
+    assign sk_out[29183:9216] = polyet0_pack; 
+    	
+endmodule

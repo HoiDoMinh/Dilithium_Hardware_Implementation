@@ -1,0 +1,17 @@
+
+module tb_power2round;
+    reg signed [31:0] a;
+    wire signed [31:0] a0;
+    wire signed [31:0] a1;
+power2round dut(
+    .a(a),.a0(a0),.a1(a1)
+);
+
+initial begin
+	a=123456;
+	#1;
+	$display("a1=%0d",$signed(a1));
+	$display("a0=%0d",$signed(a0));
+end
+
+endmodule 
