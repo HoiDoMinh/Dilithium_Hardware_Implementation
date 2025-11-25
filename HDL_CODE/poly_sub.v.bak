@@ -1,0 +1,24 @@
+
+module poly_sub(
+    input signed [8191:0] a_in,
+    input signed [8191:0] b_in,
+    output signed [8191:0]c_out
+    );
+    
+    localparam N = 256;
+    
+    wire signed [31:0] a [0:N - 1];
+    wire signed [31:0] b [0:N - 1];
+    wire signed [31:0] c [0:N - 1];
+
+    generate
+        genvar x;
+        for (x = 0; x < N; x = x + 1) begin
+		    assign a[x] = a_in[32 * x + 31:32 * x];
+		    assign b[x] = b_in[32 * x + 31:32 * x];
+		    assign c[x] = a[x] + b[x];
+		    assign c_out[32 * x + 31:32 * x] = c[x];
+		end
+    endgenerate
+    
+endmodule

@@ -1,0 +1,30 @@
+module poly_make_hint(
+    input  signed [8191:0] a0_in,   // 256 coeff × 32-bit
+    input  signed [8191:0] a1_in,
+    output signed [8191:0] h_out
+);
+
+    localparam N = 256;
+
+    wire signed [31:0] a0 [0:N-1];
+    wire signed [31:0] a1 [0:N-1];
+    wire [0:0]         h_bit [0:N-1];
+
+    genvar x;
+    generate
+        for (x = 0; x < N; x = x + 1) begin : gen_hint
+            assign a0[x] = a0_in[32*x + 31 : 32*x];
+            assign a1[x] = a1_in[32*x + 31 : 32*x];
+
+            make_hint make_hint_inst (
+                .a0(a0[x]),
+                .a1(a1[x]),
+                .overflow_signal(h_bit[x])
+            );
+
+            // Zero-extend 1 bit -> 32-bit coeff
+            assign h_out[32*x + 31 : 32*x] = {31'd0, h_bit[x]};
+        end
+    endgenerate
+
+endmodule

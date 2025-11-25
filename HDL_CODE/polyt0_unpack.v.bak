@@ -1,0 +1,23 @@
+module polyt0_pack(
+    input   [3327:0] a_in,     // 416 bytes  
+    output  [8191:0] r_out     // 256 coeff × 32-bit signed
+);
+    localparam N = 256;
+    localparam D = 13;
+
+    genvar i;
+    generate 
+	for (i = 0; i < N/8; i = i + 1) begin : unpack_loop
+		wire [7:0] b0 = a_in(
+	
+
+
+
+	end
+
+
+
+    endgenerate 
+
+
+endmodule 

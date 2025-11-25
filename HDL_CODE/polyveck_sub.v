@@ -1,0 +1,25 @@
+
+
+module polyveck_sub(
+    input signed [49151:0] u_in,
+    input signed [49151:0] v_in,
+    output signed [49151:0] w_out
+);
+    
+    localparam K = 6;
+    
+    wire signed [8191:0] u [0:K - 1];
+    wire signed [8191:0] v [0:K - 1];
+    wire signed [8191:0] w [0:K - 1];
+    
+    generate
+        genvar x;
+        for (x = 0; x < K; x = x + 1) begin
+		    assign u[x] = u_in[8192 * x + 8191:8192 * x];
+		    assign v[x] = v_in[8192 * x + 8191:8192 * x];
+		    poly_sub poly_sub_inst(.a_in(u[x]), .b_in(v[x]), .c_out(w[x]));
+		    assign w_out[8192 * x + 8191:8192 * x] = w[x];
+		end
+	endgenerate
+	
+endmodule

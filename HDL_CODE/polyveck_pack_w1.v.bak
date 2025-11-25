@@ -1,0 +1,27 @@
+module polyveck_pack_w1(
+    input  [49151:0] w1_in,      // 6 polys × 8192 bits = 49152 bits
+    output [6143:0]  r_out       // 6 × 128 bytes = 768 bytes = 6144 bits
+);
+
+    localparam K = 6;  
+
+    wire [8191:0] poly [0:K-1];
+    wire [1023:0] packed [0:K-1];
+
+    genvar i;
+    generate
+        for (i = 0; i < K; i = i + 1) begin : GEN_PACK
+
+            assign poly[i] = w1_in[8192*i + 8191 : 8192*i];
+
+            polyw1_pack pack_inst(
+                .a_in(poly[i]),
+                .r_out(packed[i])
+            );
+
+            assign r_out[1024*i + 1023 : 1024*i] = packed[i];
+
+        end
+    endgenerate
+
+endmodule

@@ -1,0 +1,36 @@
+module poly_make_hint(
+    input  signed [8191:0] a0_in,    // 256 coeffs × 32-bit
+    input  signed [8191:0] a1_in,
+    output [8191:0] h_out            // 256 hints × 32-bit (m?i hint 1-bit nh?ng padding 32-bit)
+);
+    localparam N = 256;
+    
+    // Unpack input arrays
+    wire signed [31:0] a0 [0:N-1];
+    wire signed [31:0] a1 [0:N-1];
+    wire hint_bit [0:N-1];           // M?i hint là 1 bit
+    wire [31:0] h [0:N-1];           // Extend to 32-bit for output
+    
+    genvar i;
+    generate
+        for (i = 0; i < N; i = i + 1) begin : hint_loop
+            // Unpack inputs
+            assign a0[i] = a0_in[32*i + 31 : 32*i];
+            assign a1[i] = a1_in[32*i + 31 : 32*i];
+            
+            // Instantiate make_hint
+            make_hint make_hint_inst (
+                .a0(a0[i]),
+                .a1(a1[i]),
+                .hint(hint_bit[i])
+            );
+            
+            // Extend 1-bit hint to 32-bit (zero-extend)
+            assign h[i] = {31'b0, hint_bit[i]};
+            
+            // Pack output
+            assign h_out[32*i + 31 : 32*i] = h[i];
+        end
+    endgenerate
+
+endmodule

@@ -1,0 +1,210 @@
+module keccak_squeeze #(
+    parameter out_len = 32          // s? byte t?i ?a output ra bus
+)(
+    input  clock,
+    input  reset,
+    input  start,
+
+    input  [1599:0] s_in,           // 25 words × 64-bit = 1600-bit
+    input  [31:0]   pos_in,         // v? trí hi?n t?i trong block
+    input  [31:0]   r,              // rate (168 cho SHAKE128, 136 cho SHAKE256)
+    input  [63:0]   outlen_in,      // s? byte C?N output (<= out_len)
+
+    output [1599:0] s_out,          // state sau squeeze
+    output reg [out_len*8-1:0] out, // data out
+    output reg [31:0] pos_out,
+    output reg done
+);
+
+    reg  [63:0] s[0:24];
+    wire [63:0] sin_t[0:24];
+
+    genvar x;
+    generate
+        for (x = 0; x < 25; x = x + 1) begin : GEN_STATE_IO
+            assign sin_t[x]          = s_in[64*x+63 : 64*x];
+            assign s_out[64*x+63:64*x] = s[x];
+        end
+    endgenerate
+
+    wire [1599:0] permute_out;
+    wire          done_permute;
+    reg           start_permute;
+
+    wire [63:0] permute_t[0:24];
+    generate
+        for (x = 0; x < 25; x = x + 1) begin : GEN_PERM_OUT
+            assign permute_t[x] = permute_out[64*x+63 : 64*x];
+        end
+    endgenerate
+
+    KeccakF1600_StatePermute PERM (
+        .Ain  (s_out),
+        .Aout (permute_out),
+        .clk  (clock),
+        .reset(reset),
+        .start(start_permute),
+        .done (done_permute)
+    );
+
+    reg [31:0] pos;          
+    reg [63:0] outlen;       
+    reg [31:0] out_idx;     
+
+    reg [7:0] out_bytes [0:out_len-1];
+    reg [7:0] current_byte;
+
+
+    localparam SIZE       = 4;
+    localparam IDLE       = 4'd0,
+               PRE_RD_INP = 4'd1,
+               RD_INP     = 4'd2;
+
+    reg [SIZE-1:0] state;
+    reg [SIZE-1:0] next_state;
+
+
+    always @(posedge clock) begin
+        if (reset)
+            state <= IDLE;
+        else
+            state <= next_state;
+    end
+
+    always @(*) begin
+        next_state    = state;
+        start_permute = 0;
+        done          = 0;
+
+        case (state)
+            IDLE: begin
+                if (start)
+                    next_state = PRE_RD_INP;
+            end
+
+            PRE_RD_INP: begin
+                if (start)
+                    next_state = RD_INP;
+                else
+                    next_state = PRE_RD_INP;
+            end
+
+            RD_INP: begin
+                next_state = 4'd3;
+            end
+
+            4'd3: begin 
+                if (outlen == 0)
+                    next_state = 4'd8; 
+                else if (pos == r)
+                    next_state = 4'd4; 
+                else
+                    next_state = 4'd6; 
+            end
+
+            4'd4: begin 
+                start_permute = 1;
+                next_state    = 4'd5; 
+            end
+
+            4'd5: begin // WAIT_PERMUTE
+                if (done_permute)
+                    next_state = 4'd3; 
+                else
+                    next_state = 4'd5;
+            end
+
+            4'd6: begin 
+                next_state = 4'd7;     
+            end
+
+            4'd7: begin 
+                next_state = 4'd3;    
+            end
+
+            4'd8: begin // DONE
+                done = 1;
+                if (~start)
+                    next_state = IDLE;
+                else
+                    next_state = 4'd8;
+            end
+
+            default: next_state = IDLE;
+        endcase
+    end
+
+    integer i;
+    always @(posedge clock) begin
+        if (reset) begin
+            pos     <= 0;
+            outlen  <= 0;
+            out_idx <= 0;
+            pos_out <= 0;
+            for (i = 0; i < 25; i = i + 1)
+                s[i] <= 64'd0;
+        end else begin
+            case (state)
+                RD_INP: begin
+                    for (i = 0; i < 25; i = i + 1)
+                        s[i] <= sin_t[i];
+
+                    pos     <= pos_in;
+                    outlen  <= outlen_in;
+                    out_idx <= 0;
+                end
+
+                4'd5: begin // WAIT_PERMUTE
+                    if (done_permute) begin
+                        for (i = 0; i < 25; i = i + 1)
+                            s[i] <= permute_t[i];
+                        pos <= 0;
+                    end
+                end
+
+                4'd6: begin // OUTPUT_BYTE
+                    if (outlen > 0 && pos < r && out_idx < out_len) begin
+                        case (pos[2:0]) // pos % 8
+                            3'd0: current_byte <= s[pos/8][7:0];
+                            3'd1: current_byte <= s[pos/8][15:8];
+                            3'd2: current_byte <= s[pos/8][23:16];
+                            3'd3: current_byte <= s[pos/8][31:24];
+                            3'd4: current_byte <= s[pos/8][39:32];
+                            3'd5: current_byte <= s[pos/8][47:40];
+                            3'd6: current_byte <= s[pos/8][55:48];
+                            3'd7: current_byte <= s[pos/8][63:56];
+                            default: current_byte <= 8'h00;
+                        endcase
+                        out_bytes[out_idx] <= current_byte;
+                    end
+                end
+
+                4'd7: begin // UPDATE
+                    if (outlen > 0) begin
+                        pos     <= pos + 1;
+                        out_idx <= out_idx + 1;
+                        outlen  <= outlen - 1;
+                    end
+                end
+
+                4'd8: begin // DONE
+                    pos_out <= pos;
+                end
+
+                default: ;
+            endcase
+        end
+    end
+
+
+    genvar y;
+    generate
+        for (y = 0; y < out_len; y = y + 1) begin : GEN_OUT_PACK
+            always @(*) begin
+                out[8*y+7 : 8*y] = out_bytes[y];
+            end
+        end
+    endgenerate
+
+endmodule
+

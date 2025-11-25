@@ -1,0 +1,33 @@
+module decompose(
+    input  signed [31:0] a,
+    output signed [31:0] a0,
+    output signed [31:0] a1
+);
+
+    localparam Q       = 32'd8380417;
+    localparam GAMMA2  = (Q-1)/32;      // = 261887
+    localparam HALF_Qm1 =(Q-1)/2  ;      // = 4190208
+
+
+    // a1 = (a + 127) >> 7;
+    wire signed [31:0] step1_a1 = (a + 32'sd127) >>> 7;
+
+    // a1 = (a1*1025 + (1<<21)) >> 22;
+
+    wire signed [31:0] step2_mul   = step1_a1 * 32'sd1025;
+    wire signed [31:0] step2_shift = (step2_mul + (32'sd1 <<< 21)) >>> 22;
+
+    // a1 &= 15
+    assign a1 = step2_shift & 32'sd15;
+    // a0 = a - a1*(2*GAMMA2)
+    wire signed [31:0] two_gamma2 = (GAMMA2 <<< 1);
+    wire signed [31:0] raw_a0     = a - a1 * two_gamma2;
+
+    // a0 -= (((Q-1)/2 - a0) >> 31) & Q;
+    // N?u ( (Q-1)/2 - a0 ) là âm ? sign-bit = 1 ? tr? Q
+
+    wire signed [31:0] cond = ((Q-1)/2 - raw_a0) >>> 31;   // 0 ho?c -1
+    assign a0 = raw_a0 - (cond & Q);
+
+endmodule
+

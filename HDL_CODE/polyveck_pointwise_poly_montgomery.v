@@ -1,0 +1,27 @@
+
+module polyveck_pointwise_poly_montgomery(
+    input  signed [8191:0] a_in,             // poly a
+    input  signed [49151:0] v_in,            // K poly, m?i poly = 8192 bit
+    output signed [49151:0] r_out
+);
+    localparam K = 6;
+
+    wire signed [8191:0] v [0:K-1];
+    wire signed [8191:0] r [0:K-1];
+
+    genvar i;
+    generate 
+        for (i = 0; i < K; i = i + 1) begin : GEN_VEC
+            // Tách t?ng poly v[i]
+            assign v[i] = v_in[8192*i + 8191 : 8192*i];
+
+            poly_pointwise_montgomery ppm_inst (
+                .a_in(a_in),    
+                .b_in(v[i]),     
+                .c_out(r[i])     
+            );
+            assign r_out[8192*i + 8191 : 8192*i] = r[i];
+        end
+    endgenerate
+
+endmodule

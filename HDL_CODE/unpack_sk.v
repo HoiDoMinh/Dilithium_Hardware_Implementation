@@ -1,0 +1,65 @@
+module unpack_sk(
+    input  [32255:0] sk_in,        // 4032 bytes = 32256 bits
+    output [255:0]   rho_out,      // 32 bytes
+    output [255:0]   key_out,      // 32 bytes
+    output [511:0]   tr_out,       // 64 bytes
+    output [40959:0] s1_out,       // 5 polys × 8192 bit
+    output [49151:0] s2_out,       // 6 polys × 8192 bit
+    output [49151:0] t0_out        // 6 polys × 8192 bit
+);
+
+    localparam K = 6;
+    localparam L = 5;
+
+
+    // 1) rho, key, tr
+    assign rho_out = sk_in[255:0];
+    assign key_out = sk_in[511:256];
+    assign tr_out  = sk_in[1023:512];
+
+    // 2) s1 (L polys)
+    wire [L*1024-1:0] polyeta_unpack_s1;
+    assign polyeta_unpack_s1 = sk_in[6143:1024];
+
+    genvar i1;
+    generate
+        for (i1 = 0; i1 < L; i1 = i1 + 1) begin : unpack_s1_loop
+            polyeta_unpack polyeta_unpacks1 (
+                .a_in (polyeta_unpack_s1[1024*i1 + 1023 : 1024*i1]),
+                .r_out(s1_out[8192*i1 + 8191 : 8192*i1])
+            );
+        end
+    endgenerate
+
+
+    // 3) s2 (K polys)
+
+    wire [K*1024-1:0] polyeta_unpack_s2;
+    assign polyeta_unpack_s2 = sk_in[12287:6144];
+
+    genvar i2;
+    generate
+        for (i2 = 0; i2 < K; i2 = i2 + 1) begin : unpack_s2_loop
+            polyeta_unpack polyeta_unpacks2 (
+                .a_in (polyeta_unpack_s2[1024*i2 + 1023 : 1024*i2]),
+                .r_out(s2_out[8192*i2 + 8191 : 8192*i2])
+            );
+        end
+    endgenerate
+
+    // 4) t0 (K polys)
+    wire [K*3328-1:0] polyt0_unpack_in;
+    assign polyt0_unpack_in = sk_in[32255:12288];
+
+    genvar i3;
+    generate
+        for(i3 = 0; i3 < K; i3 = i3 + 1) begin : unpack_t0_loop
+            polyt0_unpack polyt0_unpacks(
+                .a_in(polyt0_unpack_in[3328*i3 + 3327 : 3328*i3]),
+                .r_out(t0_out[8192*i3 + 8191 : 8192*i3])
+            );
+        end
+    endgenerate
+
+endmodule
+

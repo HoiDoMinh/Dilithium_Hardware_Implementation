@@ -1,0 +1,13 @@
+
+module use_hint(
+	input signed [31:0] a,
+	output [31:0] hint
+
+);
+wire signed [31:0] a0,a1;
+decompose decompose(.a(a),.a0(a0),.a1(a1);
+
+
+
+
+endmodule 

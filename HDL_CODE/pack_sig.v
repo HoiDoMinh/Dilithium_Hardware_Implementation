@@ -1,0 +1,69 @@
+
+module pack_sig #(
+    parameter CTILDEBYTES = 48,
+    parameter L = 5,
+    parameter K = 6,
+    parameter N = 256,
+    parameter OMEGA = 55,
+    parameter POLYZ_PACKEDBYTES = 640,
+    parameter POLYVECH_PACKEDBYTES = OMEGA + K,   // = 61
+    parameter CRYPTO_BYTES = CTILDEBYTES + L*POLYZ_PACKEDBYTES + POLYVECH_PACKEDBYTES // = 3309 bytes
+)(                                                      
+    input  [CTILDEBYTES*8-1:0] c_in,                   // 48 bytes
+    input  [L*256*32-1:0]      z_in,                   // 5 polys
+    input  [K*N*32-1:0]        h_in,                   // hint vector =49152 bits 
+    output [CRYPTO_BYTES*8-1:0] sig_out                // 3309 bytes
+);
+
+    genvar i;
+    generate
+        for (i = 0; i < CTILDEBYTES; i = i + 1) begin : GEN_C
+            assign sig_out[8*i +: 8] = c_in[8*i +: 8];
+        end
+    endgenerate
+
+    wire [POLYZ_PACKEDBYTES*8-1:0] z_pack_out [0:L-1];
+
+    generate
+        for (i = 0; i < L; i = i + 1) begin : GEN_ZPACK
+            polyz_pack u_pz (
+                .a_in ( z_in[i*256*32 +: 256*32] ),
+                .r_out( z_pack_out[i] )
+            );
+
+            assign sig_out[(CTILDEBYTES + i*POLYZ_PACKEDBYTES)*8 +: POLYZ_PACKEDBYTES*8] = z_pack_out[i];
+        end
+    endgenerate
+
+
+    localparam H_OFFSET = CTILDEBYTES + L*POLYZ_PACKEDBYTES;   // 48 + 3200 = 3248
+
+    integer ii, jj;
+    reg [7:0] idx_val [0:OMEGA+K-1];
+    reg [7:0] kpos;
+
+    // tao du lieu h
+    always @(*) begin
+        kpos = 0;
+
+        for (ii = 0; ii < K; ii = ii + 1) begin
+
+            for (jj = 0; jj < N; jj = jj + 1) begin
+                if (h_in[(ii*N + jj)*32 +: 32] != 32'd0) begin
+                    idx_val[kpos] = jj[7:0];
+                    kpos = kpos + 1;
+                end
+            end
+
+            idx_val[OMEGA + ii] = kpos;
+        end
+    end
+
+    // Xu?t idx_val vào sig
+    generate
+        for (i = 0; i < OMEGA + K; i = i + 1) begin : GEN_H
+            assign sig_out[(H_OFFSET + i)*8 +: 8] = idx_val[i];
+        end
+    endgenerate
+
+endmodule

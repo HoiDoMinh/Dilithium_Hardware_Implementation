@@ -1,0 +1,1046 @@
+m255
+K4
+z2
+13
+!s112 1.1
+!i10d 8192
+!i10e 25
+!i10f 100
+cModel Technology
+Z0 dD:/DATA/EDA/UVM/ram_uvm2
+T_opt
+!s110 1762614506
+V73_@dnO^gl_R94TH:>A1e3
+Z1 04 14 4 work tb_randombytes fast 0
+=1-983468c18a9c-690f5cea-20d-4c20
+Z2 o-quiet -auto_acc_if_foreign -work work
+Z3 tCvgOpt 0
+n@_opt
+Z4 OL;O;10.7c;67
+R0
+T_opt1
+!s110 1762614658
+V^_[CNNX9G_dFXnO:`ad>a2
+R1
+=1-983468c18a9c-690f5d81-3cb-1950
+R2
+R3
+n@_opt1
+R4
+R0
+T_opt2
+!s110 1762615216
+Ve`e?M7iP3W^4=4_W=BVC61
+R1
+=1-983468c18a9c-690f5fb0-120-17b4
+R2
+R3
+n@_opt2
+R4
+vcaddq
+Z5 !s110 1762579108
+!i10b 1
+!s100 `f8of?DUE5b^4j[moGn4[2
+I[3B]2H_QJGFNKl[P`oRVG3
+Z6 VDg1SIo80bB@j0V0VzS_@n1
+Z7 dD:/DATA/DOAN/vivado_doan/dilithium_verilogcode
+w1761578117
+8D:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/caddq.v
+FD:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/caddq.v
+L0 1
+Z8 OL;L;10.7c;67
+r1
+!s85 0
+31
+Z9 !s108 1762579108.000000
+!s107 D:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/caddq.v|
+!s90 -reportprogress|300|-work|work|-vopt|-stats=none|D:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/caddq.v|
+!i113 0
+Z10 o-work work -L mtiAvm -L mtiRnm -L mtiOvm -L mtiUvm -L mtiUPF -L infact
+R3
+vcrypto_sign_keypair
+R5
+!i10b 1
+!s100 P_ZlgcZ<2[JV2a[UnXDJL1
+I18GPMP9RgVRCCD78c8AWL3
+R6
+R7
+w1761578201
+8D:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/crypto_sign_keypair.v
+FD:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/crypto_sign_keypair.v
+L0 4
+R8
+r1
+!s85 0
+31
+R9
+!s107 D:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/crypto_sign_keypair.v|
+!s90 -reportprogress|300|-work|work|-vopt|-stats=none|D:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/crypto_sign_keypair.v|
+!i113 0
+R10
+R3
+vdilithium_shake128_stream_init
+R5
+!i10b 1
+!s100 BaCWL[_ZiKVm8:9J`iKEA0
+I:MDj:SaJ[YPz8PYVB;RBQ1
+R6
+R7
+w1761578208
+8D:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/dilithium_shake128_stream_init.v
+FD:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/dilithium_shake128_stream_init.v
+L0 4
+R8
+r1
+!s85 0
+31
+R9
+!s107 D:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/dilithium_shake128_stream_init.v|
+!s90 -reportprogress|300|-work|work|-vopt|-stats=none|D:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/dilithium_shake128_stream_init.v|
+!i113 0
+R10
+R3
+vdilithium_shake256_stream_init
+R5
+!i10b 1
+!s100 6]9JKQ[_ii1DB6?YK0Md]3
+I_5jOY6<X^o]Cl=JUDjOdf2
+R6
+R7
+w1761582248
+8D:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/dilithium_shake256_stream_init.v
+FD:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/dilithium_shake256_stream_init.v
+L0 4
+R8
+r1
+!s85 0
+31
+R9
+!s107 D:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/dilithium_shake256_stream_init.v|
+!s90 -reportprogress|300|-work|work|-vopt|-stats=none|D:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/dilithium_shake256_stream_init.v|
+!i113 0
+R10
+R3
+vfqmul_32bit
+R5
+!i10b 1
+!s100 <dJYX?fG]BmBDlDffHQ_Z1
+IK0jj>i=[9Y?Jdk8;CeTz=0
+R6
+R7
+w1761578130
+8D:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/fqmul_32bit.v
+FD:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/fqmul_32bit.v
+L0 3
+R8
+r1
+!s85 0
+31
+R9
+!s107 D:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/fqmul_32bit.v|
+!s90 -reportprogress|300|-work|work|-vopt|-stats=none|D:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/fqmul_32bit.v|
+!i113 0
+R10
+R3
+vkeccak_absorb
+Z11 !s110 1762579109
+!i10b 1
+!s100 Ro98j>F;1TYaWcfhIf9<j0
+IaEnCoKQ`XEZWo3^1]RFVT0
+R6
+R7
+w1761578706
+8D:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/keccak_absorb.v
+FD:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/keccak_absorb.v
+L0 4
+R8
+r1
+!s85 0
+31
+Z12 !s108 1762579109.000000
+!s107 D:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/keccak_absorb.v|
+!s90 -reportprogress|300|-work|work|-vopt|-stats=none|D:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/keccak_absorb.v|
+!i113 0
+R10
+R3
+vkeccak_finalize
+R11
+!i10b 1
+!s100 Pm?oM6HL8INjAjG20O2n00
+I6BK<om8EaLSnIzZ:0?0<S1
+R6
+R7
+w1761578678
+8D:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/keccak_finalize.v
+FD:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/keccak_finalize.v
+L0 4
+R8
+r1
+!s85 0
+31
+R12
+!s107 D:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/keccak_finalize.v|
+!s90 -reportprogress|300|-work|work|-vopt|-stats=none|D:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/keccak_finalize.v|
+!i113 0
+R10
+R3
+vkeccak_init
+R11
+!i10b 1
+!s100 `8`bUCCU;hN_P@C0C8H192
+I:YHoaHeLR9LWZWmGTV6Ad0
+R6
+R7
+w1761578670
+8D:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/keccak_init.v
+FD:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/keccak_init.v
+L0 3
+R8
+r1
+!s85 0
+31
+R12
+!s107 D:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/keccak_init.v|
+!s90 -reportprogress|300|-work|work|-vopt|-stats=none|D:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/keccak_init.v|
+!i113 0
+R10
+R3
+vkeccak_squeezeblocks
+R11
+!i10b 1
+!s100 FIoH9FgE0?^iVQFRPDVQS2
+IoRc3ATC^E@:11PN@MV;3X3
+R6
+R7
+w1761578664
+8D:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/keccak_squeezeblocks.v
+FD:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/keccak_squeezeblocks.v
+L0 4
+R8
+r1
+!s85 0
+31
+R12
+!s107 D:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/keccak_squeezeblocks.v|
+!s90 -reportprogress|300|-work|work|-vopt|-stats=none|D:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/keccak_squeezeblocks.v|
+!i113 0
+R10
+R3
+vKeccakF1600_StatePermute
+R11
+!i10b 1
+!s100 43h22M;gC?Ldmb6PV[RcN1
+I<O:UeMlTLKR5P1T_JDFnO2
+R6
+R7
+w1761578194
+8D:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/KeccakF1600_StatePermute.v
+FD:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/KeccakF1600_StatePermute.v
+L0 4
+R8
+r1
+!s85 0
+31
+R12
+!s107 D:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/KeccakF1600_StatePermute.v|
+!s90 -reportprogress|300|-work|work|-vopt|-stats=none|D:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/KeccakF1600_StatePermute.v|
+!i113 0
+R10
+R3
+n@keccak@f1600_@state@permute
+vmontgomery_reduce
+R11
+!i10b 1
+!s100 VD:mc[j6lUL3K[gcdi];L2
+IB`8HY:9JUjMKnf9l2GA111
+R6
+R7
+w1761578139
+8D:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/montgomery_reduce.v
+FD:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/montgomery_reduce.v
+L0 1
+R8
+r1
+!s85 0
+31
+R12
+!s107 D:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/montgomery_reduce.v|
+!s90 -reportprogress|300|-work|work|-vopt|-stats=none|D:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/montgomery_reduce.v|
+!i113 0
+R10
+R3
+vmontgomery_reduce_32bit
+R11
+!i10b 1
+!s100 ]jY=W:60_4adhWK]U][7G2
+I`Lb1QHLk:m8aOLNKRW[W;1
+R6
+R7
+w1761578148
+8D:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/montgomery_reduce_32bit.v
+FD:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/montgomery_reduce_32bit.v
+L0 3
+R8
+r1
+!s85 0
+31
+R12
+!s107 D:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/montgomery_reduce_32bit.v|
+!s90 -reportprogress|300|-work|work|-vopt|-stats=none|D:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/montgomery_reduce_32bit.v|
+!i113 0
+R10
+R3
+vpack_pk
+R11
+!i10b 1
+!s100 i1d:XWM1E]k^hh<Dn:^@:2
+I:OTJ2cajOJ58NQ@=TAo^i2
+R6
+R7
+w1761578658
+8D:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/pack_pk.v
+FD:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/pack_pk.v
+L0 4
+R8
+r1
+!s85 0
+31
+R12
+!s107 D:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/pack_pk.v|
+!s90 -reportprogress|300|-work|work|-vopt|-stats=none|D:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/pack_pk.v|
+!i113 0
+R10
+R3
+vpack_sk
+R11
+!i10b 1
+!s100 U0CO?2;9nlEJS@j^AXLNb2
+I]ZUf6B^V;j_^B:nA;S02O0
+R6
+R7
+w1761578652
+8D:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/pack_sk.v
+FD:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/pack_sk.v
+L0 4
+R8
+r1
+!s85 0
+31
+R12
+!s107 D:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/pack_sk.v|
+!s90 -reportprogress|300|-work|work|-vopt|-stats=none|D:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/pack_sk.v|
+!i113 0
+R10
+R3
+vparallel_invntt_tomont_32bit
+R11
+!i10b 1
+!s100 L?NMl[dA73OkA[Ncfm6Z_3
+IN6_^G`lE_0O6M8JVmMneb3
+R6
+R7
+w1761578163
+8D:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/parallel_invntt_tomont_32bit.v
+FD:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/parallel_invntt_tomont_32bit.v
+L0 3
+R8
+r1
+!s85 0
+31
+R12
+!s107 D:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/parallel_invntt_tomont_32bit.v|
+!s90 -reportprogress|300|-work|work|-vopt|-stats=none|D:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/parallel_invntt_tomont_32bit.v|
+!i113 0
+R10
+R3
+vparallel_ntt_32bit
+R11
+!i10b 1
+!s100 :nb^N;QTz1o@V^G_`PYH?0
+IJP]9Add<h6bj2DCj93gUf0
+R6
+R7
+w1761578170
+8D:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/parallel_ntt_32bit.v
+FD:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/parallel_ntt_32bit.v
+L0 3
+R8
+r1
+!s85 0
+31
+R12
+!s107 D:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/parallel_ntt_32bit.v|
+!s90 -reportprogress|300|-work|work|-vopt|-stats=none|D:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/parallel_ntt_32bit.v|
+!i113 0
+R10
+R3
+vPermuteFunction
+R11
+!i10b 1
+!s100 8FGiEHBfZ5>jQDgD7foPg0
+IGo6P>mNhk4:4G4>[SF4b60
+R6
+R7
+w1761578063
+8D:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/PermuteFunction.v
+FD:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/PermuteFunction.v
+L0 1
+R8
+r1
+!s85 0
+31
+R12
+!s107 D:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/PermuteFunction.v|
+!s90 -reportprogress|300|-work|work|-vopt|-stats=none|D:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/PermuteFunction.v|
+!i113 0
+R10
+R3
+n@permute@function
+vPermuteFunction_oneRound
+R11
+!i10b 1
+!s100 0]2`QMz<J8Zga=]W@6Yci2
+IhHNm5z>9GNF;e3AEV7iL]2
+R6
+R7
+w1761578075
+8D:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/PermuteFunction_oneRound.v
+FD:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/PermuteFunction_oneRound.v
+L0 1
+R8
+r1
+!s85 0
+31
+R12
+!s107 D:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/PermuteFunction_oneRound.v|
+!s90 -reportprogress|300|-work|work|-vopt|-stats=none|D:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/PermuteFunction_oneRound.v|
+!i113 0
+R10
+R3
+n@permute@function_one@round
+vpoly_add
+R11
+!i10b 1
+!s100 ^YL929KLD@5ZA1TeR6>^l3
+IEU0ollAZRNMB82TcR<X:U1
+R6
+R7
+w1761578645
+8D:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/poly_add.v
+FD:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/poly_add.v
+L0 4
+R8
+r1
+!s85 0
+31
+R12
+!s107 D:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/poly_add.v|
+!s90 -reportprogress|300|-work|work|-vopt|-stats=none|D:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/poly_add.v|
+!i113 0
+R10
+R3
+vpoly_caddq
+R11
+!i10b 1
+!s100 LE<k12C]olbKiZ6gP[PEQ2
+IB4YHV1:P2^f8NUzC>mB0M0
+R6
+R7
+w1761578637
+8D:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/poly_caddq.v
+FD:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/poly_caddq.v
+L0 4
+R8
+r1
+!s85 0
+31
+R12
+!s107 D:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/poly_caddq.v|
+!s90 -reportprogress|300|-work|work|-vopt|-stats=none|D:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/poly_caddq.v|
+!i113 0
+R10
+R3
+vpoly_pointwise_montgomery
+R11
+!i10b 1
+!s100 <27_6kEF^zEUfl6b54:WA3
+Izlc_U?beM?FSM9HgERK7f3
+R6
+R7
+w1761578629
+8D:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/poly_pointwise_montgomery.v
+FD:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/poly_pointwise_montgomery.v
+L0 4
+R8
+r1
+!s85 0
+31
+R12
+!s107 D:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/poly_pointwise_montgomery.v|
+!s90 -reportprogress|300|-work|work|-vopt|-stats=none|D:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/poly_pointwise_montgomery.v|
+!i113 0
+R10
+R3
+vpoly_reduce
+R11
+!i10b 1
+!s100 SET9`6z6W2E_UmEYQNBWm2
+IK:G;OMhRYI?NKJfb2^FTY2
+R6
+R7
+w1761578737
+8D:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/poly_reduce.v
+FD:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/poly_reduce.v
+L0 4
+R8
+r1
+!s85 0
+31
+R12
+!s107 D:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/poly_reduce.v|
+!s90 -reportprogress|300|-work|work|-vopt|-stats=none|D:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/poly_reduce.v|
+!i113 0
+R10
+R3
+vpoly_uniform
+R11
+!i10b 1
+!s100 SLCi0a1JGZJzWX4zODHh^3
+INmDQXngPARR6BCnQNU9bQ0
+R6
+R7
+w1761578561
+8D:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/poly_uniform.v
+FD:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/poly_uniform.v
+L0 3
+R8
+r1
+!s85 0
+31
+R12
+!s107 D:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/poly_uniform.v|
+!s90 -reportprogress|300|-work|work|-vopt|-stats=none|D:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/poly_uniform.v|
+!i113 0
+R10
+R3
+vpoly_uniform_eta
+R11
+!i10b 1
+!s100 V:KTke1J=mFonzzbmTUb[0
+Ihij3ac783^H`W<kc6aDJB3
+R6
+R7
+w1761578554
+8D:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/poly_uniform_eta.v
+FD:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/poly_uniform_eta.v
+L0 3
+R8
+r1
+!s85 0
+31
+R12
+!s107 D:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/poly_uniform_eta.v|
+!s90 -reportprogress|300|-work|work|-vopt|-stats=none|D:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/poly_uniform_eta.v|
+!i113 0
+R10
+R3
+vpolyeta_pack
+R11
+!i10b 1
+!s100 f3E?Y4cfAQbe9RT<Qb3H>3
+IO@ol7:`Z;Kil306fi>MDN2
+R6
+R7
+w1761578546
+8D:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/polyeta_pack.v
+FD:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/polyeta_pack.v
+L0 4
+R8
+r1
+!s85 0
+31
+R12
+!s107 D:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/polyeta_pack.v|
+!s90 -reportprogress|300|-work|work|-vopt|-stats=none|D:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/polyeta_pack.v|
+!i113 0
+R10
+R3
+vpolyt0_pack
+R11
+!i10b 1
+!s100 Sg6e4dYA8:GNoSI5Mh^_M1
+IU3b4CL5QG?Eh9]mAjRi5P1
+R6
+R7
+w1761578540
+8D:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/polyt0_pack.v
+FD:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/polyt0_pack.v
+L0 4
+R8
+r1
+!s85 0
+31
+R12
+!s107 D:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/polyt0_pack.v|
+!s90 -reportprogress|300|-work|work|-vopt|-stats=none|D:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/polyt0_pack.v|
+!i113 0
+R10
+R3
+vpolyt1_pack
+R11
+!i10b 1
+!s100 =_@[QFL>CIQXi^LRIc;nB0
+I:VTPjcY]839FkOg7iOAJ<3
+R6
+R7
+w1761578533
+8D:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/polyt1_pack.v
+FD:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/polyt1_pack.v
+L0 4
+R8
+r1
+!s85 0
+31
+R12
+!s107 D:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/polyt1_pack.v|
+!s90 -reportprogress|300|-work|work|-vopt|-stats=none|D:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/polyt1_pack.v|
+!i113 0
+R10
+R3
+vpolyvec_matrix_expand
+Z13 !s110 1762579110
+!i10b 1
+!s100 EjJe]`KK?CoJ3UJ^h^ja50
+II:bR4cPL?CaV;6`<Dmfh72
+R6
+R7
+w1761578523
+8D:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/polyvec_matrix_expand.v
+FD:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/polyvec_matrix_expand.v
+L0 4
+R8
+r1
+!s85 0
+31
+Z14 !s108 1762579110.000000
+!s107 D:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/polyvec_matrix_expand.v|
+!s90 -reportprogress|300|-work|work|-vopt|-stats=none|D:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/polyvec_matrix_expand.v|
+!i113 0
+R10
+R3
+vpolyvec_matrix_pointwise_montgomery
+R13
+!i10b 1
+!s100 VHVlYdBAc4BIVz3PZoT8h2
+I6zRLK@]N2cQWbKi?6=zoR0
+R6
+R7
+w1761578509
+8D:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/polyvec_matrix_pointwise_montgomery.v
+FD:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/polyvec_matrix_pointwise_montgomery.v
+L0 4
+R8
+r1
+!s85 0
+31
+R14
+!s107 D:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/polyvec_matrix_pointwise_montgomery.v|
+!s90 -reportprogress|300|-work|work|-vopt|-stats=none|D:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/polyvec_matrix_pointwise_montgomery.v|
+!i113 0
+R10
+R3
+vpolyveck_add
+R13
+!i10b 1
+!s100 K[@ALIml6o5SCJh24HhBb1
+IFiiLUmD4IQSYd?QRo_O@k1
+R6
+R7
+w1761578491
+8D:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/polyveck_add.v
+FD:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/polyveck_add.v
+L0 4
+R8
+r1
+!s85 0
+31
+R14
+!s107 D:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/polyveck_add.v|
+!s90 -reportprogress|300|-work|work|-vopt|-stats=none|D:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/polyveck_add.v|
+!i113 0
+R10
+R3
+vpolyveck_caddq
+R13
+!i10b 1
+!s100 glXRCU0T[GBgA]6QY@R;L3
+I?cmkiZi2`NHK0gRG7>VP?1
+R6
+R7
+w1761578485
+8D:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/polyveck_caddq.v
+FD:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/polyveck_caddq.v
+L0 4
+R8
+r1
+!s85 0
+31
+R14
+!s107 D:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/polyveck_caddq.v|
+!s90 -reportprogress|300|-work|work|-vopt|-stats=none|D:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/polyveck_caddq.v|
+!i113 0
+R10
+R3
+vpolyveck_invntt_tomont
+R13
+!i10b 1
+!s100 M>JG6Pzd^2O`OXMSiIZZd3
+ITcP8HUZmzUC=ggcfhKE_D0
+R6
+R7
+w1761578472
+8D:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/polyveck_invntt_tomont.v
+FD:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/polyveck_invntt_tomont.v
+L0 4
+R8
+r1
+!s85 0
+31
+R14
+!s107 D:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/polyveck_invntt_tomont.v|
+!s90 -reportprogress|300|-work|work|-vopt|-stats=none|D:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/polyveck_invntt_tomont.v|
+!i113 0
+R10
+R3
+vpolyveck_power2round
+R13
+!i10b 1
+!s100 8Z89b8DB>n_loHFnkh3U62
+IEQIo3Cn_5]7:5XeZ4;BV22
+R6
+R7
+w1761578464
+8D:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/polyveck_power2round.v
+FD:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/polyveck_power2round.v
+L0 4
+R8
+r1
+!s85 0
+31
+R14
+!s107 D:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/polyveck_power2round.v|
+!s90 -reportprogress|300|-work|work|-vopt|-stats=none|D:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/polyveck_power2round.v|
+!i113 0
+R10
+R3
+vpolyveck_reduce
+R13
+!i10b 1
+!s100 N9PYNIIl0aKAg`2EdXPC93
+IzIJIWHcZR3kf@1YgF;^JI3
+R6
+R7
+w1761578456
+8D:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/polyveck_reduce.v
+FD:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/polyveck_reduce.v
+L0 4
+R8
+r1
+!s85 0
+31
+R14
+!s107 D:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/polyveck_reduce.v|
+!s90 -reportprogress|300|-work|work|-vopt|-stats=none|D:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/polyveck_reduce.v|
+!i113 0
+R10
+R3
+vpolyvecl_ntt
+R13
+!i10b 1
+!s100 ChX6Lz@J9ZHnY9XV7oOFj1
+IVNTan6k?mI9Q2E^?SB?cz0
+R6
+R7
+w1761578383
+8D:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/polyvecl_ntt.v
+FD:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/polyvecl_ntt.v
+L0 4
+R8
+r1
+!s85 0
+31
+R14
+!s107 D:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/polyvecl_ntt.v|
+!s90 -reportprogress|300|-work|work|-vopt|-stats=none|D:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/polyvecl_ntt.v|
+!i113 0
+R10
+R3
+vpolyvecl_pointwise_acc_montgomery
+R13
+!i10b 1
+!s100 o[lkIGI?XbISanD;7a;i42
+IGzQ1<6m>WABYzPljYQiLV1
+R6
+R7
+w1761578377
+8D:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/polyvecl_pointwise_acc_montgomery.v
+FD:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/polyvecl_pointwise_acc_montgomery.v
+L0 4
+R8
+r1
+!s85 0
+31
+R14
+!s107 D:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/polyvecl_pointwise_acc_montgomery.v|
+!s90 -reportprogress|300|-work|work|-vopt|-stats=none|D:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/polyvecl_pointwise_acc_montgomery.v|
+!i113 0
+R10
+R3
+vpolyvecl_uniform_eta
+R13
+!i10b 1
+!s100 KgQiFUEMzA[SR>gMJVoGE3
+Ihe`eGHg;WI@9jY@0jHOOM0
+R6
+R7
+w1761578365
+8D:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/polyvecl_uniform_eta.v
+FD:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/polyvecl_uniform_eta.v
+L0 4
+R8
+r1
+!s85 0
+31
+R14
+!s107 D:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/polyvecl_uniform_eta.v|
+!s90 -reportprogress|300|-work|work|-vopt|-stats=none|D:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/polyvecl_uniform_eta.v|
+!i113 0
+R10
+R3
+vpower2round
+R13
+!i10b 1
+!s100 D2;DZLF26JoT_XiTfEKdF2
+I2zBVgoObEE0Y3TAfiTEnI3
+R6
+R7
+w1761578329
+8D:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/power2round.v
+FD:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/power2round.v
+L0 4
+R8
+r1
+!s85 0
+31
+R14
+!s107 D:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/power2round.v|
+!s90 -reportprogress|300|-work|work|-vopt|-stats=none|D:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/power2round.v|
+!i113 0
+R10
+R3
+vrandombytes
+!s110 1762615126
+!i10b 1
+!s100 YI<jE^cC^U>kbE_Ae3Sf53
+IB8KHG:45ZzoT3a^kWz^190
+R6
+R7
+w1762615125
+8D:/DATA/DOAN/vivado_doan/dilithium_verilogcode/randombytes.v
+FD:/DATA/DOAN/vivado_doan/dilithium_verilogcode/randombytes.v
+L0 2
+R8
+r1
+!s85 0
+31
+!s108 1762615126.000000
+!s107 D:/DATA/DOAN/vivado_doan/dilithium_verilogcode/randombytes.v|
+!s90 -reportprogress|300|-work|work|-vopt|-stats=none|D:/DATA/DOAN/vivado_doan/dilithium_verilogcode/randombytes.v|
+!i113 0
+R10
+R3
+vreduce32
+R13
+!i10b 1
+!s100 F3N[UGjG;;?Eo2BDSJJIb3
+IDk=H`NSZR4lHAhh[AWLXM3
+R6
+R7
+w1761578181
+8D:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/reduce32.v
+FD:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/reduce32.v
+L0 2
+R8
+r1
+!s85 0
+31
+R14
+!s107 D:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/reduce32.v|
+!s90 -reportprogress|300|-work|work|-vopt|-stats=none|D:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/reduce32.v|
+!i113 0
+R10
+R3
+vrej_eta
+R13
+!i10b 1
+!s100 Y6QV>=W?1:SgfUkhz;B[l1
+I67oUE_=53`X?A_`PN12S;1
+R6
+R7
+w1761578317
+8D:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/rej_eta.v
+FD:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/rej_eta.v
+L0 4
+R8
+r1
+!s85 0
+31
+R14
+!s107 D:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/rej_eta.v|
+!s90 -reportprogress|300|-work|work|-vopt|-stats=none|D:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/rej_eta.v|
+!i113 0
+R10
+R3
+vrej_uniform
+R13
+!i10b 1
+!s100 3EBX4VfJ;DIQ?8H0ffc3<1
+IT5=FkzJf^5G5_``3]81100
+R6
+R7
+w1761578310
+8D:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/rej_uniform.v
+FD:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/rej_uniform.v
+L0 4
+R8
+r1
+!s85 0
+31
+R14
+!s107 D:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/rej_uniform.v|
+!s90 -reportprogress|300|-work|work|-vopt|-stats=none|D:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/rej_uniform.v|
+!i113 0
+R10
+R3
+vshake128_absorb
+R13
+!i10b 1
+!s100 N1=WG>IRT27Q>:=VMVR2X1
+IQTNW8RP<QFT[jaFV_RLIk2
+R6
+R7
+w1761578299
+8D:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/shake128_absorb.v
+FD:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/shake128_absorb.v
+L0 4
+R8
+r1
+!s85 0
+31
+R14
+!s107 D:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/shake128_absorb.v|
+!s90 -reportprogress|300|-work|work|-vopt|-stats=none|D:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/shake128_absorb.v|
+!i113 0
+R10
+R3
+vshake128_finalize
+R13
+!i10b 1
+!s100 4>6ZTUJ3i9f7TdjH0mUFa0
+I1=NIX?DbcfQcZEd>KjPZg1
+R6
+R7
+w1761578288
+8D:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/shake128_finalize.v
+FD:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/shake128_finalize.v
+L0 4
+R8
+r1
+!s85 0
+31
+R14
+!s107 D:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/shake128_finalize.v|
+!s90 -reportprogress|300|-work|work|-vopt|-stats=none|D:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/shake128_finalize.v|
+!i113 0
+R10
+R3
+vshake128_init
+R13
+!i10b 1
+!s100 H04[kT@_5=><?1TQFN=1I0
+IAo=JdQl1e9QooG;?<m31g0
+R6
+R7
+w1761578281
+8D:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/shake128_init.v
+FD:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/shake128_init.v
+L0 4
+R8
+r1
+!s85 0
+31
+R14
+!s107 D:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/shake128_init.v|
+!s90 -reportprogress|300|-work|work|-vopt|-stats=none|D:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/shake128_init.v|
+!i113 0
+R10
+R3
+vshake128_squeezeblocks
+R13
+!i10b 1
+!s100 dh4N3C4z1o996RR0DH_fD3
+IOeDig^:1P03KiV0^0JomN2
+R6
+R7
+w1761578271
+8D:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/shake128_squeezeblocks.v
+FD:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/shake128_squeezeblocks.v
+L0 4
+R8
+r1
+!s85 0
+31
+R14
+!s107 D:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/shake128_squeezeblocks.v|
+!s90 -reportprogress|300|-work|work|-vopt|-stats=none|D:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/shake128_squeezeblocks.v|
+!i113 0
+R10
+R3
+vshake256_absorb
+R13
+!i10b 1
+!s100 FN5<^ZhMRam<hRkn]eanl2
+I6DHZjLhc2I_BH[>_L38P83
+R6
+R7
+w1761578259
+8D:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/shake256_absorb.v
+FD:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/shake256_absorb.v
+L0 4
+R8
+r1
+!s85 0
+31
+R14
+!s107 D:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/shake256_absorb.v|
+!s90 -reportprogress|300|-work|work|-vopt|-stats=none|D:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/shake256_absorb.v|
+!i113 0
+R10
+R3
+vshake256_finalize
+R13
+!i10b 1
+!s100 He;B5K[1f?VQRQWTCd:Dc0
+ISidP?MUo`X9RW:QAUDPMH2
+R6
+R7
+w1761578252
+8D:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/shake256_finalize.v
+FD:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/shake256_finalize.v
+L0 4
+R8
+r1
+!s85 0
+31
+R14
+!s107 D:/

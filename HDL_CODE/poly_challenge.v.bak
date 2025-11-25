@@ -1,0 +1,354 @@
+`timescale 1ns/1ps
+
+module poly_challenge #(
+    parameter N             = 256,
+    parameter CTILDEBYTES   = 48,
+    parameter SHAKE256_RATE = 136,
+    parameter TAU           = 49
+)(
+    input                       clock,
+    input                       reset,
+    input                       start,
+    input  [CTILDEBYTES*8-1:0]  seed_in,   // 48 bytes
+
+    output [N*32-1:0]           c_out,     
+    output reg                  done
+);
+
+    reg signed [31:0] c [0:N-1];
+
+    genvar gi;
+    generate
+        for (gi = 0; gi < N; gi = gi + 1) begin : GEN_C_OUT
+            assign c_out[32*gi + 31 : 32*gi] = c[gi];
+        end
+    endgenerate
+
+    reg  [1599:0] state_s_reg;
+    reg  [31:0]   state_pos_reg;
+
+    //shake256_init
+    wire [1599:0] init_s;
+    wire [31:0]   init_pos;
+
+    shake256_init u_init (
+        .state_s  (init_s),
+        .state_pos(init_pos)
+    );
+
+    //shake256_absorb
+    wire [1599:0] absorb_s_out;
+    wire [31:0]   absorb_pos_out;
+    wire          absorb_done;
+    reg           absorb_start;
+
+    shake256_absorb #(.in_len(CTILDEBYTES)) u_absorb (
+        .clock        (clock),
+        .reset        (reset),
+        .start        (absorb_start),
+        .state_s_in   (state_s_reg),
+        .state_pos_in (state_pos_reg),
+        .in           (seed_in),
+        .inlen        (64'd48),      // 48 bytes
+        .state_s_out  (absorb_s_out),
+        .state_pos_out(absorb_pos_out),
+        .done         (absorb_done)
+    );
+
+    //shake256_finalize
+    wire [1599:0] final_s_out;
+    wire [31:0]   final_pos_out;
+    wire          final_done;
+    reg           final_start;
+
+    shake256_finalize u_finalize (
+        .clock        (clock),
+        .reset        (reset),
+        .start        (final_start),
+        .state_s_in   (state_s_reg),
+        .state_pos_in (state_pos_reg),
+        .state_s_out  (final_s_out),
+        .state_pos_out(final_pos_out),
+        .done         (final_done)
+    );
+
+    //shake256_squeezeblocks
+    wire [2175:0] squeeze_out;      // 2176 bit = 272 byte
+    wire [1599:0] squeeze_s_out;
+    wire          squeeze_done;
+    reg           squeeze_start;
+    reg  [63:0]   squeeze_nblocks;
+
+    shake256_squeezeblocks u_squeezeblocks (
+        .clock      (clock),
+        .reset      (reset),
+        .start      (squeeze_start),
+        .state_s_in (state_s_reg),
+        .nblocks    (squeeze_nblocks),
+        .out        (squeeze_out),
+        .state_s_out(squeeze_s_out),
+        .done       (squeeze_done)
+    );
+
+    wire [7:0] squeeze_bytes [0:SHAKE256_RATE-1];
+    genvar sb;
+    generate
+        for (sb = 0; sb < SHAKE256_RATE; sb = sb + 1) begin : GEN_SQ_BYTES
+            assign squeeze_bytes[sb] = squeeze_out[8*sb + 7 : 8*sb];
+        end
+    endgenerate
+
+
+    reg [7:0]  buffer   [0:SHAKE256_RATE-1];  // 136 byte
+    reg [63:0] signs;                         // 64-bit
+    reg [7:0]  pos;                           // index trong buffer
+    reg [8:0]  i_idx;                         // i trong for (0..256)
+    reg [7:0]  b;                            
+
+    integer j, k;
+
+
+    localparam SIZE            = 4;
+
+    localparam IDLE            = 4'd0;
+    localparam PRE_RD_INP      = 4'd1;
+    localparam RD_INP          = 4'd2;
+    localparam ABSORB_WAIT     = 4'd3;
+    localparam FINALIZE_STATE  = 4'd4;
+    localparam FINAL_WAIT      = 4'd5;
+    localparam SQUEEZE0        = 4'd6;
+    localparam SQUEEZE0_WAIT   = 4'd7;
+    localparam INIT_CHALL      = 4'd8;
+    localparam CHECK_BUF       = 4'd9;
+    localparam NEED_SQUEEZE    = 4'd10;
+    localparam NEED_SQ_WAIT    = 4'd11;
+    localparam GET_B           = 4'd12;
+    localparam UPDATE_COEFF    = 4'd13;
+    localparam DONE_STATE      = 4'd14;
+
+    reg [SIZE-1:0] state;
+    reg [SIZE-1:0] next_state;
+
+
+    always @(posedge clock or posedge reset) begin
+        if (reset)
+            state <= IDLE;
+        else
+            state <= next_state;
+    end
+
+    always @(*) begin
+
+        absorb_start    = 1'b0;
+        final_start     = 1'b0;
+        squeeze_start   = 1'b0;
+        squeeze_nblocks = 64'd0;
+        done            = 1'b0;
+        next_state      = state;
+
+        case (state)
+
+            IDLE: begin
+                if (start)
+                    next_state = PRE_RD_INP;
+            end
+
+            PRE_RD_INP: begin
+                if (start)
+                    next_state = RD_INP;
+            end
+
+            RD_INP: begin
+                absorb_start = 1'b1;
+                next_state   = ABSORB_WAIT;
+            end
+
+            // 3: ABSORB_WAIT ? gi? absorb_start ??n khi done
+            ABSORB_WAIT: begin
+                absorb_start = 1'b1;
+                if (absorb_done)
+                    next_state = FINALIZE_STATE;
+            end
+
+            // 4: FINALIZE ? b?t ??u finalize
+            FINALIZE_STATE: begin
+                final_start = 1'b1;
+                next_state  = FINAL_WAIT;
+            end
+
+            // 5: FINAL_WAIT ? gi? final_start ??n khi done
+            FINAL_WAIT: begin
+                final_start = 1'b1;
+                if (final_done)
+                    next_state = SQUEEZE0;
+            end
+
+            // 6: SQUEEZE0 ? l?y block ??u tiên
+            SQUEEZE0: begin
+                squeeze_start   = 1'b1;
+                squeeze_nblocks = 64'd1;
+                next_state      = SQUEEZE0_WAIT;
+            end
+
+            // 7: SQUEEZE0_WAIT ? gi? start t?i khi done
+            SQUEEZE0_WAIT: begin
+                squeeze_start   = 1'b1;
+                squeeze_nblocks = 64'd1;
+                if (squeeze_done)
+                    next_state = INIT_CHALL;
+            end
+
+            // 8: INIT_CHALL ? init c, signs, pos, i
+            INIT_CHALL: begin
+                next_state = CHECK_BUF;
+            end
+
+            // 9: CHECK_BUF ? gi?ng vòng for/do-while trong C
+            CHECK_BUF: begin
+                // d?ng khi i_idx >= N (t?c là ?ã v??t 255)
+                if (i_idx >= N)
+                    next_state = DONE_STATE;
+                else if (pos >= SHAKE256_RATE)
+                    next_state = NEED_SQUEEZE;
+                else
+                    next_state = GET_B;
+            end
+
+            // 10: NEED_SQUEEZE ? squeeze thêm block
+            NEED_SQUEEZE: begin
+                squeeze_start   = 1'b1;
+                squeeze_nblocks = 64'd1;
+                next_state      = NEED_SQ_WAIT;
+            end
+
+            // 11: NEED_SQ_WAIT ? ch? squeeze_done
+            NEED_SQ_WAIT: begin
+                squeeze_start   = 1'b1;
+                squeeze_nblocks = 64'd1;
+                if (squeeze_done)
+                    next_state = CHECK_BUF;
+            end
+
+            // 12: GET_B ? b = buffer[pos], pos++
+            GET_B: begin
+                next_state = UPDATE_COEFF;
+            end
+
+            // 13: UPDATE_COEFF ? if (b <= i) then update, else l?p
+            UPDATE_COEFF: begin
+                next_state = CHECK_BUF;
+            end
+
+            // 14: DONE_STATE
+            DONE_STATE: begin
+                done = 1'b1;
+                if (!start)
+                    next_state = IDLE;
+            end
+
+            default: begin
+                next_state = IDLE;
+            end
+        endcase
+    end
+
+    //SEQUENTIAL / DATA PAT
+    always @(posedge clock or posedge reset) begin
+        if (reset) begin
+            state_s_reg   <= 1600'd0;
+            state_pos_reg <= 32'd0;
+            signs         <= 64'd0;
+            pos           <= 8'd0;
+            i_idx         <= 9'd0;
+            b             <= 8'd0;
+            for (k = 0; k < N; k = k + 1)
+                c[k] <= 32'sd0;
+        end else begin
+            case (state)
+
+ 
+                PRE_RD_INP: begin
+                    if (start) begin
+                        state_s_reg   <= init_s;
+                        state_pos_reg <= init_pos;   // = 0
+                    end
+                end
+
+                ABSORB_WAIT: begin
+                    if (absorb_done) begin
+                        state_s_reg   <= absorb_s_out;
+                        state_pos_reg <= absorb_pos_out;
+                    end
+                end
+
+
+                FINAL_WAIT: begin
+                    if (final_done) begin
+                        state_s_reg   <= final_s_out;
+                        state_pos_reg <= final_pos_out;
+                    end
+                end
+
+                SQUEEZE0_WAIT: begin
+                    if (squeeze_done) begin
+                        for (j = 0; j < SHAKE256_RATE; j = j + 1)
+                            buffer[j] <= squeeze_bytes[j];
+                        state_s_reg <= squeeze_s_out;
+                    end
+                end
+
+   
+                INIT_CHALL: begin
+                    // c[i] = 0
+                    for (k = 0; k < N; k = k + 1)
+                        c[k] <= 32'sd0;
+
+                    // signs = sum buf[i] << (8*i), i=0..7 (little endian)
+                    signs <= { buffer[7], buffer[6], buffer[5], buffer[4],
+                               buffer[3], buffer[2], buffer[1], buffer[0] };
+
+                    pos   <= 8'd8;           // pos = 8
+                    i_idx <= N - TAU;        // i = N-TAU = 207
+                end
+
+
+                NEED_SQ_WAIT: begin
+                    if (squeeze_done) begin
+                        for (j = 0; j < SHAKE256_RATE; j = j + 1)
+                            buffer[j] <= squeeze_bytes[j];
+                        state_s_reg <= squeeze_s_out;
+                        pos         <= 8'd0;
+                    end
+                end
+
+
+                GET_B: begin
+                    b   <= buffer[pos];
+                    pos <= pos + 1'b1;
+                end
+
+
+                UPDATE_COEFF: begin
+                    if (b <= i_idx[7:0]) begin
+ 
+                        if (signs[0] == 1'b1)
+                            c[b] <= -32'sd1;
+                        else
+                            c[b] <=  32'sd1;
+
+                        c[i_idx] <= c[b];
+
+                        signs <= signs >> 1;
+                        if (i_idx < N)
+                            i_idx <= i_idx + 1'b1;
+                    end
+                end
+
+                default: begin
+                end
+            endcase
+        end
+    end
+
+endmodule
+
