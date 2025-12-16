@@ -1,0 +1,139 @@
+module poly_uniform_gamma1 (
+    input               clock,
+    input               reset,
+    input               start,
+    input      [511:0]  seed,
+    input      [15:0]   nonce,
+    output signed [8191:0] a_out,
+    output reg          done
+);
+
+    localparam N                           = 256;
+    localparam SHAKE256_RATE               = 136;  // bytes per block
+    localparam POLY_UNIFORM_GAMMA1_NBLOCKS = 5;
+    localparam POLYZ_PACKEDBYTES           = 640;  // 640 bytes c?n cho unpack
+
+    localparam TOTAL_BUF_BYTES = POLY_UNIFORM_GAMMA1_NBLOCKS * SHAKE256_RATE; // 5*136 = 680
+    localparam TOTAL_BUF_BITS  = TOTAL_BUF_BYTES * 8;                         // 5440 bit
+
+
+    wire [1599:0] state_s;
+    wire [31:0]   state_pos;
+    wire [TOTAL_BUF_BITS-1:0] linear_buf;  // 5440 bit t? squeeze
+    wire [1599:0] linear_state_s_out;
+    
+    reg  start_dilithium_shake256_stream_init;
+    wire done_dilithium_shake256_stream_init;
+    wire done_shake256_squeezeblocks;
+
+    reg [63:0] nblocks;
+    reg [31:0] len;
+    reg [31:0] buflen;
+    initial begin
+        nblocks = 64'd5;         // 5 blocks
+        len     = 32'd256;       // 256 coefficients
+        buflen  = 32'd680;       // 680 bytes buffer
+    end
+
+    dilithium_shake256_stream_init dilithium_shake256_stream_init (
+        .clock    (clock),
+        .reset    (reset),
+        .start    (start_dilithium_shake256_stream_init),
+        .seed     (seed),
+        .nonce    (nonce),
+        .state_s  (state_s),
+        .state_pos(state_pos),
+        .done     (done_dilithium_shake256_stream_init)
+    );
+    shake256_squeezeblocks #(
+        .MAX_NBLOCKS   (POLY_UNIFORM_GAMMA1_NBLOCKS),  // 5
+        .SHAKE256_RATE (SHAKE256_RATE)                 // 136
+    ) shake256_squeezeblocks_inst (
+        .clock       (clock),
+        .reset       (reset),
+        .start       (done_dilithium_shake256_stream_init),
+        .state_s_in  (state_s),
+        .nblocks     (nblocks),              // reg [63:0]
+        .out         (linear_buf),
+        .state_s_out (linear_state_s_out),
+        .done        (done_shake256_squeezeblocks)
+    );
+
+    polyz_unpack polyz_unpack_inst (
+        .a_in  (linear_buf[POLYZ_PACKEDBYTES*8-1:0]),  // L?y 640 bytes ??u
+        .r_out (a_out)                                  // Output tr?c ti?p
+    );
+
+    localparam SIZE       = 3;
+    localparam IDLE       = 3'd0;
+    localparam PRE_RD_INP = 3'd1;
+    localparam RD_INP     = 3'd2;
+
+    reg [SIZE-1:0] state;
+    reg [SIZE-1:0] next_state;
+
+    // State register
+    always @(posedge clock) begin
+        if (reset == 1'b1) begin
+            state <= IDLE;
+        end else begin
+            state <= next_state;
+        end
+    end
+
+
+    always @(*) begin
+        case (state)
+            IDLE: begin
+                done = 0;
+                start_dilithium_shake256_stream_init = 0;
+                next_state = PRE_RD_INP;
+            end
+            
+            PRE_RD_INP: begin
+                done = 0;
+                start_dilithium_shake256_stream_init = 0;
+                if (start == 1'b1) begin
+                    next_state = RD_INP;
+                end else begin
+                    next_state = PRE_RD_INP;
+                end
+            end
+            
+            RD_INP: begin
+                done = 0;
+
+                if (done_shake256_squeezeblocks) begin
+                    next_state = RD_INP;
+                    start_dilithium_shake256_stream_init = 0;
+                end else begin
+                    start_dilithium_shake256_stream_init = 1;
+                    next_state = 3;  // WAIT_DONE state
+                end
+            end
+            
+            3: begin  
+                if (done_shake256_squeezeblocks) begin
+                    done = 1;
+                    if (~start) begin
+                        start_dilithium_shake256_stream_init = 0;
+                        next_state = IDLE;
+                    end else begin
+                        start_dilithium_shake256_stream_init = 1;
+                        next_state = 3;
+                    end
+                end else begin
+                    done = 0;
+                    start_dilithium_shake256_stream_init = 1;
+                    next_state = 3;
+                end
+            end
+            default: begin
+                done = 0;
+                start_dilithium_shake256_stream_init = 0;
+                next_state = IDLE;
+            end
+        endcase
+    end
+
+endmodule

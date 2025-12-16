@@ -1,4 +1,4 @@
-`timescale 1ns/1ps
+
 
 module poly_challenge #(
     parameter N             = 256,

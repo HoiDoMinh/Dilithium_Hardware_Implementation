@@ -1,0 +1,396 @@
+module crypto_sign_signature_internal #(
+    parameter M_MAX   = 64,
+    parameter PRE_MAX = 32
+) (
+    input           clock,
+    input           reset,
+    input           start_sign_internal,
+    output reg      done_sign_internal,
+    output  [26471:0] sig,
+    input   [8*M_MAX-1:0]   m,
+    input   [31:0]          mlen,
+    input   [8*PRE_MAX-1:0] pre,
+    input   [31:0]          prelen,
+    input   [255:0]         rnd,
+    input   [32255:0]       sk
+);
+    // Parameters
+    localparam K = 6, L = 5;
+    localparam SEEDBYTES = 32, TRBYTES = 64, CRHBYTES = 64;
+    localparam RNDBYTES = 32, CTILDEBYTES = 48;
+    localparam POLYW1_PACKEDBYTES = 128;
+    localparam Q = 8380417, GAMMA1 = 524288, GAMMA2 = 261888;
+    localparam BETA = 196, OMEGA = 55;
+
+    // STEP 1: Unpack secret key 
+    wire [255:0]  rho, key;
+    wire [511:0]  tr;
+    wire signed [49151:0] t0, s2;
+    wire signed [40959:0] s1;
+
+    unpack_sk unpack_sk_inst (
+        .sk_in(sk), .rho_out(rho), .tr_out(tr), .key_out(key),
+        .t0_out(t0), .s1_out(s1), .s2_out(s2)
+    );
+
+    // STEP 2: Compute mu (Sequential)
+    localparam MU_BYTES = TRBYTES + PRE_MAX + M_MAX;
+    localparam MU_BITS  = 8 * MU_BYTES;
+    
+    wire [MU_BITS-1:0] mu_input;
+    genvar i;
+    generate
+        for (i = 0; i < TRBYTES; i = i + 1) begin : gen_mu_tr
+            assign mu_input[8*i +: 8] = tr[8*i +: 8];
+        end
+        for (i = 0; i < PRE_MAX; i = i + 1) begin : gen_mu_pre
+            assign mu_input[8*(TRBYTES + i) +: 8] = (i < prelen) ? pre[8*i +: 8] : 8'd0;
+        end
+        for (i = 0; i < M_MAX; i = i + 1) begin : gen_mu_m
+            assign mu_input[8*(TRBYTES + PRE_MAX + i) +: 8] = (i < mlen) ? m[8*i +: 8] : 8'd0;
+        end
+    endgenerate
+
+    wire [511:0] mu;
+    wire done_mu;
+
+    SHAKE256 #(.r(1088), .c(512), .outlen(511), .len(MU_BITS)) shake256_mu (
+        .in(mu_input), .reset(reset), .clk(clock),
+        .start(start_sign_internal), .SHAKEout(mu), .done(done_mu)
+    );
+
+    // STEP 3: Compute rhoprime (Sequential)
+    localparam RP_BYTES = SEEDBYTES + RNDBYTES + CRHBYTES;
+    localparam RP_BITS  = 8 * RP_BYTES;
+    wire [RP_BITS-1:0] rhoprime_input;
+
+    generate
+        for (i = 0; i < SEEDBYTES; i = i + 1) begin : gen_rp_key
+            assign rhoprime_input[8*i +: 8] = key[8*i +: 8];
+        end
+        for (i = 0; i < RNDBYTES; i = i + 1) begin : gen_rp_rnd
+            assign rhoprime_input[8*(SEEDBYTES + i) +: 8] = rnd[8*i +: 8];
+        end
+        for (i = 0; i < CRHBYTES; i = i + 1) begin : gen_rp_mu
+            assign rhoprime_input[8*(SEEDBYTES + RNDBYTES + i) +: 8] = mu[8*i +: 8];
+        end
+    endgenerate
+
+    wire [511:0] rhoprime;
+    wire done_rhoprime;
+
+    SHAKE256 #(.r(1088), .c(512), .outlen(511), .len(RP_BITS)) shake256_rhoprime (
+        .in(rhoprime_input), .reset(reset), .clk(clock),
+        .start(done_mu), .SHAKEout(rhoprime), .done(done_rhoprime)
+    );
+
+    // STEP 4: Parallel precomputation
+    wire signed [65535:0] mat1, mat2, mat3;
+    wire signed [49151:0] mat4;
+    wire done_matrix_expand;
+
+    polyvec_matrix_expand polyvec_matrix_expand_inst (
+        .clock(clock), .reset(reset), .start(done_rhoprime), .rho_in(rho),
+        .mat1(mat1), .mat2(mat2), .mat3(mat3), .mat4(mat4), .done(done_matrix_expand)
+    );
+
+    wire signed [40959:0] s1_ntt;
+    wire done_s1_ntt;
+    polyvecl_ntt polyvecl_ntt_s1 (
+        .clock(clock), .reset(reset), .start(done_rhoprime),
+        .v_in(s1), .v_out(s1_ntt), .done(done_s1_ntt)
+    );
+
+    wire signed [49151:0] s2_ntt;
+    wire done_s2_ntt;
+    polyveck_ntt polyveck_ntt_s2 (
+        .clock(clock), .reset(reset), .start(done_rhoprime),
+        .v_in(s2), .v_out(s2_ntt), .done(done_s2_ntt)
+    );
+
+    wire signed [49151:0] t0_ntt;
+    wire done_t0_ntt;
+    polyveck_ntt polyveck_ntt_t0 (
+        .clock(clock), .reset(reset), .start(done_rhoprime),
+        .v_in(t0), .v_out(t0_ntt), .done(done_t0_ntt)
+    );
+
+    // Synchronization latches
+    reg done_mat_r, done_s1_r, done_s2_r, done_t0_r;
+    always @(posedge clock) begin
+        if (reset) begin
+            done_mat_r <= 1'b0; done_s1_r <= 1'b0;
+            done_s2_r <= 1'b0; done_t0_r <= 1'b0;
+        end else begin
+            if (done_matrix_expand) done_mat_r <= 1'b1;
+            if (done_s1_ntt) done_s1_r <= 1'b1;
+            if (done_s2_ntt) done_s2_r <= 1'b1;
+            if (done_t0_ntt) done_t0_r <= 1'b1;
+            if (start_sign_internal) begin
+                done_mat_r <= 1'b0; done_s1_r <= 1'b0;
+                done_s2_r <= 1'b0; done_t0_r <= 1'b0;
+            end
+        end
+    end
+
+    wire precompute_done = done_mat_r & done_s1_r & done_s2_r & done_t0_r;
+
+    // FSM States
+    localparam ST_IDLE = 4'd0, ST_SAMPLE_Y = 4'd1, ST_COMPUTE_W = 4'd2;
+    localparam ST_CHALLENGE = 4'd3, ST_COMPUTE_Z = 4'd4, ST_CHECK_Z = 4'd5;
+    localparam ST_COMPUTE_CS2 = 4'd6, ST_CHECK_W0 = 4'd7, ST_COMPUTE_CT0 = 4'd8;
+    localparam ST_CHECK_H = 4'd9, ST_PACK_SIG = 4'd10, ST_DONE = 4'd11;
+
+    reg [3:0] state, next_state;
+    reg [15:0] nonce;
+
+    always @(posedge clock) begin
+        if (reset) begin
+            state <= ST_IDLE;
+            nonce <= 16'd0;
+            done_sign_internal <= 1'b0;
+        end else begin
+            state <= next_state;
+            if (start_sign_internal && state == ST_IDLE)
+                done_sign_internal <= 1'b0;
+            if (state == ST_DONE)
+                done_sign_internal <= 1'b1;
+            if (state != ST_SAMPLE_Y && next_state == ST_SAMPLE_Y)
+                nonce <= nonce + 16'd1;
+            if (start_sign_internal && state == ST_IDLE)
+                nonce <= 16'd0;
+        end
+    end
+
+    // Sample Y
+    reg start_y_sample;
+    always @(posedge clock) begin
+        if (reset)
+            start_y_sample <= 1'b0;
+        else
+            start_y_sample <= (state != ST_SAMPLE_Y && next_state == ST_SAMPLE_Y);
+    end
+
+    wire signed [40959:0] y;
+    wire done_y;
+    polyvecl_uniform_gamma1 polyvecl_uniform_gamma1_inst (
+        .clock(clock), .reset(reset), .start(start_y_sample),
+        .seed(rhoprime), .nonce(nonce), .v_out(y), .done(done_y)
+    );
+
+    // Compute W = A*y
+    wire signed [40959:0] y_ntt;
+    wire done_y_ntt;
+    polyvecl_ntt polyvecl_ntt_y (
+        .clock(clock), .reset(reset), .start(done_y),
+        .v_in(y), .v_out(y_ntt), .done(done_y_ntt)
+    );
+
+    wire signed [49151:0] w_temp;
+    wire done_w_mult;
+    polyvec_matrix_pointwise_montgomery polyvec_matrix_mult (
+        .clock(clock), .reset(reset), .start(done_y_ntt),
+        .v_in(y_ntt), .mat1(mat1), .mat2(mat2), .mat3(mat3), .mat4(mat4),
+        .t_out(w_temp), .done(done_w_mult)
+    );
+
+    wire signed [49151:0] w_reduced;
+    polyveck_reduce polyveck_reduce_w (.v_in(w_temp), .v_out(w_reduced));
+
+    wire signed [49151:0] w_invntt;
+    wire done_w_invntt;
+    polyveck_invntt_tomont polyveck_invntt_w (
+        .clock(clock), .reset(reset), .start(done_w_mult),
+        .v_in(w_reduced), .v_out(w_invntt), .done(done_w_invntt)
+    );
+
+    wire signed [49151:0] w_caddq;
+    polyveck_caddq polyveck_caddq_w (.v_in(w_invntt), .v_out(w_caddq));
+
+    // Decompose
+    wire signed [49151:0] w1_decomp, w0_decomp;
+    polyveck_decompose polyveck_decompose_inst (
+        .v_in(w_caddq), .v1_out(w1_decomp), .v0_out(w0_decomp)
+    );
+
+    // Pack w1 
+    wire [K*POLYW1_PACKEDBYTES*8-1:0] w1_packed;
+    polyveck_pack_w1 polyveck_pack_w1_inst (
+        .w1_in(w1_decomp), .r_out(w1_packed)
+    );
+
+    // Challenge hash
+    localparam CH_IN_BITS = 8*CRHBYTES + K*POLYW1_PACKEDBYTES*8;
+    wire [CH_IN_BITS-1:0] challenge_input;
+    generate
+        for (i = 0; i < CRHBYTES; i = i + 1) begin : gen_ch_mu
+            assign challenge_input[8*i +: 8] = mu[8*i +: 8];
+        end
+        for (i = 0; i < K*POLYW1_PACKEDBYTES; i = i + 1) begin : gen_ch_w1
+            assign challenge_input[8*(CRHBYTES + i) +: 8] = w1_packed[8*i +: 8];
+        end
+    endgenerate
+
+    wire [8*CTILDEBYTES-1:0] ctilde;
+    wire done_ctilde;
+    SHAKE256 #(.r(1088), .c(512), .outlen(8*CTILDEBYTES), .len(CH_IN_BITS)) shake256_challenge (
+        .in(challenge_input), .reset(reset), .clk(clock),
+        .start(done_w_invntt), .SHAKEout(ctilde), .done(done_ctilde)
+    );
+
+    // Generate challenge polynomial
+    wire signed [8191:0] cp;
+    wire done_cp;
+    poly_challenge poly_challenge_inst (
+        .clock(clock), .reset(reset), .start(done_ctilde),
+        .seed_in(ctilde), .c_out(cp), .done(done_cp)
+    );
+
+    wire signed [8191:0] cp_ntt;
+    wire done_cp_ntt;
+    poly_ntt poly_ntt_cp (
+        .clock(clock), .reset(reset), .start(done_cp),
+        .poly_in(cp), .poly_out(cp_ntt), .done(done_cp_ntt)
+    );
+
+    // Compute Z 
+    wire signed [40959:0] cs1_ntt;
+    polyvecl_pointwise_poly_montgomery polyvecl_mult_cs1 (
+        .a_in(cp_ntt), .v_in(s1_ntt), .r_out(cs1_ntt)
+    );
+
+    wire signed [40959:0] cs1;
+    wire done_cs1_invntt;
+    polyvecl_invntt_tomont polyvecl_invntt_cs1 (
+        .clock(clock), .reset(reset), .start(done_cp_ntt),
+        .v_in(cs1_ntt), .v_out(cs1), .done(done_cs1_invntt)
+    );
+
+    // z = cs1 + y 
+    wire signed [40959:0] z_temp;
+    polyvecl_add polyvecl_add_z (.v_in(cs1), .u_in(y), .w_out(z_temp));
+
+    wire signed [40959:0] z_final;
+    polyvecl_reduce polyvecl_reduce_z (.v_in(z_temp), .v_out(z_final));
+
+    // Check z norm 
+    wire z_norm_pass;
+    polyvecl_chknorm polyvecl_chknorm_z (
+        .v_in(z_final), .B(GAMMA1 - BETA), .flag(z_norm_pass)
+    );
+
+    // Compute cs2 
+    wire signed [49151:0] cs2_ntt;
+    polyveck_pointwise_poly_montgomery polyveck_mult_cs2 (
+        .a_in(cp_ntt), .v_in(s2_ntt), .r_out(cs2_ntt)
+    );
+
+    wire signed [49151:0] cs2;
+    wire done_cs2_invntt;
+    polyveck_invntt_tomont polyveck_invntt_cs2 (
+        .clock(clock), .reset(reset), .start(done_cp_ntt),
+        .v_in(cs2_ntt), .v_out(cs2), .done(done_cs2_invntt)
+    );
+
+    // Check w0 
+    wire signed [49151:0] w0_sub;
+    polyveck_sub polyveck_sub_w0 (.u_in(w0_decomp), .v_in(cs2), .w_out(w0_sub));
+
+    wire signed [49151:0] w0_reduced;
+    polyveck_reduce polyveck_reduce_w0 (.v_in(w0_sub), .v_out(w0_reduced));
+
+    wire w0_norm_pass;
+    polyveck_chknorm polyveck_chknorm_w0 (
+        .v_in(w0_reduced), .B(GAMMA2 - BETA), .flag(w0_norm_pass)
+    );
+
+    // Compute ct0 
+    wire signed [49151:0] ct0_ntt;
+    polyveck_pointwise_poly_montgomery polyveck_mult_ct0 (
+        .a_in(cp_ntt), .v_in(t0_ntt), .r_out(ct0_ntt)
+    );
+
+    wire signed [49151:0] h_ct0;
+    wire done_ct0_invntt;
+    polyveck_invntt_tomont polyveck_invntt_ct0 (
+        .clock(clock), .reset(reset), .start(done_cp_ntt),
+        .v_in(ct0_ntt), .v_out(h_ct0), .done(done_ct0_invntt)
+    );
+
+    wire signed [49151:0] h_reduced;
+    polyveck_reduce polyveck_reduce_h (.v_in(h_ct0), .v_out(h_reduced));
+
+    wire h_norm_pass;
+    polyveck_chknorm polyveck_chknorm_h (
+        .v_in(h_reduced), .B(GAMMA2), .flag(h_norm_pass)
+    );
+
+    // Make hints 
+    wire signed [49151:0] w0_plus_h;
+    polyveck_add polyveck_add_w0h (.v_in(w0_reduced), .u_in(h_reduced), .w_out(w0_plus_h));
+
+    wire signed [49151:0] hints;
+    wire [31:0] hint_count;
+    polyveck_make_hint polyveck_make_hint_inst (
+        .v0_in(w0_plus_h), .v1_in(w1_decomp), .h_out(hints), .count(hint_count)
+    );
+
+    wire hint_count_pass = (hint_count <= OMEGA);
+
+    // Pack signature 
+    pack_sig pack_sig_inst (
+        .c_in(ctilde), .z_in(z_final), .h_in(hints), .sig_out(sig)
+    );
+
+    // FSM 
+    always @(*) begin
+        next_state = state;
+        case (state)
+            ST_IDLE: 
+                if (precompute_done) next_state = ST_SAMPLE_Y;
+            
+            ST_SAMPLE_Y: 
+                if (done_y) next_state = ST_COMPUTE_W;
+            
+            ST_COMPUTE_W: 
+                if (done_w_invntt) next_state = ST_CHALLENGE;
+            
+            ST_CHALLENGE: 
+                if (done_cp_ntt) next_state = ST_COMPUTE_Z;
+            
+            ST_COMPUTE_Z: 
+                if (done_cs1_invntt) next_state = ST_CHECK_Z;
+            
+            ST_CHECK_Z: 
+                // z_norm_pass available immediately after done_cs1_invntt
+                next_state = z_norm_pass ? ST_COMPUTE_CS2 : ST_SAMPLE_Y;
+            
+            ST_COMPUTE_CS2: 
+                if (done_cs2_invntt) next_state = ST_CHECK_W0;
+            
+            ST_CHECK_W0: 
+                // w0_norm_pass available immediately after done_cs2_invntt
+                next_state = w0_norm_pass ? ST_COMPUTE_CT0 : ST_SAMPLE_Y;
+            
+            ST_COMPUTE_CT0: 
+                if (done_ct0_invntt) next_state = ST_CHECK_H;
+            
+            ST_CHECK_H: 
+                // h_norm_pass and hint_count_pass available immediately
+                if (h_norm_pass && hint_count_pass)
+                    next_state = ST_PACK_SIG;
+                else
+                    next_state = ST_SAMPLE_Y;
+            
+            ST_PACK_SIG: 
+                // Signature packing is combinational, done immediately
+                next_state = ST_DONE;
+            
+            ST_DONE: 
+                next_state = ST_DONE;
+            default: 
+                next_state = ST_IDLE;
+        endcase
+    end
+
+endmodule

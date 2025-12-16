@@ -37,4 +37,10 @@ module tb_poly_uniform_eta;
     #10 start = 0;
     #50 $finish;
   end
+// Timeout
+    initial begin
+        #200000;
+        $display("\n[ERROR] SIMULATION TIMEOUT!\n");
+        $finish;
+    end
 endmodule

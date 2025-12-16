@@ -23,8 +23,6 @@ module polyz_pack(
             wire [7:0] b3 =  t1[11:4];
             wire [7:0] b4 =  t1[19:12];
 
-            localparam integer BASE = 5*i;
-
             assign r_out[8*(5*i+0) + 7 : 8*(5*i+0)] = b0;
             assign r_out[8*(5*i+1) + 7 : 8*(5*i+1)] = b1;
             assign r_out[8*(5*i+2) + 7 : 8*(5*i+2)] = b2;

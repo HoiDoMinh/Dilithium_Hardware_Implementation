@@ -16,7 +16,7 @@ module poly_make_hint(
             assign a0[x] = a0_in[32*x + 31 : 32*x];
             assign a1[x] = a1_in[32*x + 31 : 32*x];
 
-            make_hint Uhint (
+            make_hint make_hint_inst (
                 .a0(a0[x]),
                 .a1(a1[x]),
                 .overflow_signal(h_bit[x])

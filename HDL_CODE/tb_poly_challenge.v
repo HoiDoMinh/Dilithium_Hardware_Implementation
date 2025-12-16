@@ -43,9 +43,10 @@ module tb_poly_challenge;
         reset = 0;
 
         // Set seed gi?ng C-code
-        for (i = 0; i < CTILDEBYTES; i = i + 1)
-            seed_in[8*i +: 8] = 8'hABCDFF;   
-        #20;
+        //for (i = 0; i < CTILDEBYTES; i = i + 1)
+         //   seed_in[8*i +: 8] = 8'hABCDFF;   
+       // #20;
+	seed_in=384'h2f2e2d2c2b2a292827262524232221201f1e1d1c1b1a191817161514131211100f0e0d0c0b0a09080706050403020100;
 
         start = 1;
         #30;

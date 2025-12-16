@@ -11,7 +11,7 @@ module pack_sig #(
 )(                                                      
     input  [CTILDEBYTES*8-1:0] c_in,                   // 48 bytes
     input  [L*256*32-1:0]      z_in,                   // 5 polys
-    input  [K*N*32-1:0]        h_in,                   // hint vector
+    input  [K*N*32-1:0]        h_in,                   // hint vector =49152 bits 
     output [CRYPTO_BYTES*8-1:0] sig_out                // 3309 bytes
 );
 

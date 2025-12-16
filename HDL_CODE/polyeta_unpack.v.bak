@@ -13,7 +13,7 @@ module polyeta_unpack (
             // 1 byte input
             wire [7:0] byte_i = a_in[8*i + 7 : 8*i]; 
 
-            // Extract nibbles
+            // trich xuat theo he so
             wire [3:0] t0 = byte_i[3:0];   // low 
             wire [3:0] t1 = byte_i[7:4];   // high 
 

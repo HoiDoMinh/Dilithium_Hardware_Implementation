@@ -1,30 +1,24 @@
 module polyeta_unpack (
-    input  [1023:0] a_in,       // 128 bytes = 1024 bit
-    output [8191:0] r_out       // 256 coeff × 32-bit signed
+    input  [1023:0] a_in,
+    output [8191:0]  r_out
 );
-
-    localparam N   = 256;
-    localparam ETA = 4;
+    localparam N = 256;
+    localparam signed [31:0] ETA_S = 32'sd4;
 
     genvar i;
     generate
-        for (i = 0; i < N/2; i = i + 1) begin : unpack_loop
+      for (i = 0; i < N/2; i = i + 1) begin : unpack_loop
+        wire [7:0] byte_i = a_in[8*i + 7 : 8*i];
 
-            // 1 byte input
-            wire [7:0] byte_i = a_in[8*i + 7 : 8*i]; 
+        wire [3:0] t0 = byte_i[3:0];
+        wire [3:0] t1 = byte_i[7:4];
 
-            // trich xuat theo he so
-            wire [3:0] t0 = byte_i[3:0];   // low 
-            wire [3:0] t1 = byte_i[7:4];   // high 
+        wire signed [31:0] coeff0 = ETA_S - $signed({28'd0, t0});
+        wire signed [31:0] coeff1 = ETA_S - $signed({28'd0, t1});
 
-            // coeff = ETA - t
-            wire signed [31:0] coeff0 = $signed(ETA - t0);
-            wire signed [31:0] coeff1 = $signed(ETA - t1);     //1byte chua 2 he so 32 bit
-
-            assign r_out[32*(2*i+0) + 31 : 32*(2*i+0)] = coeff0;
-            assign r_out[32*(2*i+1) + 31 : 32*(2*i+1)] = coeff1;
-
-        end
+        assign r_out[32*(2*i+0) +: 32] = coeff0;
+        assign r_out[32*(2*i+1) +: 32] = coeff1;
+      end
     endgenerate
-
 endmodule
+

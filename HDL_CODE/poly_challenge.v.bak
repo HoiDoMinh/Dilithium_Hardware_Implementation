@@ -252,7 +252,6 @@ module poly_challenge #(
         endcase
     end
 
-    //SEQUENTIAL / DATA PAT
     always @(posedge clock or posedge reset) begin
         if (reset) begin
             state_s_reg   <= 1600'd0;

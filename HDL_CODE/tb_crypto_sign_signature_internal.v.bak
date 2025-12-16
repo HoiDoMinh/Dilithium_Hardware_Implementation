@@ -1,0 +1,201 @@
+`timescale 1ns/1ps
+`include "byte_and_print.vh"
+
+module tb_crypto_sign_signature_internal;
+
+  // ============================================================
+  // CLOCK / RESET
+  // ============================================================
+  reg clock;
+  reg reset;
+
+  initial clock = 0;
+  always #5 clock = ~clock;   // 100 MHz
+
+  // ============================================================
+  // DUT INPUTS
+  // ============================================================
+  reg start_sign_internal;
+  reg [8*64-1:0]  m;
+  reg [31:0]      mlen;
+  reg [8*32-1:0]  pre;
+  reg [31:0]      prelen;
+  reg [255:0]     rnd;
+  reg [32255:0]   sk;
+
+  // ============================================================
+  // DUT OUTPUTS
+  // ============================================================
+  wire done_sign_internal;
+  wire [26471:0] sig;
+
+  // ============================================================
+  // DUT
+  // ============================================================
+  crypto_sign_signature_internal dut (
+    .clock(clock),
+    .reset(reset),
+    .start_sign_internal(start_sign_internal),
+    .done_sign_internal(done_sign_internal),
+    .sig(sig),
+    .m(m),
+    .mlen(mlen),
+    .pre(pre),
+    .prelen(prelen),
+    .rnd(rnd),
+    .sk(sk)
+  );
+
+  // ============================================================
+  // FSM STATE NAME (DEBUG)
+  // ============================================================
+  reg [127:0] state_name, prev_state_name;
+
+  always @(*) begin
+    case (dut.state)
+      4'd0: state_name = "IDLE";
+      4'd1: state_name = "SAMPLE_Y";
+      4'd2: state_name = "COMPUTE_W";
+      4'd3: state_name = "CHALLENGE";
+      4'd4: state_name = "COMPUTE_Z";
+      4'd5: state_name = "CHECK_Z";
+      4'd6: state_name = "COMPUTE_CS2";
+      4'd7: state_name = "CHECK_W0";
+      4'd8: state_name = "COMPUTE_CT0";
+      4'd9: state_name = "CHECK_H";
+      4'd10: state_name = "PACK_SIG";
+      4'd11: state_name = "DONE";
+      default: state_name = "UNKNOWN";
+    endcase
+
+    case (dut.prev_state)
+      4'd0: prev_state_name = "IDLE";
+      4'd1: prev_state_name = "SAMPLE_Y";
+      4'd2: prev_state_name = "COMPUTE_W";
+      4'd3: prev_state_name = "CHALLENGE";
+      4'd4: prev_state_name = "COMPUTE_Z";
+      4'd5: prev_state_name = "CHECK_Z";
+      4'd6: prev_state_name = "COMPUTE_CS2";
+      4'd7: prev_state_name = "CHECK_W0";
+      4'd8: prev_state_name = "COMPUTE_CT0";
+      4'd9: prev_state_name = "CHECK_H";
+      4'd10: prev_state_name = "PACK_SIG";
+      4'd11: prev_state_name = "DONE";
+      default: prev_state_name = "UNKNOWN";
+    endcase
+  end
+
+  // ============================================================
+  // FSM MONITOR + WATCHDOG
+  // ============================================================
+  integer state_cycles;
+
+  always @(posedge clock) begin
+    if (reset) begin
+      state_cycles <= 0;
+    end else begin
+      if (dut.state != dut.prev_state) begin
+        $display("[%0t] FSM: %s ? %s (cycles=%0d, nonce=%0d)",
+          $time, prev_state_name, state_name, state_cycles, dut.nonce);
+        state_cycles <= 0;
+      end else begin
+        state_cycles <= state_cycles + 1;
+
+        if (state_cycles > 50000) begin
+          $display("\n======================================");
+          $display("? FSM STUCK!");
+          $display("State      : %s", state_name);
+          $display("Cycles     : %0d", state_cycles);
+          $display("Nonce      : %0d", dut.nonce);
+          $display("--------------------------------------");
+          $display("done_mu            = %b", dut.done_mu);
+          $display("done_rhoprime      = %b", dut.done_rhoprime);
+          $display("precompute_done    = %b", dut.precompute_done);
+          $display("done_y             = %b", dut.done_y);
+          $display("done_y_ntt         = %b", dut.done_y_ntt);
+          $display("done_w_invntt      = %b", dut.done_w_invntt);
+          $display("done_ctilde        = %b", dut.done_ctilde);
+          $display("done_cp_ntt        = %b", dut.done_cp_ntt);
+          $display("done_cs1_invntt    = %b", dut.done_cs1_invntt);
+          $display("done_cs2_invntt    = %b", dut.done_cs2_invntt);
+          $display("done_ct0_invntt    = %b", dut.done_ct0_invntt);
+          $display("--------------------------------------");
+          $display("z_norm_pass        = %b", dut.z_norm_pass);
+          $display("w0_norm_pass       = %b", dut.w0_norm_pass);
+          $display("h_norm_pass        = %b", dut.h_norm_pass);
+          $display("hint_count         = %0d", dut.hint_count);
+          $display("======================================\n");
+          $finish;
+        end
+      end
+    end
+  end
+
+  // ============================================================
+  // DONE SIGNAL TRACE
+  // ============================================================
+  always @(posedge clock) begin
+    if (!reset) begin
+      if (dut.done_mu)         $display("[%0t] ? done_mu", $time);
+      if (dut.done_rhoprime)   $display("[%0t] ? done_rhoprime", $time);
+      if (dut.done_y)          $display("[%0t] ? done_y (nonce=%0d)", $time, dut.nonce);
+      if (dut.done_y_ntt)      $display("[%0t] ? done_y_ntt", $time);
+      if (dut.done_w_invntt)   $display("[%0t] ? done_w_invntt", $time);
+      if (dut.done_ctilde)     $display("[%0t] ? done_ctilde", $time);
+      if (dut.done_cp_ntt)     $display("[%0t] ? done_cp_ntt", $time);
+      if (dut.done_cs1_invntt) $display("[%0t] ? done_cs1_invntt", $time);
+      if (dut.done_cs2_invntt) $display("[%0t] ? done_cs2_invntt", $time);
+      if (dut.done_ct0_invntt) $display("[%0t] ? done_ct0_invntt", $time);
+    end
+  end
+
+  // ============================================================
+  // TEST SEQUENCE
+  // ============================================================
+  integer i;
+
+  initial begin
+    $display("\n======================================");
+    $display(" DILITHIUM SIGNATURE RTL TESTBENCH ");
+    $display("======================================\n");
+
+    reset = 1;
+    start_sign_internal = 0;
+
+    mlen   = 64;
+    prelen = 32;
+
+    for (i = 0; i < 64; i = i + 1)  m[8*i +: 8] = 8'h11;
+    for (i = 0; i < 32; i = i + 1) pre[8*i +: 8] = 8'h22;
+    for (i = 0; i < 32; i = i + 1) rnd[8*i +: 8] = 8'h33;
+
+    #50 reset = 0;
+    sk = 32256'h8;
+    #20 start_sign_internal = 1;
+    #10 start_sign_internal = 0;
+
+    // === FOLLOW C FLOW ===
+    @(posedge dut.done_mu);
+    @(posedge dut.done_rhoprime);
+    @(posedge dut.done_y);
+    @(posedge dut.done_ctilde);
+    @(posedge done_sign_internal);
+
+    $display("\n======================================");
+    $display(" ? SIGNATURE DONE SUCCESSFULLY ");
+    $display("======================================\n");
+
+    $finish;
+  end
+
+  // ============================================================
+  // GLOBAL TIMEOUT
+  // ============================================================
+  initial begin
+    #5_000_000;
+    $display("\n? GLOBAL TIMEOUT (5ms)");
+    $finish;
+  end
+
+endmodule
+

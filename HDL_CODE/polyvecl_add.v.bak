@@ -1,0 +1,24 @@
+
+
+module polyvecl_add(
+    input signed [40959:0] u_in,
+    input signed [40959:0] v_in,
+    output signed [40959:0] w_out
+);
+    
+    localparam L = 5;
+    wire signed [8191:0] u [0:L - 1];
+    wire signed [8191:0] v [0:L - 1];
+    wire signed [8191:0] w [0:L - 1];
+    
+    generate
+        genvar x;
+        for (x = 0; x < L; x = x + 1) begin
+		    assign u[x] = u_in[8192 * x + 8191:8192 * x];
+		    assign v[x] = v_in[8192 * x + 8191:8192 * x];
+		    poly_add poly_add(.a_in(u[x]), .b_in(v[x]), .c_out(w[x]));
+		    assign w_out[8192 * x + 8191:8192 * x] = w[x];
+		end
+	endgenerate
+	
+endmodule
