@@ -3,199 +3,445 @@
 
 module tb_crypto_sign_signature_internal;
 
-  // ============================================================
-  // CLOCK / RESET
-  // ============================================================
-  reg clock;
-  reg reset;
+    // 1. PARAMETERS
+    localparam M_MAX = 64;
+    localparam PRE_MAX = 32;
+    localparam K = 6;
+    localparam L = 5;
+    localparam N = 256;
+    
+    localparam POLYVECL_BYTES = L * N * 4; // 5120 bytes
+    localparam POLYVECK_BYTES = K * N * 4; // 6144 bytes
+    localparam POLY_BYTES = N * 4;         // 1024 bytes
+    localparam SIG_BYTES = 3309;
 
-  initial clock = 0;
-  always #5 clock = ~clock;   // 100 MHz
+    // ========================================================================
+    // 2. CLOCK / RESET
+    // ========================================================================
+    reg clock;
+    reg reset;
+    
+    initial clock = 0;
+    always #5 clock = ~clock;
 
-  // ============================================================
-  // DUT INPUTS
-  // ============================================================
-  reg start_sign_internal;
-  reg [8*64-1:0]  m;
-  reg [31:0]      mlen;
-  reg [8*32-1:0]  pre;
-  reg [31:0]      prelen;
-  reg [255:0]     rnd;
-  reg [32255:0]   sk;
+    // ========================================================================
+    // 3. DUT SIGNALS
+    // ========================================================================
+    reg start_sign_internal;
+    reg [8*M_MAX-1:0] m;
+    reg [31:0] mlen;
+    reg [8*PRE_MAX-1:0] pre;
+    reg [31:0] prelen;
+    reg [255:0] rnd;
+    reg [32255:0] sk;
+    
+    wire done_sign_internal;
+    wire [26471:0] sig;
 
-  // ============================================================
-  // DUT OUTPUTS
-  // ============================================================
-  wire done_sign_internal;
-  wire [26471:0] sig;
+    // ========================================================================
+    // 4. DUT INSTANTIATION
+    // ========================================================================
+    crypto_sign_signature_internal #(
+        .M_MAX(M_MAX), 
+        .PRE_MAX(PRE_MAX)
+    ) dut (
+        .clock(clock),
+        .reset(reset),
+        .start_sign_internal(start_sign_internal),
+        .done_sign_internal(done_sign_internal),
+        .sig(sig),
+        .m(m),
+        .mlen(mlen),
+        .pre(pre),
+        .prelen(prelen),
+        .rnd(rnd),
+        .sk(sk)
+    );
 
-  // ============================================================
-  // DUT
-  // ============================================================
-  crypto_sign_signature_internal dut (
-    .clock(clock),
-    .reset(reset),
-    .start_sign_internal(start_sign_internal),
-    .done_sign_internal(done_sign_internal),
-    .sig(sig),
-    .m(m),
-    .mlen(mlen),
-    .pre(pre),
-    .prelen(prelen),
-    .rnd(rnd),
-    .sk(sk)
-  );
+    integer i,fd;
 
-  // ============================================================
-  // FSM STATE NAME (DEBUG)
-  // ============================================================
-  reg [127:0] state_name, prev_state_name;
+    // ========================================================================
+    // 5. BYTE ARRAYS FOR PRINTING
+    // ========================================================================
+    reg [7:0] rho_bytes [0:31];
+    reg [7:0] key_bytes [0:31];
+    reg [7:0] tr_bytes [0:63];
+    reg [7:0] mu_bytes [0:63];
+    reg [7:0] rhoprime_bytes [0:63];
+    reg [7:0] ctilde_bytes [0:47];
+    
+    // Vectors
+    reg [7:0] s1_bytes [0:POLYVECL_BYTES-1];
+    reg [7:0] s1_ntt_bytes [0:POLYVECL_BYTES-1];
+    reg [7:0] s2_bytes [0:POLYVECK_BYTES-1];
+    reg [7:0] s2_ntt_bytes [0:POLYVECK_BYTES-1];
+    reg [7:0] t0_bytes [0:POLYVECK_BYTES-1];
+    reg [7:0] t0_ntt_bytes [0:POLYVECK_BYTES-1];
+    
+    reg [7:0] y_bytes [0:POLYVECL_BYTES-1];
+    reg [7:0] y_ntt_bytes [0:POLYVECL_BYTES-1];
+    reg [7:0] z_temp_bytes [0:POLYVECL_BYTES-1];
+    reg [7:0] z_final_bytes [0:POLYVECL_BYTES-1];
+    
+    reg [7:0] w_reduced_bytes [0:POLYVECK_BYTES-1];
+    reg [7:0] w_invntt_bytes [0:POLYVECK_BYTES-1];
+    reg [7:0] w_caddq_bytes [0:POLYVECK_BYTES-1];
+    reg [7:0] w1_decomp_bytes [0:POLYVECK_BYTES-1];
+    reg [7:0] w0_decomp_bytes [0:POLYVECK_BYTES-1];
+    reg [7:0] w0_reduced_check_bytes [0:POLYVECK_BYTES-1];
+    
+    reg [7:0] cs1_ntt_bytes [0:POLYVECL_BYTES-1];
+    reg [7:0] cs1_bytes [0:POLYVECL_BYTES-1];
+    reg [7:0] cs2_ntt_bytes [0:POLYVECK_BYTES-1];
+    reg [7:0] cs2_bytes [0:POLYVECK_BYTES-1];
+    
+    reg [7:0] h_reduced_bytes [0:POLYVECK_BYTES-1];
+    reg [7:0] hints_bytes [0:POLYVECK_BYTES-1];
+    reg [7:0] w0_plus_h_bytes [0:POLYVECK_BYTES-1];
+    
+    reg [7:0] cp_bytes [0:POLY_BYTES-1];
+    reg [7:0] cp_ntt_bytes [0:POLY_BYTES-1];
+    
+    reg [7:0] sig_bytes [0:SIG_BYTES-1];
 
-  always @(*) begin
-    case (dut.state)
-      4'd0: state_name = "IDLE";
-      4'd1: state_name = "SAMPLE_Y";
-      4'd2: state_name = "COMPUTE_W";
-      4'd3: state_name = "CHALLENGE";
-      4'd4: state_name = "COMPUTE_Z";
-      4'd5: state_name = "CHECK_Z";
-      4'd6: state_name = "COMPUTE_CS2";
-      4'd7: state_name = "CHECK_W0";
-      4'd8: state_name = "COMPUTE_CT0";
-      4'd9: state_name = "CHECK_H";
-      4'd10: state_name = "PACK_SIG";
-      4'd11: state_name = "DONE";
-      default: state_name = "UNKNOWN";
-    endcase
-
-    case (dut.prev_state)
-      4'd0: prev_state_name = "IDLE";
-      4'd1: prev_state_name = "SAMPLE_Y";
-      4'd2: prev_state_name = "COMPUTE_W";
-      4'd3: prev_state_name = "CHALLENGE";
-      4'd4: prev_state_name = "COMPUTE_Z";
-      4'd5: prev_state_name = "CHECK_Z";
-      4'd6: prev_state_name = "COMPUTE_CS2";
-      4'd7: prev_state_name = "CHECK_W0";
-      4'd8: prev_state_name = "COMPUTE_CT0";
-      4'd9: prev_state_name = "CHECK_H";
-      4'd10: prev_state_name = "PACK_SIG";
-      4'd11: prev_state_name = "DONE";
-      default: prev_state_name = "UNKNOWN";
-    endcase
-  end
-
-  // ============================================================
-  // FSM MONITOR + WATCHDOG
-  // ============================================================
-  integer state_cycles;
-
-  always @(posedge clock) begin
-    if (reset) begin
-      state_cycles <= 0;
-    end else begin
-      if (dut.state != dut.prev_state) begin
-        $display("[%0t] FSM: %s ? %s (cycles=%0d, nonce=%0d)",
-          $time, prev_state_name, state_name, state_cycles, dut.nonce);
-        state_cycles <= 0;
-      end else begin
-        state_cycles <= state_cycles + 1;
-
-        if (state_cycles > 50000) begin
-          $display("\n======================================");
-          $display("? FSM STUCK!");
-          $display("State      : %s", state_name);
-          $display("Cycles     : %0d", state_cycles);
-          $display("Nonce      : %0d", dut.nonce);
-          $display("--------------------------------------");
-          $display("done_mu            = %b", dut.done_mu);
-          $display("done_rhoprime      = %b", dut.done_rhoprime);
-          $display("precompute_done    = %b", dut.precompute_done);
-          $display("done_y             = %b", dut.done_y);
-          $display("done_y_ntt         = %b", dut.done_y_ntt);
-          $display("done_w_invntt      = %b", dut.done_w_invntt);
-          $display("done_ctilde        = %b", dut.done_ctilde);
-          $display("done_cp_ntt        = %b", dut.done_cp_ntt);
-          $display("done_cs1_invntt    = %b", dut.done_cs1_invntt);
-          $display("done_cs2_invntt    = %b", dut.done_cs2_invntt);
-          $display("done_ct0_invntt    = %b", dut.done_ct0_invntt);
-          $display("--------------------------------------");
-          $display("z_norm_pass        = %b", dut.z_norm_pass);
-          $display("w0_norm_pass       = %b", dut.w0_norm_pass);
-          $display("h_norm_pass        = %b", dut.h_norm_pass);
-          $display("hint_count         = %0d", dut.hint_count);
-          $display("======================================\n");
-          $finish;
+    // ========================================================================
+    // 6. EXTRACT BYTES FROM SIGNALS 
+    // ========================================================================
+    always @(*) begin
+        // Seeds and hashes
+        for (i = 0; i < 32; i = i + 1) begin
+            rho_bytes[i] = dut.rho[8*i +: 8];
+            key_bytes[i] = dut.key[8*i +: 8];
         end
-      end
+        for (i = 0; i < 64; i = i + 1) begin
+            tr_bytes[i] = dut.tr[8*i +: 8];
+            mu_bytes[i] = dut.mu[8*i +: 8];
+            rhoprime_bytes[i] = dut.rhoprime[8*i +: 8];
+        end
+        for (i = 0; i < 48; i = i + 1) begin
+            ctilde_bytes[i] = dut.ctilde[8*i +: 8];
+        end
+        
+        // Vectors
+        for (i = 0; i < POLYVECL_BYTES; i = i + 1) begin
+            s1_bytes[i] = dut.s1[8*i +: 8];
+            // ??c tr?c ti?p wire t? Top module
+            s1_ntt_bytes[i] = dut.s1_ntt_wire[8*i +: 8]; 
+            
+            y_bytes[i] = dut.y[8*i +: 8];
+            y_ntt_bytes[i] = dut.y_ntt[8*i +: 8];
+            z_temp_bytes[i] = dut.z_temp[8*i +: 8];
+            z_final_bytes[i] = dut.z_final[8*i +: 8];
+            cs1_ntt_bytes[i] = dut.cs1_ntt[8*i +: 8];
+            cs1_bytes[i] = dut.cs1[8*i +: 8];
+        end
+        
+        for (i = 0; i < POLYVECK_BYTES; i = i + 1) begin
+            s2_bytes[i] = dut.s2[8*i +: 8];
+            // ??c tr?c ti?p wire
+            s2_ntt_bytes[i] = dut.s2_ntt_wire[8*i +: 8]; 
+            
+            t0_bytes[i] = dut.t0[8*i +: 8];
+            // ??c tr?c ti?p wire
+            t0_ntt_bytes[i] = dut.t0_ntt_wire[8*i +: 8]; 
+            
+            w_reduced_bytes[i] = dut.w_reduced_temp[8*i +: 8];       
+            w_invntt_bytes[i] = dut.w_invntt[8*i +: 8];
+            w_caddq_bytes[i] = dut.w_caddq[8*i +: 8];
+            w1_decomp_bytes[i] = dut.w1_decomp[8*i +: 8];
+            w0_decomp_bytes[i] = dut.w0_decomp[8*i +: 8];
+            w0_reduced_check_bytes[i] = dut.w0_reduced_check[8*i +: 8];
+            
+            cs2_ntt_bytes[i] = dut.cs2_ntt[8*i +: 8];
+            cs2_bytes[i] = dut.cs2[8*i +: 8];
+            h_reduced_bytes[i] = dut.h_reduced[8*i +: 8];
+            hints_bytes[i] = dut.hints[8*i +: 8];
+            w0_plus_h_bytes[i] = dut.w0_plus_h[8*i +: 8];
+        end
+        
+        // Challenge
+        for (i = 0; i < POLY_BYTES; i = i + 1) begin
+            // ??c t? wire cp_direct
+            cp_bytes[i] = dut.cp_direct[8*i +: 8];
+            cp_ntt_bytes[i] = dut.cp_ntt[8*i +: 8];
+        end
+        
+        // Signature
+        for (i = 0; i < SIG_BYTES; i = i + 1) begin
+            sig_bytes[i] = sig[8*i +: 8];
+        end
     end
-  end
 
-  // ============================================================
-  // DONE SIGNAL TRACE
-  // ============================================================
-  always @(posedge clock) begin
-    if (!reset) begin
-      if (dut.done_mu)         $display("[%0t] ? done_mu", $time);
-      if (dut.done_rhoprime)   $display("[%0t] ? done_rhoprime", $time);
-      if (dut.done_y)          $display("[%0t] ? done_y (nonce=%0d)", $time, dut.nonce);
-      if (dut.done_y_ntt)      $display("[%0t] ? done_y_ntt", $time);
-      if (dut.done_w_invntt)   $display("[%0t] ? done_w_invntt", $time);
-      if (dut.done_ctilde)     $display("[%0t] ? done_ctilde", $time);
-      if (dut.done_cp_ntt)     $display("[%0t] ? done_cp_ntt", $time);
-      if (dut.done_cs1_invntt) $display("[%0t] ? done_cs1_invntt", $time);
-      if (dut.done_cs2_invntt) $display("[%0t] ? done_cs2_invntt", $time);
-      if (dut.done_ct0_invntt) $display("[%0t] ? done_ct0_invntt", $time);
+    // ========================================================================
+    // 7. FSM STATE NAME HELPER
+    // ========================================================================
+    function [127:0] state_name;
+        input [3:0] st;
+        begin
+            case (st)
+                4'd0: state_name = "IDLE";
+                4'd1: state_name = "CALC_MU";
+                4'd2: state_name = "CALC_RHO";
+                4'd3: state_name = "PRECOMP";
+                4'd4: state_name = "SAMPLE_Y";
+                4'd5: state_name = "COMPUTE_W";
+                4'd6: state_name = "CHALLENGE";
+                4'd7: state_name = "COMPUTE_Z";
+                4'd8: state_name = "CHECK_Z";
+                4'd9: state_name = "COMPUTE_CS2";
+                4'd10: state_name = "CHECK_W0";
+                4'd11: state_name = "COMPUTE_CT0";
+                4'd12: state_name = "CHECK_H";
+                4'd13: state_name = "PACK_SIG";
+                4'd14: state_name = "DONE";
+                default: state_name = "UNKNOWN";
+            endcase
+        end
+    endfunction
+
+    // ========================================================================
+    // 8. MONITORING LOGIC (UPDATE FOR 1=FAIL LOGIC)
+    // ========================================================================
+    reg [3:0] prev_state;
+    integer state_cycles;
+    integer rejection_count;
+    
+    // Previous done signals for edge detection
+    reg prev_all_precomp_done;
+    reg prev_done_w_invntt;
+    reg prev_done_cp_ntt;
+    reg prev_done_cs1_invntt;
+    reg prev_done_z_norm;
+    reg prev_done_w0_norm;
+    reg prev_done_cs2_invntt;
+    reg prev_done_make_hint;
+    reg prev_done_h_norm;
+    reg prev_done_sign_internal;
+    
+    initial begin
+        prev_state = 4'd0;
+        state_cycles = 0;
+        rejection_count = 0;
+        prev_all_precomp_done = 0;
+        prev_done_w_invntt = 0;
+        prev_done_cp_ntt = 0;
+        prev_done_cs1_invntt = 0;
+        prev_done_z_norm = 0;
+        prev_done_w0_norm = 0;
+        prev_done_cs2_invntt = 0;
+        prev_done_make_hint = 0;
+        prev_done_h_norm = 0;
+	prev_done_sign_internal = 0;
     end
-  end
 
-  // ============================================================
-  // TEST SEQUENCE
-  // ============================================================
-  integer i;
+    // State Transitions
+    always @(posedge clock) begin
+        if (reset) begin
+            prev_state <= 4'd0;
+            state_cycles <= 0;
+        end else begin
+            if (dut.state != prev_state) begin
+                $display("\n[%0t] FSM: %-12s -> %-12s (cycles=%0d, nonce=%0d)",
+                    $time, state_name(prev_state), state_name(dut.state),
+                    state_cycles, dut.nonce);
+                prev_state <= dut.state;
+                state_cycles <= 0;
+            end else begin
+                state_cycles <= state_cycles + 1;
+            end
+        end
+    end
 
-  initial begin
-    $display("\n======================================");
-    $display(" DILITHIUM SIGNATURE RTL TESTBENCH ");
-    $display("======================================\n");
+    // ========================================================================
+    // 9. EVENT DUMPING (UPDATE: Check FAIL flags instead of PASS)
+    // ========================================================================
+    always @(posedge clock) begin
+        if (!reset) begin
+            if (dut.all_precomp_done && !prev_all_precomp_done) begin
+                $display("\n========== PRECOMPUTE COMPLETE ==========");
+                `PRINT_HEX_ARRAY("RHO", rho_bytes, 32)
+                `PRINT_HEX_ARRAY("KEY", key_bytes, 32)
+                `PRINT_HEX_ARRAY("TR", tr_bytes, 64)
+                `PRINT_HEX_ARRAY("MU", mu_bytes, 64)
+                `PRINT_HEX_ARRAY("RHOPRIME", rhoprime_bytes, 64)
+                `PRINT_HEX_ARRAY("S1_NTT", s1_ntt_bytes, 64)
+                `PRINT_HEX_ARRAY("S2_NTT", s2_ntt_bytes, 64)
+                `PRINT_HEX_ARRAY("T0_NTT", t0_ntt_bytes, 64)
+                $display("=========================================\n");
+            end
+            
+            if (dut.done_w_invntt && !prev_done_w_invntt) begin
+                $display("\n========== COMPUTE_W COMPLETE (nonce=%0d) ==========", dut.nonce);
+                `PRINT_HEX_ARRAY("Y", y_bytes, 64)
+                `PRINT_HEX_ARRAY("Y_NTT", y_ntt_bytes, 64)
+                `PRINT_HEX_ARRAY("W_REDUCED", w_reduced_bytes, 64)
+                `PRINT_HEX_ARRAY("W_INVNTT", w_invntt_bytes, 64)
+                `PRINT_HEX_ARRAY("W_CADDQ", w_caddq_bytes, 64)
+                `PRINT_HEX_ARRAY("W1_DECOMP", w1_decomp_bytes, 64)
+                `PRINT_HEX_ARRAY("W0_DECOMP", w0_decomp_bytes, 64)
+                $display("====================================================\n");
+            end
+            
+            if (dut.done_cp_ntt && !prev_done_cp_ntt) begin
+                $display("\n========== CHALLENGE COMPLETE (nonce=%0d) ==========", dut.nonce);
+                `PRINT_HEX_ARRAY("CTILDE", ctilde_bytes, 48)
+                `PRINT_HEX_ARRAY("CP (Direct)", cp_bytes, 64)
+                `PRINT_HEX_ARRAY("CP_NTT", cp_ntt_bytes, 64)
+                $display("===================================================\n");
+            end
+            
+            if (dut.done_cs1_invntt && !prev_done_cs1_invntt) begin
+                $display("\n========== COMPUTE_Z COMPLETE (nonce=%0d) ==========", dut.nonce);
+                `PRINT_HEX_ARRAY("CS1_NTT", cs1_ntt_bytes, 64)
+                `PRINT_HEX_ARRAY("CS1", cs1_bytes, 64)
+                `PRINT_HEX_ARRAY("Z_TEMP", z_temp_bytes, 64)
+                `PRINT_HEX_ARRAY("Z_FINAL", z_final_bytes, 64)
+                $display("===================================================\n");
+            end
+            
+            // --- FIX: Hi?n th? tr?ng thái Pass/Fail ?úng ngh?a (1=Fail) ---
+            if (dut.done_z_norm && !prev_done_z_norm) begin
+                $display("\n========== CHECK_Z (nonce=%0d) ==========", dut.nonce);
+                $display("Check Result: %s (Flag: %b)", 
+                         dut.z_norm_fail ? "FAILED (Norm too high)" : "PASSED", 
+                         dut.z_norm_fail);
+                $display("========================================\n");
+            end
+            
+            if (dut.done_cs2_invntt && !prev_done_cs2_invntt) begin
+                $display("\n========== COMPUTE_CS2 COMPLETE (nonce=%0d) ==========", dut.nonce);
+                `PRINT_HEX_ARRAY("CS2_NTT", cs2_ntt_bytes, 64)
+                `PRINT_HEX_ARRAY("CS2", cs2_bytes, 64)
+                $display("======================================================\n");
+            end
+            
+            if (dut.done_w0_norm && !prev_done_w0_norm) begin
+                $display("\n========== CHECK_W0 (nonce=%0d) ==========", dut.nonce);
+                $display("Check Result: %s (Flag: %b)", 
+                         dut.w0_norm_fail ? "FAILED (Norm too high)" : "PASSED", 
+                         dut.w0_norm_fail);
+                `PRINT_HEX_ARRAY("W0_REDUCED_CHECK", w0_reduced_check_bytes, 64)
+                $display("=========================================\n");
+            end
+            
+            if (dut.done_h_norm && dut.done_make_hint && !prev_done_make_hint) begin
+                $display("\n========== CHECK_H (nonce=%0d) ==========", dut.nonce);
+                $display("Check Result: %s", 
+                         (dut.h_norm_fail || dut.hint_count_fail) ? "FAILED" : "PASSED");
+                $display("  - H Norm Flag: %b (%s)", dut.h_norm_fail, dut.h_norm_fail ? "Fail" : "Pass");
+                $display("  - Hint Count : %0d (Max 55) -> Flag: %b (%s)", 
+                         dut.hint_count, dut.hint_count_fail, dut.hint_count_fail ? "Fail" : "Pass");
+                         
+                `PRINT_HEX_ARRAY("H_REDUCED", h_reduced_bytes, 64)
+                `PRINT_HEX_ARRAY("W0_PLUS_H", w0_plus_h_bytes, 64)
+                `PRINT_HEX_ARRAY("HINTS", hints_bytes, 64)
+                $display("========================================\n");
+            end
+            
+            if (done_sign_internal && !prev_done_sign_internal) begin
+                $display("\n========== SIGNATURE COMPLETE ==========");
+                $display("Time : %0t ns", $time);
+                $display("Final nonce: %0d", dut.nonce);
+                $display("Total Rejections : %0d", rejection_count);
+                //`PRINT_HEX_ARRAY("FINAL_SIGNATURE", sig_bytes, SIG_BYTES)
+		`DUMP_HEX_FILE("sig.hex", sig_bytes, SIG_BYTES)
+		$system("notepad sig.hex");
+                $display("========================================\n");
+            end
+        end
+        
+        // Update previous values
+        prev_all_precomp_done <= dut.all_precomp_done;
+        prev_done_w_invntt <= dut.done_w_invntt;
+        prev_done_cp_ntt <= dut.done_cp_ntt;
+        prev_done_cs1_invntt <= dut.done_cs1_invntt;
+        prev_done_z_norm <= dut.done_z_norm;
+        prev_done_w0_norm <= dut.done_w0_norm;
+        prev_done_cs2_invntt <= dut.done_cs2_invntt;
+        prev_done_make_hint <= dut.done_make_hint;
+        prev_done_h_norm <= dut.done_h_norm;
+	prev_done_sign_internal <= done_sign_internal;
+    end
 
-    reset = 1;
-    start_sign_internal = 0;
+    // ========================================================================
+    // 10. REJECTION MONITOR & ERROR CHECK (Logic 1=FAIL)
+    // ========================================================================
+    always @(posedge clock) begin
+        if (reset) begin
+            rejection_count <= 0;
+        end else begin
+            // Ki?m tra n?u FSM chuy?n t? tr?ng thái CHECK v? SAMPLE_Y (t?c là REJECT)
+            if ((prev_state == 4'd8  && dut.state == 4'd4) || // CHECK_Z -> SAMPLE_Y
+                (prev_state == 4'd10 && dut.state == 4'd4) || // CHECK_W0 -> SAMPLE_Y
+                (prev_state == 4'd12 && dut.state == 4'd4))   // CHECK_H -> SAMPLE_Y
+            begin
+                rejection_count <= rejection_count + 1;
+                $display("\n!!! REJECTION #%0d DETECTED at %s !!!", rejection_count, state_name(prev_state));
+                
+                // In lý do chi ti?t (Logic: Flag=1 là L?i)
+                case (prev_state)
+                    4'd8:  $display(" -> Reason: Z Norm Check FAILED (z_norm_fail=1)");
+                    4'd10: $display(" -> Reason: W0 Norm Check FAILED (w0_norm_fail=1)");
+                    4'd12: begin
+                        if (dut.h_norm_fail) 
+                            $display(" -> Reason: H Norm Check FAILED (h_norm_fail=1)");
+                        if (dut.hint_count_fail) 
+                            $display(" -> Reason: Hint Count Limit FAILED (count=%0d > 55)", dut.hint_count);
+                    end
+                endcase
+           
+                // Gi?i h?n s? l?n reject
+                if (rejection_count > 30) begin
+                    $display("\n[ERROR] TOO MANY REJECTIONS (%0d). Algorithm might be stuck or logic incorrect.", rejection_count);
+                    $finish;
+                end
+            end
+        end
+    end
 
-    mlen   = 64;
-    prelen = 32;
+    // ========================================================================
+    // 11. MAIN INITIAL BLOCK
+    // ========================================================================
+    initial begin
+        $display("\n========================================");
+        $display("DILITHIUM SIGNATURE DEBUG TESTBENCH");
+        $display("========================================\n");
 
-    for (i = 0; i < 64; i = i + 1)  m[8*i +: 8] = 8'h11;
-    for (i = 0; i < 32; i = i + 1) pre[8*i +: 8] = 8'h22;
-    for (i = 0; i < 32; i = i + 1) rnd[8*i +: 8] = 8'h33;
+        reset = 1;
+        start_sign_internal = 0;
+        mlen = 64;
+        prelen = 32;
 
-    #50 reset = 0;
-    sk = 32256'h8;
-    #20 start_sign_internal = 1;
-    #10 start_sign_internal = 0;
+        // Fill message and prefix with pattern
+        for (i = 0; i < 64; i = i + 1) m[8*i +: 8] = 8'h11;
+        for (i = 0; i < 32; i = i + 1) pre[8*i +: 8] = 8'h22;
+        for (i = 0; i < 32; i = i + 1) rnd[8*i +: 8] = 8'h33;
 
-    // === FOLLOW C FLOW ===
-    @(posedge dut.done_mu);
-    @(posedge dut.done_rhoprime);
-    @(posedge dut.done_y);
-    @(posedge dut.done_ctilde);
-    @(posedge done_sign_internal);
+        // DÁN KEY C?A B?N VÀO ?ÂY
+        sk = 32256'ha73c0e12b9584f732ac842d4a8fb7c5fdcfbf74aa7ebba24e3783c7c673380912a348d2130dca384347568652b0cd06960fa58de5a50719e605347ede23fced740310739e8ca53ae480dd2835613f3c8efc57f943bbf4559a10e9417504b680fbb7c028ed7d0718bf0f02c902135a8b0df1d56cc31c523f43f61c2e63dedacc13fce39b7abe31af0271f2c1a40ba0fa2561e8c5594b67fbd84e6b2e002a5ceb0d302799b298ae66401e7a8f327977f21c78523f54553e4ce6ade3a113ccfd3d13914bae4d4db574cd1de0a4b7c65ac21bb743aa4f8dcfb4ecf74fa6bc306495d2fb4aaf5a08994f2d3eaae0cb603965be83b3c54af33be939327cfa77bb626da52e2836d5c1c3cae8807732e0058cb04063f629647865037afacbf37bc753aabace9c5be39e73b96904e0591896d87511a9bb860524c241cf1dd9c7e5a5e43b32fb23c155b01934cb39be155f6ff2a042db0f30948b48e5ff50805a94ad4a5a95ec49c1e18310fb7761eb29d322abcd2949b6fbda43ce0500b06e12e3311bff725c094ca79d22b7710853e7deab32e1a6ecb04da13a02b30ba9fd15331c443e92981a2392e1dc677015fc8e0725cd9e8d282f0de50d8ebf2934c89cb3d3ecaf20b1c4847e244bed2e6d1197da53e48e08bbfd503a9a6e933939dc60ec8522fa2733573828a279173a084f57af15235ff59207b42898812b3df55d840ac0d731baeaf59019a1103d81258761bc37d91621f63b0d2c2ba74a50dc255503b68386182d942e79898771a98ba01725296baca796a0926047b0329a1915f6827ed82cc64c62d12ad0596f73b8a8da401cbf51ecbb3e72959965bef5cf12417ae9e6eaf01d84b340cbdf88a2d914e7b27550a8d2071acf1f2cf8010680c47681e79574c75919e3f5fee962497ae9558e16df994ba098d83c1d1cc4d1a0ee15b24fb9aff6498e8375cdd7d165ecbbed0b7a864c14266c72665164a526a6b6f11c58590ac0e506553e0782e4aececf17e46544261328ce68131a650a9cf4adc2d6036df8cff2f7ca860bcddd1e73e44a9880b923009ecb75d5a6e11adcbe124090e3f0175125550b1c0c89fa6628aeba47d3c15697d4051ab422884b528da871b2e502ff0087d2a9e43db3ad8667930b6faae745b634c02c64eaf7a24d206871c5d9838610ef82a677d7103b7a4369d9c0e13da331f30171cf06e69417ae3ae877406c021fec9135ec65117a9ade19e4a4ca3a2ee6448e4889188fd0d47a2f4f815a5b69193728db19f9fa3cb8a62cfee76bc1eeaf7acb82ba1b5a1b3c1a8110b725b6ae4f2d8820ef52ff5d0d22925520bdaac0a343979ddf2ee2c97d6661a875838a07107d5700dadf925775162a93257f31432eaf8d135c90b64dfbef25e10bafafb98a5190d72733e79094ab672e4ca7459e4ec7f7030e45cf86f371270280e2d45aa3bef5381a159831057542252f4e33b3e2281f89caef1fbac77eff7e4757c4a6fb6708c2b403ab7587bda80d6a5d45c9333f51b2d359cd0387999e95ba311c13bead5ab4a01b7f360cb18e4754b929f389a5f72addb9cdae2fbed38df65bd1b486de67707fd7dfa44ca34a34e0b4da9cb7b25cf93bb53884cb800c0410253bfd3ebcdcc451826cc5d60163651af7efc788d8abd85f149280efce415011bcf5c2bb3f2b8c61abef2542a45142acc63f630c569369210eeb910a4c5f1195cfcc853326f0242ff83aa27e362beeb5463a0bf6dbc7e05dc6309e38a0a06d1086c6e5231e5c925e5c2b1eb1589188f26d86415c1dae2076c84b2e7ace7c51d64caf23b083fad9c4309806116ae8e8fc7a02a0af627939ea0da272921e21ba1ebeaa3a6827a74a2da44026c4b9d35b95c13967f65cdb94c2084e8b644d3de3aeda6968cff88b472f9d6b7ca63cd2c56fb33705117ee4a07f00fc788d4d26a526b57faceb75f4ef81d0f488ea0432d64bfbbce0594996690f1d1a10a55a688c39f7b8e0f248768eb36a7fff394f647b9795f47473b8072d0fca230f6a723d152ae8a88f0138fee4916f2c22086dcc5164e76dc1275d737280033e6f0d5ed9a316991f54edad00599e724e50b28a74b529128019f299ed4a4101ca01cdf413ac5686b0a6ee3143c2863b5331f82ffddebe4e4bb1ba11dac0a4f907de9eb5197f71c1ca16b3db4ec0567382472e2ebbc610d415f012338c9638d8375e196531de383c9d5cb4183b8246b504e4bea5eadb1da23a641c86549dc8678039b1c5a6f3b50cff289a324a0a59ec03e3fa4ccdcd28d4be1e473cb992d2261e77fbdc0f65c4548c682a608982e65c980f5ef5ae703ed6194ca0ef6782aa6ab315239bc3b52ce5300cb8bf18e0b65e293dc3c873e2874081b2bd1bf31d5e88ef756f0b85661282f6072ac1c7dbc8f0b1e4894b78a1e04d13e9064fc261ee18f4ba96c0b35ec51e898ebc4d5be28df91f80e1f824f5ac4a0a763e4d99e6df54551a080580dd518a9b43274ee061bfaa06cb1de14a41922eeb3030ac47ba8c9c4632961ef021561f06fc68f38b844cbe108c99a1230ec62784979658e2716b9c0b7f5701ca7cce3cb97c7eea3e713fb37153692608b55e0587e41ea70fc45d0c31026931a2e6f6e0d07a6697870d48fb2bad3c0121f31fe4506400b51304dfa3ae958828cda2557259c7663caddf90dc05d51e83e2059f3785105573fc5d17917645561970ff5327bb2caffc5a207b028d54404dfd51ec8433c77bec2794cbeda0310c3f296a9a9cafc520a9b00c7cf40c821dd8f08dabd99cada3e327a49a0f8cf52c04fe478209bd65e7040d5099f3982d7a32f6beb1d312989725b894bd4b16261da40c4db38cda6fa2fcef55aec31760b0c4c4045f30a515f48fe511340d88609b36f125438a205a8dd45b930077c6a2a1c2bd305697d7102b6b22117736cdecb060cc7c02f1ecfe1b7599b569a4b79fdb678f02b5440a1252924c7e08f600b9204ae4d546a71783dd682bea5caec786e1a983b78215e5e9cdba908203a90acc8feb9906b0f9f40a99fba832e0642c178cc3ae8bb28cf4d14e8a8ca369678a50922ec076e5c072e840c953cb5cee688d0dd65464a331d91298c04eb606f6aed53c92d8918a7c92f6da38ca11a6ac3786eaba0efeaab5bbdf7ed62a441a973740548b2ae978f7c39838e1e71186b0dc29371d15a160ffd631c9990f4b7c04082e7a6f8408e777d53a8dba8a732ba8bb9279320c7ffe32df4d12a11ab958ef19de2844f01e3b306d11ef0273975b313cbbb003961bb29be0438faf59cb02feb0b878a87e367ddbe1e21245e2bcd3d3f668cf41f6c5d412313c9026eab988e158f28e33fe5c6969e143e623b84cec8273dba6fe03116b54d150b1d1eb4769a9879bf17ddb83c1232a3bba0ba7cddf1fddb80f4f2d2917ae368867fbebeb586fe0ddf17f6501ba9df97411671a2b7bf2939c0f120b08a0cc5810b118ad720dca53af6841d8435a0734d5c6212b5ac8275eaf38fd81f47247ad6f275fb34eb2ac20cea3557b42c6128520977826837362611262874345766308308005384184660514585177518726252544440825466366747871587271568101226701705864232276701367513863544405473401077613865318031202274814205320401865663302510635152512818012031283806552356076451413704117123224546361843277740708766347387867455181046843280240625342870118308764161438708628058351150085762318783375651154667701357131605614273446616262130470373338612576244028715187205448427207780042807714140064641055515333730004357861588762820744388336805870370066087060065676212824652673763177413604631757405561382463057821741364701713338230136844545824776247047157100658386653441420806313244524221375413325318444013744061221543734876865304484360243227210450833428134308253053280252101704706148475860201182678626076678204616787448802857238048104346413271104882008473572674424322313363536586423135444207814660047060845712656808707010710666531056438144787580631327552022524661054564373517251165246577045776175320286284885224327837435737117055301224542088281584061236278340045153221561764273278183881646426521812513587332756616881687125830356132453027726258768374812831380065751816455045520573261502600236006613556504411534042830643050607557875045110003371752227117117311733612268051005342403450470442227775007546422243750652746335115344276060238715067344608816342366413433710550723558375133675433403043563210665882543740734727748584356758162024271343828683421485636008800713784646561572234003558237422343370840046023470511388535280520838130370724810581052732673853473325431223486023017732828438777637058746420830423352424066088435383264238712141461071550726712573655218677432235414066604014105654860002356312621634154527182801218184714078012875085664388741055552452032104561620015888862071654882823426427681322413506145556058105267017346537016107464850211300030525570346725144238336756871276522330150620725480542476133702588562544160817551055470565758275332581336012354410347160138154783872712630067774352756323701102874788340062146160647081737730375217883107061636150301363404376232046240332106214811023170820685330170100500343351740374855672404476161668155332217033486225106863735331338786087647367660628274878402360346280677051375762200437006745158307742384773535178270316466834803076404472111267112156321505627044610724002577047706881776372751784001002581027177126148264117538052358386154333812528545838743363375861872364373061853388545077140137040137705372014672384052885650266705177620811633128522626544688820275126117041340537388471207473762205885115248084462065518383547664724660052735783858121217011432686257777171503048344207854766468256046335880817244731503217663675660365053255674862227203567700742763383144263527680725357203504003516148837106368237664357607351816570316111316045008445115366117467174201851382134382763625722682306440705567182217156365581080520122638687345857554128636afb74aa16066f6b05cf39f506b13b487eece33cf56a71047a641f893bac795c54cfcdee964f3b1f0247138d151e07d66dc228414587321e223a4fb3696d32382236f0e51c96b9c228ef7bc3ab1efb9b03cd249df093facef582d654b2fd63f5142199b980a7fcc76084c54710fe8833138b9ff30f1f2ebaa18360f9fd93a15fc; // Ví d?, hãy thay b?ng key th?t
 
-    $display("\n======================================");
-    $display(" ? SIGNATURE DONE SUCCESSFULLY ");
-    $display("======================================\n");
+        // ====================================================================
 
-    $finish;
-  end
+        #100 reset = 0;
+        #50 start_sign_internal = 1;
+        #10 start_sign_internal = 0;
 
-  // ============================================================
-  // GLOBAL TIMEOUT
-  // ============================================================
-  initial begin
-    #5_000_000;
-    $display("\n? GLOBAL TIMEOUT (5ms)");
-    $finish;
-  end
+        wait(done_sign_internal);
+        
+        #100;
+        $display("\n========================================");
+        $display("SUCCESS! SIGNATURE GENERATED.");
+        $display("========================================\n");
+        $finish;
+    end
+
+    // TIMEOUT GUARD 
+    initial begin
+        #50_000_000;
+        $display("\n========================================");
+        $display("ERROR: TIMEOUT (Simulation ran too long)");
+        $display("========================================\n");
+        $finish;
+    end
 
 endmodule
-

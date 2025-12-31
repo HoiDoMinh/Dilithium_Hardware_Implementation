@@ -1,4 +1,4 @@
-
+#if 0
 #include <stdio.h>
 #include <stdint.h>
 #include <string.h>
@@ -173,4 +173,4 @@ int main(void) {
 //#endif
     return 0;
 }
-
+#endif

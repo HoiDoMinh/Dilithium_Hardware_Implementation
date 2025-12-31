@@ -1,0 +1,34 @@
+# vsim -c -do "run -all" work.tb_polyz_pack 
+# Start time: 14:47:03 on Dec 19,2025
+# ** Note: (vsim-3812) Design is being optimized...
+# //  Questa Sim-64
+# //  Version 10.7c win64 Aug 18 2018
+# //
+# //  Copyright 1991-2018 Mentor Graphics Corporation
+# //  All Rights Reserved.
+# //
+# //  QuestaSim and its associated documentation contain trade
+# //  secrets and commercial or financial information that are the property of
+# //  Mentor Graphics Corporation and are privileged, confidential,
+# //  and exempt from disclosure under the Freedom of Information Act,
+# //  5 U.S.C. Section 552. Furthermore, this information
+# //  is prohibited from disclosure under the Trade Secrets Act,
+# //  18 U.S.C. Section 1905.
+# //
+# Loading work.tb_polyz_pack(fast)
+# run -all
+# r out (hex)
+# 00 00 d8 04 80 0a ff 77 0e 80 14 fe 17 18 80 1e fd b7 21 80 28 fc 57 2b 80 32 fb f7 34 80 3c fa 97 3e 80 46 f9 37 48 80 50 f8 d7 51 80 5a f7 77 5b 80 64 f6 17 65 80 6e f5 b7 6e 80 78 f4 57 78 80 82 f3 f7 
+# 81 80 8c f2 97 8b 80 96 f1 37 95 80 a0 f0 d7 9e 80 aa ef 77 a8 80 b4 ee 17 b2 80 be ed b7 bb 80 c8 ec 57 c5 80 d2 eb f7 ce 80 dc ea 97 d8 80 e6 e9 37 e2 80 f0 e8 d7 eb 80 fa e7 77 f5 80 04 e7 17 ff 80 0e 
+# e6 b7 08 81 18 e5 57 12 81 22 e4 f7 1b 81 2c e3 97 25 81 36 e2 37 2f 81 40 e1 d7 38 81 4a e0 77 42 81 54 df 17 4c 81 5e de b7 55 81 68 dd 57 5f 81 72 dc f7 68 81 7c db 97 72 81 86 da 37 7c 81 90 d9 d7 85 
+# 81 9a d8 77 8f 81 a4 d7 17 99 81 ae d6 b7 a2 81 b8 d5 57 ac 81 c2 d4 f7 b5 81 cc d3 97 bf 81 d6 d2 37 c9 81 e0 d1 d7 d2 81 ea d0 77 dc 81 f4 cf 17 e6 81 fe ce b7 ef 81 08 ce 57 f9 81 12 cd f7 02 82 1c cc 
+# 97 0c 82 26 cb 37 16 82 30 ca d7 1f 82 3a c9 77 29 82 44 c8 17 33 82 4e c7 b7 3c 82 58 c6 57 46 82 62 c5 f7 4f 82 6c c4 97 59 82 76 c3 37 63 82 80 c2 d7 6c 82 8a c1 77 76 82 94 c0 17 80 82 9e bf b7 89 82 
+# a8 be 57 93 82 b2 bd f7 9c 82 bc bc 97 a6 82 c6 bb 37 b0 82 d0 ba d7 b9 82 da b9 77 c3 82 e4 b8 17 cd 82 ee b7 b7 d6 82 f8 b6 57 e0 82 02 b6 f7 e9 82 0c b5 97 f3 82 16 b4 37 fd 82 20 b3 d7 06 83 2a b2 77 
+# 10 83 34 b1 17 1a 83 3e b0 b7 23 83 48 af 57 2d 83 52 ae f7 36 83 5c ad 97 40 83 66 ac 37 4a 83 70 ab d7 53 83 7a aa 77 5d 83 84 a9 17 67 83 8e a8 b7 70 83 98 a7 57 7a 83 a2 a6 f7 83 83 ac a5 97 8d 83 b6 
+# a4 37 97 83 c0 a3 d7 a0 83 ca a2 77 aa 83 d4 a1 17 b4 83 de a0 b7 bd 83 e8 9f 57 c7 83 f2 9e f7 d0 83 fc 9d 97 da 83 06 9d 37 e4 83 10 9c d7 ed 83 1a 9b 77 f7 83 24 9a 17 01 84 2e 99 b7 0a 84 38 98 57 14 
+# 84 42 97 f7 1d 84 4c 96 97 27 84 56 95 37 31 84 60 94 d7 3a 84 6a 93 77 44 84 74 92 17 4e 84 7e 91 b7 57 84 88 90 57 61 84 92 8f f7 6a 84 9c 8e 97 74 84 a6 8d 37 7e 84 b0 8c d7 87 84 ba 8b 77 91 84 c4 8a 
+# 17 9b 84 ce 89 b7 a4 84 d8 88 57 ae 84 e2 87 f7 b7 84 ec 86 97 c1 84 f6 85 37 cb 84 
+# ** Note: $finish    : tb_polyz_pack.v(23)
+#    Time: 1 ns  Iteration: 0  Instance: /tb_polyz_pack
+# End time: 14:47:04 on Dec 19,2025, Elapsed time: 0:00:01
+# Errors: 0, Warnings: 0

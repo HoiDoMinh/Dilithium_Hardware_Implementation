@@ -9,7 +9,6 @@ module polyveck_chknorm(
     wire signed [8191:0] poly [0:K-1];
     wire                 chk  [0:K-1];
 
-    // Packed version of chk ?? reduction OR
     wire [K-1:0] chk_vec;
 
     genvar i;
@@ -23,7 +22,7 @@ module polyveck_chknorm(
                 .flag(chk[i])
             );
 
-            assign chk_vec[i] = chk[i];   // chuy?n sang packed vector
+            assign chk_vec[i] = chk[i];   //packed vector
         end
     endgenerate
 

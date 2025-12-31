@@ -1,9 +1,9 @@
-D:/DATA/DOAN/vivado_doan/dilithium_verilogcode/polyw1_pack.v {1 {vlog -work work -vopt -stats=none D:/DATA/DOAN/vivado_doan/dilithium_verilogcode/polyw1_pack.v
+D:/DATA/DOAN/vivado_doan/dilithium_verilogcode/element_montgomery.v {1 {vlog -work work -vopt -stats=none D:/DATA/DOAN/vivado_doan/dilithium_verilogcode/element_montgomery.v
 QuestaSim-64 vlog 10.7c Compiler 2018.08 Aug 18 2018
--- Compiling module polyw1_pack
+-- Compiling module element_montgomery
 
 Top level modules:
-	polyw1_pack
+	element_montgomery
 
 } {} {}} D:/DATA/DOAN/vivado_doan/dilithium_verilogcode/tb_parallel_ntt_32bit.v {1 {vlog -work work -vopt -stats=none D:/DATA/DOAN/vivado_doan/dilithium_verilogcode/tb_parallel_ntt_32bit.v
 QuestaSim-64 vlog 10.7c Compiler 2018.08 Aug 18 2018
@@ -12,15 +12,12 @@ QuestaSim-64 vlog 10.7c Compiler 2018.08 Aug 18 2018
 Top level modules:
 	tb_parallel_ntt_32bit
 
-} {} {}} D:/DATA/DOAN/vivado_doan/dilithium_verilogcode/polyveck_use_hint.v {1 {vlog -work work -vopt -stats=none D:/DATA/DOAN/vivado_doan/dilithium_verilogcode/polyveck_use_hint.v
+} {} {}} D:/DATA/DOAN/vivado_doan/dilithium_verilogcode/polyw1_pack.v {1 {vlog -work work -vopt -stats=none D:/DATA/DOAN/vivado_doan/dilithium_verilogcode/polyw1_pack.v
 QuestaSim-64 vlog 10.7c Compiler 2018.08 Aug 18 2018
--- Compiling module polyveck_use_hint
+-- Compiling module polyw1_pack
 
 Top level modules:
-	polyveck_use_hint
-
-} {} {}} D:/DATA/DOAN/vivado_doan/dilithium_verilogcode/tb_polyt0_pack.v {1 {vlog -work work -vopt -stats=none D:/DATA/DOAN/vivado_doan/dilithium_verilogcode/tb_polyt0_pack.v
-QuestaSim-64 vlog 10.7c Compiler 2018.08 Aug 18 2018
+	polyw1_pack
 
 } {} {}} D:/DATA/DOAN/vivado_doan/dilithium_verilogcode/tb_poly_uniform_gamma1.v {1 {vlog -work work -vopt -stats=none D:/DATA/DOAN/vivado_doan/dilithium_verilogcode/tb_poly_uniform_gamma1.v
 QuestaSim-64 vlog 10.7c Compiler 2018.08 Aug 18 2018
@@ -29,8 +26,15 @@ QuestaSim-64 vlog 10.7c Compiler 2018.08 Aug 18 2018
 Top level modules:
 	tb_poly_uniform_gamma1
 
-} {} {}} D:/DATA/DOAN/vivado_doan/dilithium_verilogcode/tb_dilithium_shake256_stream_init.v {1 {vlog -work work -vopt -stats=none D:/DATA/DOAN/vivado_doan/dilithium_verilogcode/tb_dilithium_shake256_stream_init.v
+} {} {}} D:/DATA/DOAN/vivado_doan/dilithium_verilogcode/tb_polyt0_pack.v {1 {vlog -work work -vopt -stats=none D:/DATA/DOAN/vivado_doan/dilithium_verilogcode/tb_polyt0_pack.v
 QuestaSim-64 vlog 10.7c Compiler 2018.08 Aug 18 2018
+
+} {} {}} D:/DATA/DOAN/vivado_doan/dilithium_verilogcode/polyveck_use_hint.v {1 {vlog -work work -vopt -stats=none D:/DATA/DOAN/vivado_doan/dilithium_verilogcode/polyveck_use_hint.v
+QuestaSim-64 vlog 10.7c Compiler 2018.08 Aug 18 2018
+-- Compiling module polyveck_use_hint
+
+Top level modules:
+	polyveck_use_hint
 
 } {} {}} D:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/poly_power2round.v {1 {vlog -work work -vopt -stats=none D:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/poly_power2round.v
 QuestaSim-64 vlog 10.7c Compiler 2018.08 Aug 18 2018
@@ -38,6 +42,9 @@ QuestaSim-64 vlog 10.7c Compiler 2018.08 Aug 18 2018
 
 Top level modules:
 	poly_power2round
+
+} {} {}} D:/DATA/DOAN/vivado_doan/dilithium_verilogcode/tb_dilithium_shake256_stream_init.v {1 {vlog -work work -vopt -stats=none D:/DATA/DOAN/vivado_doan/dilithium_verilogcode/tb_dilithium_shake256_stream_init.v
+QuestaSim-64 vlog 10.7c Compiler 2018.08 Aug 18 2018
 
 } {} {}} D:/DATA/DOAN/vivado_doan/dilithium_verilogcode/polyveck_chknorm.v {1 {vlog -work work -vopt -stats=none D:/DATA/DOAN/vivado_doan/dilithium_verilogcode/polyveck_chknorm.v
 QuestaSim-64 vlog 10.7c Compiler 2018.08 Aug 18 2018
@@ -53,19 +60,19 @@ QuestaSim-64 vlog 10.7c Compiler 2018.08 Aug 18 2018
 Top level modules:
 	poly_challenge
 
-} {} {}} D:/DATA/DOAN/vivado_doan/dilithium_verilogcode/tb_parallel_invntt_tomont_32bit.v {1 {vlog -work work -vopt -stats=none D:/DATA/DOAN/vivado_doan/dilithium_verilogcode/tb_parallel_invntt_tomont_32bit.v
-QuestaSim-64 vlog 10.7c Compiler 2018.08 Aug 18 2018
--- Compiling module tb_parallel_invntt_tomont_32bit
-
-Top level modules:
-	tb_parallel_invntt_tomont_32bit
-
 } {} {}} D:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/keccak_init.v {1 {vlog -work work -vopt -stats=none D:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/keccak_init.v
 QuestaSim-64 vlog 10.7c Compiler 2018.08 Aug 18 2018
 -- Compiling module keccak_init
 
 Top level modules:
 	keccak_init
+
+} {} {}} D:/DATA/DOAN/vivado_doan/dilithium_verilogcode/tb_parallel_invntt_tomont_32bit.v {1 {vlog -work work -vopt -stats=none D:/DATA/DOAN/vivado_doan/dilithium_verilogcode/tb_parallel_invntt_tomont_32bit.v
+QuestaSim-64 vlog 10.7c Compiler 2018.08 Aug 18 2018
+-- Compiling module tb_parallel_invntt_tomont_32bit
+
+Top level modules:
+	tb_parallel_invntt_tomont_32bit
 
 } {} {}} D:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/polyveck_uniform_eta.v {1 {vlog -work work -vopt -stats=none D:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/polyveck_uniform_eta.v
 QuestaSim-64 vlog 10.7c Compiler 2018.08 Aug 18 2018
@@ -80,13 +87,6 @@ QuestaSim-64 vlog 10.7c Compiler 2018.08 Aug 18 2018
 
 Top level modules:
 	make_hint
-
-} {} {}} D:/DATA/DOAN/vivado_doan/dilithium_verilogcode/SHAKE_256.v {1 {vlog -work work -vopt -stats=none D:/DATA/DOAN/vivado_doan/dilithium_verilogcode/SHAKE_256.v
-QuestaSim-64 vlog 10.7c Compiler 2018.08 Aug 18 2018
--- Compiling module SHAKE_256
-
-Top level modules:
-	SHAKE_256
 
 } {} {}} D:/DATA/DOAN/vivado_doan/dilithium_verilogcode/tb_polyveck_make_hint.v {1 {vlog -work work -vopt -stats=none D:/DATA/DOAN/vivado_doan/dilithium_verilogcode/tb_polyveck_make_hint.v
 QuestaSim-64 vlog 10.7c Compiler 2018.08 Aug 18 2018
@@ -109,19 +109,19 @@ QuestaSim-64 vlog 10.7c Compiler 2018.08 Aug 18 2018
 Top level modules:
 	PermuteFunction
 
-} {} {}} D:/DATA/DOAN/vivado_doan/dilithium_verilogcode/tb_polyveck_chknorm.v {1 {vlog -work work -vopt -stats=none D:/DATA/DOAN/vivado_doan/dilithium_verilogcode/tb_polyveck_chknorm.v
-QuestaSim-64 vlog 10.7c Compiler 2018.08 Aug 18 2018
--- Compiling module tb_polyveck_chknorm
-
-Top level modules:
-	tb_polyveck_chknorm
-
 } {} {}} D:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/keccak_squeezeblocks.v {1 {vlog -work work -vopt -stats=none D:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/keccak_squeezeblocks.v
 QuestaSim-64 vlog 10.7c Compiler 2018.08 Aug 18 2018
 -- Compiling module keccak_squeezeblocks
 
 Top level modules:
 	keccak_squeezeblocks
+
+} {} {}} D:/DATA/DOAN/vivado_doan/dilithium_verilogcode/tb_polyveck_chknorm.v {1 {vlog -work work -vopt -stats=none D:/DATA/DOAN/vivado_doan/dilithium_verilogcode/tb_polyveck_chknorm.v
+QuestaSim-64 vlog 10.7c Compiler 2018.08 Aug 18 2018
+-- Compiling module tb_polyveck_chknorm
+
+Top level modules:
+	tb_polyveck_chknorm
 
 } {} {}} D:/DATA/DOAN/vivado_doan/dilithium_verilogcode/tb_fmul_32bit.v {1 {vlog -work work -vopt -stats=none D:/DATA/DOAN/vivado_doan/dilithium_verilogcode/tb_fmul_32bit.v
 QuestaSim-64 vlog 10.7c Compiler 2018.08 Aug 18 2018
@@ -200,12 +200,26 @@ QuestaSim-64 vlog 10.7c Compiler 2018.08 Aug 18 2018
 Top level modules:
 	freeze
 
+} {} {}} D:/DATA/DOAN/vivado_doan/dilithium_verilogcode/tb_crypto_sign_signature_internal.v {1 {vlog -work work -vopt -stats=none D:/DATA/DOAN/vivado_doan/dilithium_verilogcode/tb_crypto_sign_signature_internal.v
+QuestaSim-64 vlog 10.7c Compiler 2018.08 Aug 18 2018
+-- Compiling module tb_crypto_sign_signature_internal
+
+Top level modules:
+	tb_crypto_sign_signature_internal
+
 } {} {}} D:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/shake128_init.v {1 {vlog -work work -vopt -stats=none D:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/shake128_init.v
 QuestaSim-64 vlog 10.7c Compiler 2018.08 Aug 18 2018
 -- Compiling module shake128_init
 
 Top level modules:
 	shake128_init
+
+} {} {}} D:/DATA/DOAN/vivado_doan/dilithium_verilogcode/poly_shiftl.v {1 {vlog -work work -vopt -stats=none D:/DATA/DOAN/vivado_doan/dilithium_verilogcode/poly_shiftl.v
+QuestaSim-64 vlog 10.7c Compiler 2018.08 Aug 18 2018
+-- Compiling module poly_shiftl
+
+Top level modules:
+	poly_shiftl
 
 } {} {}} D:/DATA/DOAN/vivado_doan/dilithium_verilogcode/poly_chknorm.v {1 {vlog -work work -vopt -stats=none D:/DATA/DOAN/vivado_doan/dilithium_verilogcode/poly_chknorm.v
 QuestaSim-64 vlog 10.7c Compiler 2018.08 Aug 18 2018
@@ -256,6 +270,13 @@ QuestaSim-64 vlog 10.7c Compiler 2018.08 Aug 18 2018
 Top level modules:
 	reduce32
 
+} {} {}} D:/DATA/DOAN/vivado_doan/dilithium_verilogcode/montgomery_reduce.v {1 {vlog -work work -vopt -stats=none D:/DATA/DOAN/vivado_doan/dilithium_verilogcode/montgomery_reduce.v
+QuestaSim-64 vlog 10.7c Compiler 2018.08 Aug 18 2018
+-- Compiling module montgomery_reduce
+
+Top level modules:
+	montgomery_reduce
+
 } {} {}} D:/DATA/DOAN/vivado_doan/dilithium_verilogcode/tb_montgomery_reduce_32bit.v {1 {vlog -work work -vopt -stats=none D:/DATA/DOAN/vivado_doan/dilithium_verilogcode/tb_montgomery_reduce_32bit.v
 QuestaSim-64 vlog 10.7c Compiler 2018.08 Aug 18 2018
 -- Compiling module tb_montgomery_reduce_32bit
@@ -263,8 +284,14 @@ QuestaSim-64 vlog 10.7c Compiler 2018.08 Aug 18 2018
 Top level modules:
 	tb_montgomery_reduce_32bit
 
-} {} {}} D:/DATA/DOAN/vivado_doan/dilithium_verilogcode/poly_ntt.v {1 {vlog -work work -vopt -stats=none D:/DATA/DOAN/vivado_doan/dilithium_verilogcode/poly_ntt.v
+} {} {}} D:/DATA/DOAN/vivado_doan/dilithium_verilogcode/poly_ntt.v {2 {vlog -work work -vopt -stats=none D:/DATA/DOAN/vivado_doan/dilithium_verilogcode/poly_ntt.v
 QuestaSim-64 vlog 10.7c Compiler 2018.08 Aug 18 2018
+** Warning: (vlog-6) -- Waiting for lock by "Hoi@ADMIN-PC, pid = 7884
+". Lockfile is "D:/DATA/DOAN/vivado_doan/dilithium_verilogcode/work/_lock".
+-- Compiling module poly_ntt
+
+Top level modules:
+	poly_ntt
 -- Compiling module poly_ntt
 
 Top level modules:
@@ -284,13 +311,6 @@ QuestaSim-64 vlog 10.7c Compiler 2018.08 Aug 18 2018
 Top level modules:
 	tb_pack_sk
 
-} {} {}} D:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/polyveck_caddq.v {1 {vlog -work work -vopt -stats=none D:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/polyveck_caddq.v
-QuestaSim-64 vlog 10.7c Compiler 2018.08 Aug 18 2018
--- Compiling module polyveck_caddq
-
-Top level modules:
-	polyveck_caddq
-
 } {} {}} D:/DATA/DOAN/vivado_doan/dilithium_verilogcode/tb_crypto_sign_keypair1.v {1 {vlog -work work -vopt -stats=none D:/DATA/DOAN/vivado_doan/dilithium_verilogcode/tb_crypto_sign_keypair1.v
 QuestaSim-64 vlog 10.7c Compiler 2018.08 Aug 18 2018
 -- Compiling module tb_crypto_sign_keypair1
@@ -298,12 +318,12 @@ QuestaSim-64 vlog 10.7c Compiler 2018.08 Aug 18 2018
 Top level modules:
 	tb_crypto_sign_keypair1
 
-} {} {}} D:/DATA/DOAN/vivado_doan/dilithium_verilogcode/polyz_pack.v {1 {vlog -work work -vopt -stats=none D:/DATA/DOAN/vivado_doan/dilithium_verilogcode/polyz_pack.v
+} {} {}} D:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/polyveck_caddq.v {1 {vlog -work work -vopt -stats=none D:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/polyveck_caddq.v
 QuestaSim-64 vlog 10.7c Compiler 2018.08 Aug 18 2018
--- Compiling module polyz_pack
+-- Compiling module polyveck_caddq
 
 Top level modules:
-	polyz_pack
+	polyveck_caddq
 
 } {} {}} D:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/keccak_absorb.v {1 {vlog -work work -vopt -stats=none D:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/keccak_absorb.v
 QuestaSim-64 vlog 10.7c Compiler 2018.08 Aug 18 2018
@@ -312,6 +332,13 @@ QuestaSim-64 vlog 10.7c Compiler 2018.08 Aug 18 2018
 Top level modules:
 	keccak_absorb
 
+} {} {}} D:/DATA/DOAN/vivado_doan/dilithium_verilogcode/polyz_pack.v {1 {vlog -work work -vopt -stats=none D:/DATA/DOAN/vivado_doan/dilithium_verilogcode/polyz_pack.v
+QuestaSim-64 vlog 10.7c Compiler 2018.08 Aug 18 2018
+-- Compiling module polyz_pack
+
+Top level modules:
+	polyz_pack
+
 } {} {}} D:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/polyvecl_ntt.v {1 {vlog -work work -vopt -stats=none D:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/polyvecl_ntt.v
 QuestaSim-64 vlog 10.7c Compiler 2018.08 Aug 18 2018
 -- Compiling module polyvecl_ntt
@@ -319,19 +346,19 @@ QuestaSim-64 vlog 10.7c Compiler 2018.08 Aug 18 2018
 Top level modules:
 	polyvecl_ntt
 
-} {} {}} D:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/polyveck_add.v {1 {vlog -work work -vopt -stats=none D:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/polyveck_add.v
-QuestaSim-64 vlog 10.7c Compiler 2018.08 Aug 18 2018
--- Compiling module polyveck_add
-
-Top level modules:
-	polyveck_add
-
 } {} {}} D:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/caddq.v {1 {vlog -work work -vopt -stats=none D:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/caddq.v
 QuestaSim-64 vlog 10.7c Compiler 2018.08 Aug 18 2018
 -- Compiling module caddq
 
 Top level modules:
 	caddq
+
+} {} {}} D:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/polyveck_add.v {1 {vlog -work work -vopt -stats=none D:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/polyveck_add.v
+QuestaSim-64 vlog 10.7c Compiler 2018.08 Aug 18 2018
+-- Compiling module polyveck_add
+
+Top level modules:
+	polyveck_add
 
 } {} {}} D:/DATA/DOAN/vivado_doan/dilithium_verilogcode/SHAKE256.v {1 {vlog -work work -vopt -stats=none D:/DATA/DOAN/vivado_doan/dilithium_verilogcode/SHAKE256.v
 QuestaSim-64 vlog 10.7c Compiler 2018.08 Aug 18 2018
@@ -361,6 +388,13 @@ QuestaSim-64 vlog 10.7c Compiler 2018.08 Aug 18 2018
 Top level modules:
 	pack_pk
 
+} {} {}} D:/DATA/DOAN/vivado_doan/dilithium_verilogcode/tb_power2round.v {1 {vlog -work work -vopt -stats=none D:/DATA/DOAN/vivado_doan/dilithium_verilogcode/tb_power2round.v
+QuestaSim-64 vlog 10.7c Compiler 2018.08 Aug 18 2018
+-- Compiling module tb_power2round
+
+Top level modules:
+	tb_power2round
+
 } {} {}} D:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/parallel_invntt_tomont_32bit.v {1 {vlog -work work -vopt -stats=none D:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/parallel_invntt_tomont_32bit.v
 QuestaSim-64 vlog 10.7c Compiler 2018.08 Aug 18 2018
 -- Compiling module parallel_invntt_tomont_32bit
@@ -368,12 +402,12 @@ QuestaSim-64 vlog 10.7c Compiler 2018.08 Aug 18 2018
 Top level modules:
 	parallel_invntt_tomont_32bit
 
-} {} {}} D:/DATA/DOAN/vivado_doan/dilithium_verilogcode/tb_power2round.v {1 {vlog -work work -vopt -stats=none D:/DATA/DOAN/vivado_doan/dilithium_verilogcode/tb_power2round.v
+} {} {}} D:/DATA/DOAN/vivado_doan/dilithium_verilogcode/TB_DILITHIUM_TOP_MODULE.v {1 {vlog -work work -vopt -stats=none D:/DATA/DOAN/vivado_doan/dilithium_verilogcode/TB_DILITHIUM_TOP_MODULE.v
 QuestaSim-64 vlog 10.7c Compiler 2018.08 Aug 18 2018
--- Compiling module tb_power2round
+-- Compiling module TB_DILITHIUM_TOP_MODULE
 
 Top level modules:
-	tb_power2round
+	TB_DILITHIUM_TOP_MODULE
 
 } {} {}} D:/DATA/DOAN/vivado_doan/dilithium_verilogcode/poly_sub.v {1 {vlog -work work -vopt -stats=none D:/DATA/DOAN/vivado_doan/dilithium_verilogcode/poly_sub.v
 QuestaSim-64 vlog 10.7c Compiler 2018.08 Aug 18 2018
@@ -382,12 +416,12 @@ QuestaSim-64 vlog 10.7c Compiler 2018.08 Aug 18 2018
 Top level modules:
 	poly_sub
 
-} {} {}} D:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/polyveck_reduce.v {1 {vlog -work work -vopt -stats=none D:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/polyveck_reduce.v
+} {} {}} {D:/DATA/DOAN/vivado_doan/dilithium_verilogcode/poly_uniform_gamma1 .v} {1 {vlog -work work -vopt -stats=none {D:/DATA/DOAN/vivado_doan/dilithium_verilogcode/poly_uniform_gamma1 .v}
 QuestaSim-64 vlog 10.7c Compiler 2018.08 Aug 18 2018
--- Compiling module polyveck_reduce
+-- Compiling module poly_uniform_gamma1
 
 Top level modules:
-	polyveck_reduce
+	poly_uniform_gamma1
 
 } {} {}} D:/DATA/DOAN/vivado_doan/dilithium_verilogcode/tb_SHAKE256.v {1 {vlog -work work -vopt -stats=none D:/DATA/DOAN/vivado_doan/dilithium_verilogcode/tb_SHAKE256.v
 QuestaSim-64 vlog 10.7c Compiler 2018.08 Aug 18 2018
@@ -396,26 +430,12 @@ QuestaSim-64 vlog 10.7c Compiler 2018.08 Aug 18 2018
 Top level modules:
 	tb_SHAKE256
 
-} {} {}} {D:/DATA/DOAN/vivado_doan/dilithium_verilogcode/poly_uniform_gamma1 .v} {1 {vlog -work work -vopt -stats=none {D:/DATA/DOAN/vivado_doan/dilithium_verilogcode/poly_uniform_gamma1 .v}
+} {} {}} D:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/polyveck_reduce.v {1 {vlog -work work -vopt -stats=none D:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/polyveck_reduce.v
 QuestaSim-64 vlog 10.7c Compiler 2018.08 Aug 18 2018
--- Compiling module poly_uniform_gamma1
+-- Compiling module polyveck_reduce
 
 Top level modules:
-	poly_uniform_gamma1
-
-} {} {}} D:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/dilithium_shake128_stream_init.v {1 {vlog -work work -vopt -stats=none D:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/dilithium_shake128_stream_init.v
-QuestaSim-64 vlog 10.7c Compiler 2018.08 Aug 18 2018
--- Compiling module dilithium_shake128_stream_init
-
-Top level modules:
-	dilithium_shake128_stream_init
-
-} {} {}} D:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/polyvecl_pointwise_acc_montgomery.v {1 {vlog -work work -vopt -stats=none D:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/polyvecl_pointwise_acc_montgomery.v
-QuestaSim-64 vlog 10.7c Compiler 2018.08 Aug 18 2018
--- Compiling module polyvecl_pointwise_acc_montgomery
-
-Top level modules:
-	polyvecl_pointwise_acc_montgomery
+	polyveck_reduce
 
 } {} {}} D:/DATA/DOAN/vivado_doan/dilithium_verilogcode/polyz_unpack.v {1 {vlog -work work -vopt -stats=none D:/DATA/DOAN/vivado_doan/dilithium_verilogcode/polyz_unpack.v
 QuestaSim-64 vlog 10.7c Compiler 2018.08 Aug 18 2018
@@ -424,40 +444,32 @@ QuestaSim-64 vlog 10.7c Compiler 2018.08 Aug 18 2018
 Top level modules:
 	polyz_unpack
 
-} {} {}} D:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/polyvec_matrix_pointwise_montgomery.v {1 {vlog -work work -vopt -stats=none D:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/polyvec_matrix_pointwise_montgomery.v
+} {} {}} D:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/polyvecl_pointwise_acc_montgomery.v {1 {vlog -work work -vopt -stats=none D:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/polyvecl_pointwise_acc_montgomery.v
 QuestaSim-64 vlog 10.7c Compiler 2018.08 Aug 18 2018
+-- Compiling module polyvecl_pointwise_acc_montgomery
+
+Top level modules:
+	polyvecl_pointwise_acc_montgomery
+
+} {} {}} D:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/dilithium_shake128_stream_init.v {1 {vlog -work work -vopt -stats=none D:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/dilithium_shake128_stream_init.v
+QuestaSim-64 vlog 10.7c Compiler 2018.08 Aug 18 2018
+-- Compiling module dilithium_shake128_stream_init
+
+Top level modules:
+	dilithium_shake128_stream_init
+
+} {} {}} D:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/polyvec_matrix_pointwise_montgomery.v {2 {vlog -work work -vopt -stats=none D:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/polyvec_matrix_pointwise_montgomery.v
+-- Compiling module polyvec_matrix_pointwise_montgomery
+QuestaSim-64 vlog 10.7c Compiler 2018.08 Aug 18 2018
+** Warning: (vlog-6) -- Waiting for lock by "Hoi@ADMIN-PC, pid = 22380
+". Lockfile is "D:/DATA/DOAN/vivado_doan/dilithium_verilogcode/work/_lock".
+
+Top level modules:
+	polyvec_matrix_pointwise_montgomery
 -- Compiling module polyvec_matrix_pointwise_montgomery
 
 Top level modules:
 	polyvec_matrix_pointwise_montgomery
-
-} {} {}} D:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/shake256_squeezeblocks.v {1 {vlog -work work -vopt -stats=none D:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/shake256_squeezeblocks.v
-QuestaSim-64 vlog 10.7c Compiler 2018.08 Aug 18 2018
--- Compiling module shake256_squeezeblocks
-
-Top level modules:
-	shake256_squeezeblocks
-
-} {} {}} D:/DATA/DOAN/vivado_doan/dilithium_verilogcode/poly_decompose.v {1 {vlog -work work -vopt -stats=none D:/DATA/DOAN/vivado_doan/dilithium_verilogcode/poly_decompose.v
-QuestaSim-64 vlog 10.7c Compiler 2018.08 Aug 18 2018
--- Compiling module poly_decompose
-
-Top level modules:
-	poly_decompose
-
-} {} {}} D:/DATA/DOAN/vivado_doan/dilithium_verilogcode/tb_polyvec_matrix_expand.v {1 {vlog -work work -vopt -stats=none D:/DATA/DOAN/vivado_doan/dilithium_verilogcode/tb_polyvec_matrix_expand.v
-QuestaSim-64 vlog 10.7c Compiler 2018.08 Aug 18 2018
--- Compiling module tb_polyvec_matrix_expand
-
-Top level modules:
-	tb_polyvec_matrix_expand
-
-} {} {}} D:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/montgomery_reduce.v {1 {vlog -work work -vopt -stats=none D:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/montgomery_reduce.v
-QuestaSim-64 vlog 10.7c Compiler 2018.08 Aug 18 2018
--- Compiling module montgomery_reduce
-
-Top level modules:
-	montgomery_reduce
 
 } {} {}} D:/DATA/DOAN/vivado_doan/dilithium_verilogcode/shake256_squeeze.v {1 {vlog -work work -vopt -stats=none D:/DATA/DOAN/vivado_doan/dilithium_verilogcode/shake256_squeeze.v
 QuestaSim-64 vlog 10.7c Compiler 2018.08 Aug 18 2018
@@ -466,19 +478,40 @@ QuestaSim-64 vlog 10.7c Compiler 2018.08 Aug 18 2018
 Top level modules:
 	shake256_squeeze
 
+} {} {}} D:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/montgomery_reduce.v {1 {vlog -work work -vopt -stats=none D:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/montgomery_reduce.v
+QuestaSim-64 vlog 10.7c Compiler 2018.08 Aug 18 2018
+-- Compiling module montgomery_reduce
+
+Top level modules:
+	montgomery_reduce
+
+} {} {}} D:/DATA/DOAN/vivado_doan/dilithium_verilogcode/tb_polyvec_matrix_expand.v {1 {vlog -work work -vopt -stats=none D:/DATA/DOAN/vivado_doan/dilithium_verilogcode/tb_polyvec_matrix_expand.v
+QuestaSim-64 vlog 10.7c Compiler 2018.08 Aug 18 2018
+-- Compiling module tb_polyvec_matrix_expand
+
+Top level modules:
+	tb_polyvec_matrix_expand
+
+} {} {}} D:/DATA/DOAN/vivado_doan/dilithium_verilogcode/poly_decompose.v {1 {vlog -work work -vopt -stats=none D:/DATA/DOAN/vivado_doan/dilithium_verilogcode/poly_decompose.v
+QuestaSim-64 vlog 10.7c Compiler 2018.08 Aug 18 2018
+-- Compiling module poly_decompose
+
+Top level modules:
+	poly_decompose
+
+} {} {}} D:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/shake256_squeezeblocks.v {1 {vlog -work work -vopt -stats=none D:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/shake256_squeezeblocks.v
+QuestaSim-64 vlog 10.7c Compiler 2018.08 Aug 18 2018
+-- Compiling module shake256_squeezeblocks
+
+Top level modules:
+	shake256_squeezeblocks
+
 } {} {}} D:/DATA/DOAN/vivado_doan/dilithium_verilogcode/polyveck_ntt.v {1 {vlog -work work -vopt -stats=none D:/DATA/DOAN/vivado_doan/dilithium_verilogcode/polyveck_ntt.v
 QuestaSim-64 vlog 10.7c Compiler 2018.08 Aug 18 2018
 -- Compiling module polyveck_ntt
 
 Top level modules:
 	polyveck_ntt
-
-} {} {}} D:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/KeccakF1600_StatePermute.v {1 {vlog -work work -vopt -stats=none D:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/KeccakF1600_StatePermute.v
-QuestaSim-64 vlog 10.7c Compiler 2018.08 Aug 18 2018
--- Compiling module KeccakF1600_StatePermute
-
-Top level modules:
-	KeccakF1600_StatePermute
 
 } {} {}} D:/DATA/DOAN/vivado_doan/dilithium_verilogcode/polyveck_decompose.v {1 {vlog -work work -vopt -stats=none D:/DATA/DOAN/vivado_doan/dilithium_verilogcode/polyveck_decompose.v
 QuestaSim-64 vlog 10.7c Compiler 2018.08 Aug 18 2018
@@ -487,47 +520,26 @@ QuestaSim-64 vlog 10.7c Compiler 2018.08 Aug 18 2018
 Top level modules:
 	polyveck_decompose
 
+} {} {}} D:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/KeccakF1600_StatePermute.v {1 {vlog -work work -vopt -stats=none D:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/KeccakF1600_StatePermute.v
+QuestaSim-64 vlog 10.7c Compiler 2018.08 Aug 18 2018
+-- Compiling module KeccakF1600_StatePermute
+
+Top level modules:
+	KeccakF1600_StatePermute
+
+} {} {}} D:/DATA/DOAN/vivado_doan/dilithium_verilogcode/unpack_sig.v {1 {vlog -work work -vopt -stats=none D:/DATA/DOAN/vivado_doan/dilithium_verilogcode/unpack_sig.v
+QuestaSim-64 vlog 10.7c Compiler 2018.08 Aug 18 2018
+-- Compiling module unpack_sig
+
+Top level modules:
+	unpack_sig
+
 } {} {}} D:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/montgomery_reduce_32bit.v {1 {vlog -work work -vopt -stats=none D:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/montgomery_reduce_32bit.v
 QuestaSim-64 vlog 10.7c Compiler 2018.08 Aug 18 2018
 -- Compiling module montgomery_reduce_32bit
 
 Top level modules:
 	montgomery_reduce_32bit
-
-} {} {}} D:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/polyeta_pack.v {1 {vlog -work work -vopt -stats=none D:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/polyeta_pack.v
-QuestaSim-64 vlog 10.7c Compiler 2018.08 Aug 18 2018
--- Compiling module polyeta_pack
-
-Top level modules:
-	polyeta_pack
-
-} {} {}} D:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/shake256_init.v {1 {vlog -work work -vopt -stats=none D:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/shake256_init.v
-QuestaSim-64 vlog 10.7c Compiler 2018.08 Aug 18 2018
--- Compiling module shake256_init
-
-Top level modules:
-	shake256_init
-
-} {} {}} D:/DATA/DOAN/vivado_doan/dilithium_verilogcode/Theta.v {1 {vlog -work work -vopt -stats=none D:/DATA/DOAN/vivado_doan/dilithium_verilogcode/Theta.v
-QuestaSim-64 vlog 10.7c Compiler 2018.08 Aug 18 2018
--- Compiling module Theta
-
-Top level modules:
-	Theta
-
-} {} {}} D:/DATA/DOAN/vivado_doan/dilithium_verilogcode/keccak_round_function.v {1 {vlog -work work -vopt -stats=none D:/DATA/DOAN/vivado_doan/dilithium_verilogcode/keccak_round_function.v
-QuestaSim-64 vlog 10.7c Compiler 2018.08 Aug 18 2018
--- Compiling module keccak_round_function
-
-Top level modules:
-	keccak_round_function
-
-} {} {}} D:/DATA/DOAN/vivado_doan/dilithium_verilogcode/XiIota.v {1 {vlog -work work -vopt -stats=none D:/DATA/DOAN/vivado_doan/dilithium_verilogcode/XiIota.v
-QuestaSim-64 vlog 10.7c Compiler 2018.08 Aug 18 2018
--- Compiling module XiIota
-
-Top level modules:
-	XiIota
 
 } {} {}} D:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/pack_sk.v {1 {vlog -work work -vopt -stats=none D:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/pack_sk.v
 QuestaSim-64 vlog 10.7c Compiler 2018.08 Aug 18 2018
@@ -536,19 +548,47 @@ QuestaSim-64 vlog 10.7c Compiler 2018.08 Aug 18 2018
 Top level modules:
 	pack_sk
 
+} {} {}} D:/DATA/DOAN/vivado_doan/dilithium_verilogcode/XiIota.v {1 {vlog -work work -vopt -stats=none D:/DATA/DOAN/vivado_doan/dilithium_verilogcode/XiIota.v
+QuestaSim-64 vlog 10.7c Compiler 2018.08 Aug 18 2018
+-- Compiling module XiIota
+
+Top level modules:
+	XiIota
+
+} {} {}} D:/DATA/DOAN/vivado_doan/dilithium_verilogcode/keccak_round_function.v {1 {vlog -work work -vopt -stats=none D:/DATA/DOAN/vivado_doan/dilithium_verilogcode/keccak_round_function.v
+QuestaSim-64 vlog 10.7c Compiler 2018.08 Aug 18 2018
+-- Compiling module keccak_round_function
+
+Top level modules:
+	keccak_round_function
+
+} {} {}} D:/DATA/DOAN/vivado_doan/dilithium_verilogcode/Theta.v {1 {vlog -work work -vopt -stats=none D:/DATA/DOAN/vivado_doan/dilithium_verilogcode/Theta.v
+QuestaSim-64 vlog 10.7c Compiler 2018.08 Aug 18 2018
+-- Compiling module Theta
+
+Top level modules:
+	Theta
+
+} {} {}} D:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/shake256_init.v {1 {vlog -work work -vopt -stats=none D:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/shake256_init.v
+QuestaSim-64 vlog 10.7c Compiler 2018.08 Aug 18 2018
+-- Compiling module shake256_init
+
+Top level modules:
+	shake256_init
+
+} {} {}} D:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/polyeta_pack.v {1 {vlog -work work -vopt -stats=none D:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/polyeta_pack.v
+QuestaSim-64 vlog 10.7c Compiler 2018.08 Aug 18 2018
+-- Compiling module polyeta_pack
+
+Top level modules:
+	polyeta_pack
+
 } {} {}} D:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/crypto_sign_keypair.v {1 {vlog -work work -vopt -stats=none D:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/crypto_sign_keypair.v
 QuestaSim-64 vlog 10.7c Compiler 2018.08 Aug 18 2018
 -- Compiling module crypto_sign_keypair
 
 Top level modules:
 	crypto_sign_keypair
-
-} {} {}} D:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/poly_pointwise_montgomery.v {1 {vlog -work work -vopt -stats=none D:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/poly_pointwise_montgomery.v
-QuestaSim-64 vlog 10.7c Compiler 2018.08 Aug 18 2018
--- Compiling module poly_pointwise_montgomery
-
-Top level modules:
-	poly_pointwise_montgomery
 
 } {} {}} D:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/polyvec_matrix_expand.v {1 {vlog -work work -vopt -stats=none D:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/polyvec_matrix_expand.v
 QuestaSim-64 vlog 10.7c Compiler 2018.08 Aug 18 2018
@@ -557,40 +597,19 @@ QuestaSim-64 vlog 10.7c Compiler 2018.08 Aug 18 2018
 Top level modules:
 	polyvec_matrix_expand
 
+} {} {}} D:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/poly_pointwise_montgomery.v {1 {vlog -work work -vopt -stats=none D:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/poly_pointwise_montgomery.v
+QuestaSim-64 vlog 10.7c Compiler 2018.08 Aug 18 2018
+-- Compiling module poly_pointwise_montgomery
+
+Top level modules:
+	poly_pointwise_montgomery
+
 } {} {}} D:/DATA/DOAN/vivado_doan/dilithium_verilogcode/polyvecl_invntt_tomont.v {1 {vlog -work work -vopt -stats=none D:/DATA/DOAN/vivado_doan/dilithium_verilogcode/polyvecl_invntt_tomont.v
 QuestaSim-64 vlog 10.7c Compiler 2018.08 Aug 18 2018
 -- Compiling module polyvecl_invntt_tomont
 
 Top level modules:
 	polyvecl_invntt_tomont
-
-} {} {}} D:/DATA/DOAN/vivado_doan/dilithium_verilogcode/PermuteFunc_FourRound.v {1 {vlog -work work -vopt -stats=none D:/DATA/DOAN/vivado_doan/dilithium_verilogcode/PermuteFunc_FourRound.v
-QuestaSim-64 vlog 10.7c Compiler 2018.08 Aug 18 2018
--- Compiling module PermuteFunc_FourRound
-
-Top level modules:
-	PermuteFunc_FourRound
-
-} {} {}} D:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/dilithium_shake256_stream_init.v {1 {vlog -work work -vopt -stats=none D:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/dilithium_shake256_stream_init.v
-QuestaSim-64 vlog 10.7c Compiler 2018.08 Aug 18 2018
--- Compiling module dilithium_shake256_stream_init
-
-Top level modules:
-	dilithium_shake256_stream_init
-
-} {} {}} D:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/polyt1_pack.v {1 {vlog -work work -vopt -stats=none D:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/polyt1_pack.v
-QuestaSim-64 vlog 10.7c Compiler 2018.08 Aug 18 2018
--- Compiling module polyt1_pack
-
-Top level modules:
-	polyt1_pack
-
-} {} {}} D:/DATA/DOAN/vivado_doan/dilithium_verilogcode/polyt0_unpack.v {1 {vlog -work work -vopt -stats=none D:/DATA/DOAN/vivado_doan/dilithium_verilogcode/polyt0_unpack.v
-QuestaSim-64 vlog 10.7c Compiler 2018.08 Aug 18 2018
--- Compiling module polyt0_unpack
-
-Top level modules:
-	polyt0_unpack
 
 } {} {}} D:/DATA/DOAN/vivado_doan/dilithium_verilogcode/tb_polyz_pack.v {1 {vlog -work work -vopt -stats=none D:/DATA/DOAN/vivado_doan/dilithium_verilogcode/tb_polyz_pack.v
 QuestaSim-64 vlog 10.7c Compiler 2018.08 Aug 18 2018
@@ -599,12 +618,33 @@ QuestaSim-64 vlog 10.7c Compiler 2018.08 Aug 18 2018
 Top level modules:
 	tb_polyz_pack
 
-} {} {}} D:/DATA/DOAN/vivado_doan/dilithium_verilogcode/polyveck_pack_w1.v {1 {vlog -work work -vopt -stats=none D:/DATA/DOAN/vivado_doan/dilithium_verilogcode/polyveck_pack_w1.v
+} {} {}} D:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/polyt1_pack.v {1 {vlog -work work -vopt -stats=none D:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/polyt1_pack.v
 QuestaSim-64 vlog 10.7c Compiler 2018.08 Aug 18 2018
--- Compiling module polyveck_pack_w1
+-- Compiling module polyt1_pack
 
 Top level modules:
-	polyveck_pack_w1
+	polyt1_pack
+
+} {} {}} D:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/dilithium_shake256_stream_init.v {1 {vlog -work work -vopt -stats=none D:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/dilithium_shake256_stream_init.v
+QuestaSim-64 vlog 10.7c Compiler 2018.08 Aug 18 2018
+-- Compiling module dilithium_shake256_stream_init
+
+Top level modules:
+	dilithium_shake256_stream_init
+
+} {} {}} D:/DATA/DOAN/vivado_doan/dilithium_verilogcode/PermuteFunc_FourRound.v {1 {vlog -work work -vopt -stats=none D:/DATA/DOAN/vivado_doan/dilithium_verilogcode/PermuteFunc_FourRound.v
+QuestaSim-64 vlog 10.7c Compiler 2018.08 Aug 18 2018
+-- Compiling module PermuteFunc_FourRound
+
+Top level modules:
+	PermuteFunc_FourRound
+
+} {} {}} D:/DATA/DOAN/vivado_doan/dilithium_verilogcode/polyt0_unpack.v {1 {vlog -work work -vopt -stats=none D:/DATA/DOAN/vivado_doan/dilithium_verilogcode/polyt0_unpack.v
+QuestaSim-64 vlog 10.7c Compiler 2018.08 Aug 18 2018
+-- Compiling module polyt0_unpack
+
+Top level modules:
+	polyt0_unpack
 
 } {} {}} D:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/fqmul_32bit.v {1 {vlog -work work -vopt -stats=none D:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/fqmul_32bit.v
 QuestaSim-64 vlog 10.7c Compiler 2018.08 Aug 18 2018
@@ -613,12 +653,12 @@ QuestaSim-64 vlog 10.7c Compiler 2018.08 Aug 18 2018
 Top level modules:
 	fqmul_32bit
 
-} {} {}} D:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/shake256_absorb.v {1 {vlog -work work -vopt -stats=none D:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/shake256_absorb.v
+} {} {}} D:/DATA/DOAN/vivado_doan/dilithium_verilogcode/polyveck_pack_w1.v {1 {vlog -work work -vopt -stats=none D:/DATA/DOAN/vivado_doan/dilithium_verilogcode/polyveck_pack_w1.v
 QuestaSim-64 vlog 10.7c Compiler 2018.08 Aug 18 2018
--- Compiling module shake256_absorb
+-- Compiling module polyveck_pack_w1
 
 Top level modules:
-	shake256_absorb
+	polyveck_pack_w1
 
 } {} {}} D:/DATA/DOAN/vivado_doan/dilithium_verilogcode/poly_make_hint.v {1 {vlog -work work -vopt -stats=none D:/DATA/DOAN/vivado_doan/dilithium_verilogcode/poly_make_hint.v
 QuestaSim-64 vlog 10.7c Compiler 2018.08 Aug 18 2018
@@ -627,12 +667,12 @@ QuestaSim-64 vlog 10.7c Compiler 2018.08 Aug 18 2018
 Top level modules:
 	poly_make_hint
 
-} {} {}} D:/DATA/DOAN/vivado_doan/dilithium_verilogcode/tb_polyvec_matrix_pointwise_montgomery.v {1 {vlog -work work -vopt -stats=none D:/DATA/DOAN/vivado_doan/dilithium_verilogcode/tb_polyvec_matrix_pointwise_montgomery.v
+} {} {}} D:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/shake256_absorb.v {1 {vlog -work work -vopt -stats=none D:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/shake256_absorb.v
 QuestaSim-64 vlog 10.7c Compiler 2018.08 Aug 18 2018
--- Compiling module tb_polyvec_matrix_pointwise_montgomery
+-- Compiling module shake256_absorb
 
 Top level modules:
-	tb_polyvec_matrix_pointwise_montgomery
+	shake256_absorb
 
 } {} {}} D:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/rej_eta.v {1 {vlog -work work -vopt -stats=none D:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/rej_eta.v
 QuestaSim-64 vlog 10.7c Compiler 2018.08 Aug 18 2018
@@ -641,12 +681,32 @@ QuestaSim-64 vlog 10.7c Compiler 2018.08 Aug 18 2018
 Top level modules:
 	rej_eta
 
+} {} {}} D:/DATA/DOAN/vivado_doan/dilithium_verilogcode/tb_polyvec_matrix_pointwise_montgomery.v {1 {vlog -work work -vopt -stats=none D:/DATA/DOAN/vivado_doan/dilithium_verilogcode/tb_polyvec_matrix_pointwise_montgomery.v
+QuestaSim-64 vlog 10.7c Compiler 2018.08 Aug 18 2018
+-- Compiling module tb_polyvec_matrix_pointwise_montgomery
+
+Top level modules:
+	tb_polyvec_matrix_pointwise_montgomery
+
 } {} {}} D:/DATA/DOAN/vivado_doan/dilithium_verilogcode/polyveck_make_hint.v {1 {vlog -work work -vopt -stats=none D:/DATA/DOAN/vivado_doan/dilithium_verilogcode/polyveck_make_hint.v
 QuestaSim-64 vlog 10.7c Compiler 2018.08 Aug 18 2018
 -- Compiling module polyveck_make_hint
 
 Top level modules:
 	polyveck_make_hint
+
+} {} {}} D:/DATA/DOAN/vivado_doan/dilithium_verilogcode/unpack_pk.v {2 {vlog -work work -vopt -stats=none D:/DATA/DOAN/vivado_doan/dilithium_verilogcode/unpack_pk.v
+QuestaSim-64 vlog 10.7c Compiler 2018.08 Aug 18 2018
+** Warning: (vlog-6) -- Waiting for lock by "Hoi@ADMIN-PC, pid = 20472
+". Lockfile is "D:/DATA/DOAN/vivado_doan/dilithium_verilogcode/work/_lock".
+-- Compiling module unpack_pk
+
+Top level modules:
+	unpack_pk
+-- Compiling module unpack_pk
+
+Top level modules:
+	unpack_pk
 
 } {} {}} D:/DATA/DOAN/vivado_doan/dilithium_verilogcode/tb_SHAKE_256.v {1 {vlog -work work -vopt -stats=none D:/DATA/DOAN/vivado_doan/dilithium_verilogcode/tb_SHAKE_256.v
 QuestaSim-64 vlog 10.7c Compiler 2018.08 Aug 18 2018
@@ -662,13 +722,6 @@ QuestaSim-64 vlog 10.7c Compiler 2018.08 Aug 18 2018
 Top level modules:
 	keccak_finalize
 
-} {} {}} D:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/poly_uniform_eta.v {1 {vlog -work work -vopt -stats=none D:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/poly_uniform_eta.v
-QuestaSim-64 vlog 10.7c Compiler 2018.08 Aug 18 2018
--- Compiling module poly_uniform_eta
-
-Top level modules:
-	poly_uniform_eta
-
 } {} {}} D:/DATA/DOAN/vivado_doan/dilithium_verilogcode/polyveck_sub.v {1 {vlog -work work -vopt -stats=none D:/DATA/DOAN/vivado_doan/dilithium_verilogcode/polyveck_sub.v
 QuestaSim-64 vlog 10.7c Compiler 2018.08 Aug 18 2018
 -- Compiling module polyveck_sub
@@ -676,12 +729,12 @@ QuestaSim-64 vlog 10.7c Compiler 2018.08 Aug 18 2018
 Top level modules:
 	polyveck_sub
 
-} {} {}} D:/DATA/DOAN/vivado_doan/dilithium_verilogcode/polyeta_unpack.v {1 {vlog -work work -vopt -stats=none D:/DATA/DOAN/vivado_doan/dilithium_verilogcode/polyeta_unpack.v
+} {} {}} D:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/poly_uniform_eta.v {1 {vlog -work work -vopt -stats=none D:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/poly_uniform_eta.v
 QuestaSim-64 vlog 10.7c Compiler 2018.08 Aug 18 2018
--- Compiling module polyeta_unpack
+-- Compiling module poly_uniform_eta
 
 Top level modules:
-	polyeta_unpack
+	poly_uniform_eta
 
 } {} {}} D:/DATA/DOAN/vivado_doan/dilithium_verilogcode/use_hint.v {1 {vlog -work work -vopt -stats=none D:/DATA/DOAN/vivado_doan/dilithium_verilogcode/use_hint.v
 QuestaSim-64 vlog 10.7c Compiler 2018.08 Aug 18 2018
@@ -690,33 +743,12 @@ QuestaSim-64 vlog 10.7c Compiler 2018.08 Aug 18 2018
 Top level modules:
 	use_hint
 
-} {} {}} D:/DATA/DOAN/vivado_doan/dilithium_verilogcode/tb_poly_uniform.v {1 {vlog -work work -vopt -stats=none D:/DATA/DOAN/vivado_doan/dilithium_verilogcode/tb_poly_uniform.v
+} {} {}} D:/DATA/DOAN/vivado_doan/dilithium_verilogcode/polyeta_unpack.v {1 {vlog -work work -vopt -stats=none D:/DATA/DOAN/vivado_doan/dilithium_verilogcode/polyeta_unpack.v
 QuestaSim-64 vlog 10.7c Compiler 2018.08 Aug 18 2018
--- Compiling module tb_poly_uniform
+-- Compiling module polyeta_unpack
 
 Top level modules:
-	tb_poly_uniform
-
-} {} {}} D:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/polyt0_pack.v {1 {vlog -work work -vopt -stats=none D:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/polyt0_pack.v
-QuestaSim-64 vlog 10.7c Compiler 2018.08 Aug 18 2018
--- Compiling module polyt0_pack
-
-Top level modules:
-	polyt0_pack
-
-} {} {}} D:/DATA/DOAN/vivado_doan/dilithium_verilogcode/tb_polyveck_power2round.v {1 {vlog -work work -vopt -stats=none D:/DATA/DOAN/vivado_doan/dilithium_verilogcode/tb_polyveck_power2round.v
-QuestaSim-64 vlog 10.7c Compiler 2018.08 Aug 18 2018
--- Compiling module tb_polyveck_power2round
-
-Top level modules:
-	tb_polyveck_power2round
-
-} {} {}} D:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/polyvecl_uniform_eta.v {1 {vlog -work work -vopt -stats=none D:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/polyvecl_uniform_eta.v
-QuestaSim-64 vlog 10.7c Compiler 2018.08 Aug 18 2018
--- Compiling module polyvecl_uniform_eta
-
-Top level modules:
-	polyvecl_uniform_eta
+	polyeta_unpack
 
 } {} {}} D:/DATA/DOAN/vivado_doan/dilithium_verilogcode/polyvecl_uniform_gamma1.v {1 {vlog -work work -vopt -stats=none D:/DATA/DOAN/vivado_doan/dilithium_verilogcode/polyvecl_uniform_gamma1.v
 QuestaSim-64 vlog 10.7c Compiler 2018.08 Aug 18 2018
@@ -725,12 +757,33 @@ QuestaSim-64 vlog 10.7c Compiler 2018.08 Aug 18 2018
 Top level modules:
 	polyvecl_uniform_gamma1
 
-} {} {}} D:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/shake128_absorb.v {1 {vlog -work work -vopt -stats=none D:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/shake128_absorb.v
+} {} {}} D:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/polyvecl_uniform_eta.v {1 {vlog -work work -vopt -stats=none D:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/polyvecl_uniform_eta.v
 QuestaSim-64 vlog 10.7c Compiler 2018.08 Aug 18 2018
--- Compiling module shake128_absorb
+-- Compiling module polyvecl_uniform_eta
 
 Top level modules:
-	shake128_absorb
+	polyvecl_uniform_eta
+
+} {} {}} D:/DATA/DOAN/vivado_doan/dilithium_verilogcode/tb_polyveck_power2round.v {1 {vlog -work work -vopt -stats=none D:/DATA/DOAN/vivado_doan/dilithium_verilogcode/tb_polyveck_power2round.v
+QuestaSim-64 vlog 10.7c Compiler 2018.08 Aug 18 2018
+-- Compiling module tb_polyveck_power2round
+
+Top level modules:
+	tb_polyveck_power2round
+
+} {} {}} D:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/polyt0_pack.v {1 {vlog -work work -vopt -stats=none D:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/polyt0_pack.v
+QuestaSim-64 vlog 10.7c Compiler 2018.08 Aug 18 2018
+-- Compiling module polyt0_pack
+
+Top level modules:
+	polyt0_pack
+
+} {} {}} D:/DATA/DOAN/vivado_doan/dilithium_verilogcode/tb_poly_uniform.v {1 {vlog -work work -vopt -stats=none D:/DATA/DOAN/vivado_doan/dilithium_verilogcode/tb_poly_uniform.v
+QuestaSim-64 vlog 10.7c Compiler 2018.08 Aug 18 2018
+-- Compiling module tb_poly_uniform
+
+Top level modules:
+	tb_poly_uniform
 
 } {} {}} D:/DATA/DOAN/vivado_doan/dilithium_verilogcode/tb_poly_uniform_eta.v {1 {vlog -work work -vopt -stats=none D:/DATA/DOAN/vivado_doan/dilithium_verilogcode/tb_poly_uniform_eta.v
 QuestaSim-64 vlog 10.7c Compiler 2018.08 Aug 18 2018
@@ -739,29 +792,12 @@ QuestaSim-64 vlog 10.7c Compiler 2018.08 Aug 18 2018
 Top level modules:
 	tb_poly_uniform_eta
 
-} {} {}} D:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/poly_caddq.v {1 {vlog -work work -vopt -stats=none D:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/poly_caddq.v
+} {} {}} D:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/shake128_absorb.v {1 {vlog -work work -vopt -stats=none D:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/shake128_absorb.v
 QuestaSim-64 vlog 10.7c Compiler 2018.08 Aug 18 2018
--- Compiling module poly_caddq
+-- Compiling module shake128_absorb
 
 Top level modules:
-	poly_caddq
-
-} {} {}} D:/DATA/DOAN/vivado_doan/dilithium_verilogcode/tb_dilithium_shake128_stream_init.v {1 {vlog -work work -vopt -stats=none D:/DATA/DOAN/vivado_doan/dilithium_verilogcode/tb_dilithium_shake128_stream_init.v
-QuestaSim-64 vlog 10.7c Compiler 2018.08 Aug 18 2018
-
-} {} {}} D:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/rej_uniform.v {1 {vlog -work work -vopt -stats=none D:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/rej_uniform.v
-QuestaSim-64 vlog 10.7c Compiler 2018.08 Aug 18 2018
--- Compiling module rej_uniform
-
-Top level modules:
-	rej_uniform
-
-} {} {}} D:/DATA/DOAN/vivado_doan/dilithium_verilogcode/polyt1_unpack.v {1 {vlog -work work -vopt -stats=none D:/DATA/DOAN/vivado_doan/dilithium_verilogcode/polyt1_unpack.v
-QuestaSim-64 vlog 10.7c Compiler 2018.08 Aug 18 2018
--- Compiling module polyt1_unpack
-
-Top level modules:
-	polyt1_unpack
+	shake128_absorb
 
 } {} {}} D:/DATA/DOAN/vivado_doan/dilithium_verilogcode/tb_crypto_sign_keypair.v {1 {vlog -work work -vopt -stats=none D:/DATA/DOAN/vivado_doan/dilithium_verilogcode/tb_crypto_sign_keypair.v
 QuestaSim-64 vlog 10.7c Compiler 2018.08 Aug 18 2018
@@ -770,12 +806,36 @@ QuestaSim-64 vlog 10.7c Compiler 2018.08 Aug 18 2018
 Top level modules:
 	tb_crypto_sign_keypair
 
-} {} {}} D:/DATA/DOAN/vivado_doan/dilithium_verilogcode/keccak_squeeze.v {1 {vlog -work work -vopt -stats=none D:/DATA/DOAN/vivado_doan/dilithium_verilogcode/keccak_squeeze.v
+} {} {}} D:/DATA/DOAN/vivado_doan/dilithium_verilogcode/polyt1_unpack.v {1 {vlog -work work -vopt -stats=none D:/DATA/DOAN/vivado_doan/dilithium_verilogcode/polyt1_unpack.v
 QuestaSim-64 vlog 10.7c Compiler 2018.08 Aug 18 2018
--- Compiling module keccak_squeeze
+-- Compiling module polyt1_unpack
 
 Top level modules:
-	keccak_squeeze
+	polyt1_unpack
+
+} {} {}} D:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/rej_uniform.v {1 {vlog -work work -vopt -stats=none D:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/rej_uniform.v
+QuestaSim-64 vlog 10.7c Compiler 2018.08 Aug 18 2018
+-- Compiling module rej_uniform
+
+Top level modules:
+	rej_uniform
+
+} {} {}} D:/DATA/DOAN/vivado_doan/dilithium_verilogcode/tb_dilithium_shake128_stream_init.v {1 {vlog -work work -vopt -stats=none D:/DATA/DOAN/vivado_doan/dilithium_verilogcode/tb_dilithium_shake128_stream_init.v
+QuestaSim-64 vlog 10.7c Compiler 2018.08 Aug 18 2018
+
+} {} {}} D:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/poly_caddq.v {1 {vlog -work work -vopt -stats=none D:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/poly_caddq.v
+QuestaSim-64 vlog 10.7c Compiler 2018.08 Aug 18 2018
+-- Compiling module poly_caddq
+
+Top level modules:
+	poly_caddq
+
+} {} {}} D:/DATA/DOAN/vivado_doan/dilithium_verilogcode/tb_poly_challenge.v {1 {vlog -work work -vopt -stats=none D:/DATA/DOAN/vivado_doan/dilithium_verilogcode/tb_poly_challenge.v
+QuestaSim-64 vlog 10.7c Compiler 2018.08 Aug 18 2018
+-- Compiling module tb_poly_challenge
+
+Top level modules:
+	tb_poly_challenge
 
 } {} {}} D:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/PermuteFunction_oneRound.v {1 {vlog -work work -vopt -stats=none D:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/PermuteFunction_oneRound.v
 QuestaSim-64 vlog 10.7c Compiler 2018.08 Aug 18 2018
@@ -784,12 +844,15 @@ QuestaSim-64 vlog 10.7c Compiler 2018.08 Aug 18 2018
 Top level modules:
 	PermuteFunction_oneRound
 
-} {} {}} D:/DATA/DOAN/vivado_doan/dilithium_verilogcode/tb_poly_challenge.v {1 {vlog -work work -vopt -stats=none D:/DATA/DOAN/vivado_doan/dilithium_verilogcode/tb_poly_challenge.v
+} {} {}} D:/DATA/DOAN/vivado_doan/dilithium_verilogcode/keccak_squeeze.v {1 {vlog -work work -vopt -stats=none D:/DATA/DOAN/vivado_doan/dilithium_verilogcode/keccak_squeeze.v
 QuestaSim-64 vlog 10.7c Compiler 2018.08 Aug 18 2018
--- Compiling module tb_poly_challenge
+-- Compiling module keccak_squeeze
 
 Top level modules:
-	tb_poly_challenge
+	keccak_squeeze
+
+} {} {}} D:/DATA/DOAN/vivado_doan/dilithium_verilogcode/tb_polyt1_pack.v {1 {vlog -work work -vopt -stats=none D:/DATA/DOAN/vivado_doan/dilithium_verilogcode/tb_polyt1_pack.v
+QuestaSim-64 vlog 10.7c Compiler 2018.08 Aug 18 2018
 
 } {} {}} D:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/shake256_finalize.v {2 {vlog -work work -vopt -stats=none D:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/shake256_finalize.v
 QuestaSim-64 vlog 10.7c Compiler 2018.08 Aug 18 2018
@@ -802,8 +865,12 @@ Top level modules:
 	shake256_finalize
 	shake128_finalize
 
-} {} {}} D:/DATA/DOAN/vivado_doan/dilithium_verilogcode/tb_polyt1_pack.v {1 {vlog -work work -vopt -stats=none D:/DATA/DOAN/vivado_doan/dilithium_verilogcode/tb_polyt1_pack.v
+} {} {}} D:/DATA/DOAN/vivado_doan/dilithium_verilogcode/polyvecl_reduce.v {1 {vlog -work work -vopt -stats=none D:/DATA/DOAN/vivado_doan/dilithium_verilogcode/polyvecl_reduce.v
 QuestaSim-64 vlog 10.7c Compiler 2018.08 Aug 18 2018
+-- Compiling module polyvecl_reduce
+
+Top level modules:
+	polyvecl_reduce
 
 } {} {}} D:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/poly_reduce.v {1 {vlog -work work -vopt -stats=none D:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/poly_reduce.v
 QuestaSim-64 vlog 10.7c Compiler 2018.08 Aug 18 2018
@@ -812,19 +879,26 @@ QuestaSim-64 vlog 10.7c Compiler 2018.08 Aug 18 2018
 Top level modules:
 	poly_reduce
 
-} {} {}} D:/DATA/DOAN/vivado_doan/dilithium_verilogcode/polyvecl_reduce.v {1 {vlog -work work -vopt -stats=none D:/DATA/DOAN/vivado_doan/dilithium_verilogcode/polyvecl_reduce.v
-QuestaSim-64 vlog 10.7c Compiler 2018.08 Aug 18 2018
--- Compiling module polyvecl_reduce
-
-Top level modules:
-	polyvecl_reduce
-
 } {} {}} {D:/DATA/DOAN/vivado_doan/dilithium_verilogcode/crypto_sign_signature_internal .v} {1 {vlog -work work -vopt -stats=none {D:/DATA/DOAN/vivado_doan/dilithium_verilogcode/crypto_sign_signature_internal .v}
 QuestaSim-64 vlog 10.7c Compiler 2018.08 Aug 18 2018
 -- Compiling module crypto_sign_signature_internal
 
 Top level modules:
 	crypto_sign_signature_internal
+
+} {} {}} D:/DATA/DOAN/vivado_doan/dilithium_verilogcode/polyveck_shiftl.v {1 {vlog -work work -vopt -stats=none D:/DATA/DOAN/vivado_doan/dilithium_verilogcode/polyveck_shiftl.v
+QuestaSim-64 vlog 10.7c Compiler 2018.08 Aug 18 2018
+-- Compiling module polyveck_shiftl
+
+Top level modules:
+	polyveck_shiftl
+
+} {} {}} D:/DATA/DOAN/vivado_doan/dilithium_verilogcode/unpack_sk.v {1 {vlog -work work -vopt -stats=none D:/DATA/DOAN/vivado_doan/dilithium_verilogcode/unpack_sk.v
+QuestaSim-64 vlog 10.7c Compiler 2018.08 Aug 18 2018
+-- Compiling module unpack_sk
+
+Top level modules:
+	unpack_sk
 
 } {} {}} D:/DATA/DOAN/vivado_doan/dilithium_verilogcode/decompose.v {1 {vlog -work work -vopt -stats=none D:/DATA/DOAN/vivado_doan/dilithium_verilogcode/decompose.v
 QuestaSim-64 vlog 10.7c Compiler 2018.08 Aug 18 2018
@@ -833,12 +907,19 @@ QuestaSim-64 vlog 10.7c Compiler 2018.08 Aug 18 2018
 Top level modules:
 	decompose
 
-} {} {}} D:/DATA/DOAN/vivado_doan/dilithium_verilogcode/unpack_sk.v {1 {vlog -work work -vopt -stats=none D:/DATA/DOAN/vivado_doan/dilithium_verilogcode/unpack_sk.v
+} {} {}} D:/DATA/DOAN/vivado_doan/dilithium_verilogcode/DILITHIUM_TOP_MODULE.v {1 {vlog -work work -vopt -stats=none D:/DATA/DOAN/vivado_doan/dilithium_verilogcode/DILITHIUM_TOP_MODULE.v
 QuestaSim-64 vlog 10.7c Compiler 2018.08 Aug 18 2018
--- Compiling module unpack_sk
+-- Compiling module DILITHIUM_TOP_MODULE
 
 Top level modules:
-	unpack_sk
+	DILITHIUM_TOP_MODULE
+
+} {} {}} D:/DATA/DOAN/vivado_doan/dilithium_verilogcode/tb_polyvecl_ntt.v {1 {vlog -work work -vopt -stats=none D:/DATA/DOAN/vivado_doan/dilithium_verilogcode/tb_polyvecl_ntt.v
+QuestaSim-64 vlog 10.7c Compiler 2018.08 Aug 18 2018
+-- Compiling module tb_polyvecl_ntt
+
+Top level modules:
+	tb_polyvecl_ntt
 
 } {} {}} D:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/shake128_squeezeblocks.v {1 {vlog -work work -vopt -stats=none D:/DATA/DOAN/vivado_doan/keygen_dilithium3/keygen_dilithium3/keygen_dilithium3.srcs/sources_1/new/shake128_squeezeblocks.v
 QuestaSim-64 vlog 10.7c Compiler 2018.08 Aug 18 2018

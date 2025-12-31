@@ -1,120 +1,121 @@
 module SHAKE_256 #(
-    parameter INPUT_LEN = 256,    
-    parameter OUTPUT_LEN = 1024   
+    parameter r       = 1088,         // rate = 1088 bit cho SHAKE256
+    parameter c       = 512,          // capacity = 512
+    parameter outlen  = 512,          // output bits
+    parameter len     = 512           // input bits
 )(
-    input  wire clock,
-    input  wire reset,
-    input  wire start,
-    input  wire [INPUT_LEN-1:0] seed_in,
-    output reg  [OUTPUT_LEN-1:0] data_out,
-    output reg  done
+    input  [len-1:0] in,
+    input  clk, reset,
+    input  start,
+    output reg done,
+    output [outlen-1:0] SHAKEout
 );
-    //Keccak parameters
-    localparam RATE_BITS  = 1088;
-    localparam STATE_BITS = 1600;
-    localparam NUM_ROUNDS = 24;
-    
-    //FSM states
-    localparam IDLE = 0, INIT = 1, ABSORB = 2, PERMUTE = 3, SQUEEZE = 4, DONE_ST = 5;
-    reg [3:0] state;
-    
-    reg [STATE_BITS-1:0] keccak_state;
-    wire [STATE_BITS-1:0] keccak_state_permuted;
-    reg [4:0] round_counter;
-    reg [10:0] output_bits_count;
-    reg [OUTPUT_LEN-1:0] output_buffer;
-    reg [RATE_BITS-1:0] padded_input;
-    
-    integer i;
-    
-    // input padding
+    // 1. PAD 
+
+    localparam PADDED = ((len + 5 + 1 + r - 1) / r) * r; 
+
+    reg [PADDED-1:0] P;
+
     always @(*) begin
-        padded_input = {RATE_BITS{1'b0}};
-        
-        // Byte swap input: convert big-endian to little-endian
-        for (i = 0; i < INPUT_LEN/8; i = i + 1) begin
-            padded_input[i*8 +: 8] = seed_in[(INPUT_LEN/8-1-i)*8 +: 8];
-        end
-        
-        padded_input[INPUT_LEN +: 8] = 8'h1F;    // Domain separator
-        padded_input[RATE_BITS-1] = 1'b1;        // Delimiter
+        P                = 0;
+        P[len-1:0]       = in;          // input
+        P[len +: 5]      = 5'b11111;   // domain separator
+        P[PADDED-1]      = 1'b1;       // final bit
     end
-    
-    //main FSM
-    always @(posedge clock or negedge reset) begin
-        if (reset) begin
-            state <= IDLE;
-            keccak_state <= 0;
-            round_counter <= 0;
-            output_bits_count <= 0;
-            output_buffer <= 0;
-            done <= 0;
-            data_out <= 0;
+
+    // 2. CHIA thành các block 1088-bit ?? absorb vào state Keccak
+    localparam BLOCKS = PADDED / r;
+
+    wire [r-1:0] P_slices [0:BLOCKS-1];
+
+    genvar i;
+    generate
+        for (i = 0; i < BLOCKS; i = i + 1) begin
+            assign P_slices[i] = P[r*i + r-1 : r*i];
         end
-        else begin
-            case (state)
-                IDLE: begin
-                    done <= 0;
-                    output_bits_count <= 0;  
-                    if (start) state <= INIT;
-                end
-                
-                INIT: begin
-                    keccak_state <= 0;
-                    state <= ABSORB;
-                end
-                
-                ABSORB: begin
-                    keccak_state[RATE_BITS-1:0] <= keccak_state[RATE_BITS-1:0] ^ padded_input;
-                    round_counter <= 0;
-                    state <= PERMUTE;
-                end
-                
-                PERMUTE: begin
-                    if (round_counter < NUM_ROUNDS) begin
-                        keccak_state <= keccak_state_permuted;
-                        round_counter <= round_counter + 1;
-                    end else state <= SQUEEZE;
-                end
-                
-                SQUEEZE: begin
-                    if (output_bits_count < OUTPUT_LEN) begin
-                        if (output_bits_count + RATE_BITS <= OUTPUT_LEN) begin
-                            output_buffer[output_bits_count +: RATE_BITS] <= keccak_state[RATE_BITS-1:0];
-                            output_bits_count <= output_bits_count + RATE_BITS;
-                        end else begin
-                            for (i = 0; i < OUTPUT_LEN - output_bits_count; i = i + 1)
-                                output_buffer[output_bits_count + i] <= keccak_state[i];
-                            output_bits_count <= OUTPUT_LEN;
-                        end
-                        if (output_bits_count + RATE_BITS < OUTPUT_LEN) begin
-                            round_counter <= 0;
-                            state <= PERMUTE;
-                        end else state <= DONE_ST;
-                    end else state <= DONE_ST;
-                end
-                
-                DONE_ST: begin
-                    done <= 1;
-                    
-  
-                    for (i = 0; i < OUTPUT_LEN/8; i = i + 1) begin
-                        data_out[i*8 +: 8] <= output_buffer[(OUTPUT_LEN/8-1-i)*8 +: 8];
-                    end
-                    
-                    if (!start) state <= IDLE;
-                end
-                
-                default: state <= IDLE;
-            endcase
-        end
+    endgenerate
+
+
+    // 3. State Keccak
+
+    reg [1599:0] A;
+    wire [1599:0] Aout;
+
+
+    // 4. FSM: Absorb ? Permute
+    localparam IDLE = 0, WAIT = 1, LOAD = 2, ABSORB = 3, PERMUTE = 4, DONE = 5;
+
+    reg [2:0] state, next_state;
+    reg [7:0] index;
+    reg rstPF;
+    reg [3:0] rstcount;
+
+    always @(posedge clk) begin
+        if (reset) state <= IDLE;
+        else state <= next_state;
     end
-    
-    
-    keccak_round_function keccak_round_inst (
-        .state_in(keccak_state),
-        .round_index(round_counter),
-        .state_out(keccak_state_permuted)
+
+    always @(*) begin
+        case (state)
+        IDLE:    next_state = WAIT;
+        WAIT:    next_state = start ? LOAD : WAIT;
+        LOAD:    next_state = ABSORB;
+        ABSORB:  next_state = PERMUTE;
+        PERMUTE: next_state = (rstcount < 10) ? PERMUTE :
+                              (index == BLOCKS-1) ? DONE : ABSORB;
+        DONE:    next_state = (!start) ? IDLE : DONE;
+        endcase
+    end
+
+    always @(posedge clk) begin
+        case (state)
+        LOAD: begin
+            index   <= 0;
+            rstPF   <= 1;
+            rstcount <= 0;
+            A       <= 0;
+        end
+
+        ABSORB: begin
+            if (index == 0)
+                A[r-1:0] <= P_slices[0];      // absorb block ??u
+            else
+                A <= Aout ^ P_slices[index];  // absorb block ti?p theo
+            rstPF <= 1;
+            rstcount <= 0;
+        end
+
+        PERMUTE: begin
+
+            rstPF <= 0;
+            rstcount <= rstcount + 1;
+            if (rstcount == 10) index <= index + 1;
+        end
+
+        DONE: done <= 1;
+        default: done <= 0;
+        endcase
+    end
+
+    // KECCAK-f1600
+    PermuteFunction KeccakF(
+        .Ain(A),
+        .Aout(Aout),
+        .clk(clk),
+        .rst(rstPF)
     );
-    
+
+
+    // 5. Output SHAKE256 
+    wire [outlen:0] SHAKE = Aout[outlen:0];
+
+    generate
+        for (i = 0; i < (outlen + 1)/8; i = i + 1) begin
+            assign SHAKEout[
+                8 * (((outlen + 1)/8 - 1) - i) + 7 :
+                8 * (((outlen + 1)/8 - 1) - i)
+            ] = SHAKE[8*i + 7 : 8*i];
+        end
+    endgenerate
+
 endmodule

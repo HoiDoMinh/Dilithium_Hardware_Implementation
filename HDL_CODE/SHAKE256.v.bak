@@ -1,18 +1,18 @@
 module SHAKE256 #(
     parameter r       = 1088,         // rate = 1088 bit cho SHAKE256
     parameter c       = 512,          // capacity = 512
-    parameter outlen  = 511,          // output bits
+    parameter outlen  = 512,          // output bits
     parameter len     = 512           // input bits
 )(
     input  [len-1:0] in,
     input  clk, reset,
     input  start,
     output reg done,
-    output [outlen:0] SHAKEout
+    output [outlen-1:0] SHAKEout
 );
 
 
-    // 1. PAD NGAY TRONG MODULE
+    // 1. PAD 
 
     localparam PADDED = ((len + 5 + 1 + r - 1) / r) * r; 
 
@@ -111,13 +111,6 @@ module SHAKE256 #(
     // 5. Output SHAKE256 
     wire [outlen:0] SHAKE = Aout[outlen:0];
 
-    generate
-        for (i = 0; i < (outlen + 1)/8; i = i + 1) begin
-            assign SHAKEout[
-                8 * (((outlen + 1)/8 - 1) - i) + 7 :
-                8 * (((outlen + 1)/8 - 1) - i)
-            ] = SHAKE[8*i + 7 : 8*i];
-        end
-    endgenerate
+    assign SHAKEout = Aout[outlen-1:0];
 
 endmodule

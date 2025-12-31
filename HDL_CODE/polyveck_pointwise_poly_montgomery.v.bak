@@ -1,30 +1,105 @@
-
-module polyveck_pointwise_poly_montgomery(
-    input  signed [8191:0] a_in,             // poly a
-    input  signed [49151:0] v_in,            // K poly, m?i poly = 8192 bit
-    output signed [49151:0] r_out
+module polyveck_pointwise_poly_montgomery (
+    input  wire                 clock,
+    input  wire                 reset,
+    input  wire                 start,
+    input  wire signed [8191:0]  a_in,  // 1 poly A
+    input  wire signed [49151:0] v_in,  // Vector V (K polys)
+    output reg  signed [49151:0] r_out, // K?t qu? Vector R
+    output reg                  done
 );
+
     localparam K = 6;
+    localparam N = 256;
 
-    wire signed [8191:0] v [0:K-1];
-    wire signed [8191:0] r [0:K-1];
+    // 1. Registers ?? gi? input ?n ??nh
+    reg signed [8191:0]  a_reg;
+    reg signed [49151:0] v_reg;
+    
+    // Counter ?? duy?t qua 256 h? s?
+    reg [8:0] counter; 
 
-    genvar i;
-    generate 
-        for (i = 0; i < K; i = i + 1) begin : GEN_VEC
-            // Tách t?ng poly v[i]
-            assign v[i] = v_in[8192*i + 8191 : 8192*i];
+    // Tín hi?u k?t n?i t?i b? nhân
+    reg  signed [31:0] mult_in_a;
+    wire signed [31:0] mult_in_v [0:K-1];
+    wire signed [31:0] mult_out  [0:K-1];
 
-            // G?i poly_pointwise_montgomery cho t?ng poly
-            poly_pointwise_montgomery ppm_inst (
-                .a_in(a_in),     // poly a chung
-                .b_in(v[i]),     // poly v[i]
-                .c_out(r[i])     // poly r[i]
+    // FSM States
+    reg [1:0] state;
+    localparam S_IDLE = 0, S_CALC = 1, S_DONE = 2;
+
+    // Bi?n integer dùng cho vòng l?p (Khai báo ? ?ây ?? fix l?i)
+    integer j;
+
+    // --- INSTANTIATE K MULTIPLIERS ---
+    genvar k;
+    generate
+        for (k = 0; k < K; k = k + 1) begin : GEN_MULTS
+            assign mult_in_v[k] = v_reg[k*N*32 + counter*32 +: 32];
+
+            element_montgomery u_mult (
+                .clk(clock),
+                .a(mult_in_a),
+                .b(mult_in_v[k]),
+                .res(mult_out[k])
             );
-
-            // Ghép l?i k?t qu?
-            assign r_out[8192*i + 8191 : 8192*i] = r[i];
         end
     endgenerate
+
+    // --- MAIN LOGIC ---
+    always @(posedge clock) begin
+        if (reset) begin
+            state   <= S_IDLE;
+            done    <= 0;
+            counter <= 0;
+            r_out   <= 0;
+            a_reg   <= 0;
+            v_reg   <= 0;
+            mult_in_a <= 0;
+        end else begin
+            case (state)
+                S_IDLE: begin
+                    done <= 0;
+                    if (start) begin
+                        a_reg <= a_in;
+                        v_reg <= v_in;
+                        counter <= 0;
+                        state <= S_CALC;
+                    end
+                end
+
+                S_CALC: begin
+                    // 1. Chu?n b? d? li?u (a_in[counter])
+                    mult_in_a <= a_reg[counter*32 +: 32];
+
+                    // 2. L?u k?t qu? t? chu k? tr??c
+                    if (counter > 0) begin
+                        for (j = 0; j < K; j = j + 1) begin
+                            r_out[j*N*32 + (counter-1)*32 +: 32] <= mult_out[j];
+                        end
+                    end
+
+                    // 3. Loop control
+                    if (counter == N) begin
+                        state <= S_DONE;
+                    end else begin
+                        counter <= counter + 1;
+                    end
+                end
+
+                S_DONE: begin
+                    // L?u n?t k?t qu? cu?i cùng (c?a h? s? N-1 = 255)
+                    // (Lúc này counter = 256, nh?ng d? li?u mult_out là c?a 255)
+                    for (j = 0; j < K; j = j + 1) begin
+                        r_out[j*N*32 + (N-1)*32 +: 32] <= mult_out[j];
+                    end
+                    
+                    done <= 1;
+                    if (!start) state <= S_IDLE; 
+                end
+                
+                default: state <= S_IDLE;
+            endcase
+        end
+    end
 
 endmodule

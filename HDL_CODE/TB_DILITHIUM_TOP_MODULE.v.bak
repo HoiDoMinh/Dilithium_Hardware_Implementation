@@ -1,0 +1,213 @@
+`timescale 1ns/1ps
+`include "byte_and_print.vh"
+
+module TB_DILITHIUM_TOP_MODULE;
+
+    // --- PARAMETERS ---
+    localparam M_MAX = 64;
+    localparam PRE_MAX = 32;
+    localparam PK_BYTES = 1952;
+    localparam SK_BYTES = 4032;
+    localparam SIG_BYTES = 3309;
+
+    // --- CLOCK & RESET ---
+    reg clock;
+    integer fd;
+    reg reset;
+    
+    initial clock = 0;
+    always #5 clock = ~clock; // 100MHz clock
+
+    // --- INPUTS ---
+    reg start_system;
+    reg [8*M_MAX-1:0]   m;
+    reg [31:0]          mlen;
+    reg [8*PRE_MAX-1:0] pre;
+    reg [31:0]          prelen;
+    reg [255:0]         rnd;
+
+    // --- OUTPUTS ---
+    wire done_system;
+    wire system_pass; 
+    
+    wire [PK_BYTES*8-1:0]  debug_pk;
+    wire [SK_BYTES*8-1:0]  debug_sk;
+    wire [SIG_BYTES*8-1:0] debug_sig;
+
+    // --- DUT INSTANTIATION ---
+    DILITHIUM_TOP_MODULE #(
+        .M_MAX(M_MAX), 
+        .PRE_MAX(PRE_MAX)
+    ) dut (
+        .clock(clock),
+        .reset(reset),
+        .start_system(start_system),
+        
+        .m(m),
+        .mlen(mlen),
+        .pre(pre),
+        .prelen(prelen),
+        .rnd(rnd),
+        
+        .done_system(done_system),
+        .system_pass(system_pass),
+        
+        .debug_pk(debug_pk),
+        .debug_sk(debug_sk),
+        .debug_sig(debug_sig)
+    );
+
+    // --- BYTE ARRAYS ---
+    integer i;
+    reg [7:0] pk_bytes [0:PK_BYTES-1];
+    reg [7:0] sk_bytes [0:SK_BYTES-1];
+    reg [7:0] sig_bytes [0:SIG_BYTES-1];
+
+    always @(*) begin
+        for (i = 0; i < PK_BYTES; i = i + 1) pk_bytes[i] = debug_pk[8*i +: 8];
+        for (i = 0; i < SK_BYTES; i = i + 1) sk_bytes[i] = debug_sk[8*i +: 8];
+        for (i = 0; i < SIG_BYTES; i = i + 1) sig_bytes[i] = debug_sig[8*i +: 8];
+    end
+
+    // --- STATE MONITOR ---
+    reg [2:0] prev_state;
+    function [64:0] get_state_name;
+        input [2:0] st;
+        begin
+            case(st)
+                3'd0: get_state_name = "IDLE";
+                3'd1: get_state_name = "KEYGEN";
+                3'd2: get_state_name = "SIGN";
+                3'd3: get_state_name = "VERIFY";
+                3'd4: get_state_name = "DONE";
+                default: get_state_name = "UNKNOWN";
+            endcase
+        end
+    endfunction
+
+    initial prev_state = 3'd0;
+    always @(posedge clock) begin
+        if (dut.state != prev_state) begin
+            $display("[%0t] STATE CHANGE: %s -> %s", $time, get_state_name(prev_state), get_state_name(dut.state));
+            prev_state <= dut.state;
+        end
+    end
+
+    
+    reg prev_done_verify;
+    initial prev_done_verify = 0;
+
+    always @(posedge clock) begin
+        prev_done_verify <= dut.u_verifier.done_verify;
+
+        if (dut.u_verifier.done_verify && !prev_done_verify) begin
+            $display("[%0t] [DEBUG] Verify Module Finished.", $time);
+            
+            if (dut.u_verifier.verify_result == 0) begin
+                $display("\t----------------------------------------------");
+                $display("\tVerify Result: VALID (0) - OK");
+                $display("\t----------------------------------------------");
+            end else begin
+                $display("\t----------------------------------------------");
+                $display("\tVerify Result: INVALID (1) - FAIL");
+                $display("\t----------------------------------------------");
+            end
+        end
+    end
+
+    // --- MAIN TEST ---
+    initial begin
+        $display("\n========================================");
+        $display("DILITHIUM FULL SYSTEM TESTBENCH");
+        $display("========================================\n");
+
+        reset = 1; start_system = 0;
+        mlen = 64; prelen = 32;
+        
+	// 1.Gan truc tiep Message
+        set_m("CHUYEN KHOAN 1000USD CHO ALICE", 30);
+
+        // 2.Gan truc tie Prefix
+        set_pre("BANKING", 7);
+	// 3.Gan truc tiep rnd
+	
+	rnd[255:0] = 256'haa1b2c3d4e5f60718293a4b5c6d7e8f90a1b2c3d4e5f60718899aabbccddeeff;
+
+        #200 reset = 0;
+        $display("[%0t] Reset.", $time);
+        
+        #100;
+        $display("[%0t] Start Signal...", $time);
+        start_system = 1;
+        #20 start_system = 0; 
+        $display("[%0t] System Started.", $time);
+
+        wait(done_system);
+        #200;
+
+        $display("\n========================================");
+        $display("SYSTEM COMPLETE");
+        $display("========================================");
+
+        if (system_pass) 
+            $display("[PASS] VERIFICATION SUCCESSFUL!");
+        else 
+            $display("[FAIL] VERIFICATION FAILED!");
+
+        `DUMP_HEX_FILE("pk.hex", pk_bytes, PK_BYTES)
+        `DUMP_HEX_FILE("sk.hex", sk_bytes, SK_BYTES)
+        `DUMP_HEX_FILE("sig.hex", sig_bytes, SIG_BYTES)
+
+        $system("notepad pk.hex");
+        $system("notepad sk.hex");
+        $system("notepad sig.hex");
+        $display("========================================\n");
+        $finish;
+    end
+
+    // --- TIMEOUT ---
+    initial begin
+        #500_000_000; 
+        $display("\n[ERROR] TIMEOUT: System hanged at State: %s", get_state_name(dut.state));
+        $finish;
+    end
+    ////// truyen pre & m tu code C vao verilog 
+    // Task cho message m
+task set_m;
+    input [8*M_MAX-1:0] in_string;  // 864 bits
+    input [31:0] len;
+    integer k;
+    begin
+        m = 0;
+        mlen = len;
+        for(k = 0; k < len; k = k + 1) begin
+            m[8*(M_MAX-len+k) +: 8] = in_string[8*k +: 8];
+        end
+    end
+endtask
+
+// Task cho pre
+task set_pre;
+    input [8*PRE_MAX-1:0] in_string;  // 256 bits
+    input [31:0] len;
+    integer k;
+    begin
+        pre = 0;
+        prelen = len;
+        for(k = 0; k < len; k = k + 1) begin
+            pre[8*(PRE_MAX-len+k) +: 8] = in_string[8*k +: 8];
+        end
+    end
+endtask
+
+// Task cho rnd (luôn ??y nên không c?n offset)
+task set_rnd;
+    input [8*RNDBYTES-1:0] in_string;  // 256 bits
+    integer k;
+    begin
+        for(k = 0; k < RNDBYTES; k = k + 1) begin
+            rnd[8*k +: 8] = in_string[8*k +: 8];
+        end
+    end
+endtask
+endmodule

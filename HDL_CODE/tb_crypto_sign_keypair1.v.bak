@@ -3,7 +3,6 @@
 
 module tb_crypto_sign_keypair1;
 
-    // Clock parameters
     parameter CLK_PERIOD = 10;    // 10 ns
 
     // DUT signals
@@ -76,14 +75,19 @@ module tb_crypto_sign_keypair1;
 
         // Print keys
         $display("\n================ PUBLIC KEY ================");
-        `PRINT_HEX_ARRAY("  pk", pk_t, 1952)
+        //`PRINT_HEX_ARRAY("  pk", pk_t, 1952)
+	`DUMP_HEX_FILE("pk.hex", pk_t, 1952)
 
         $display("\n================ SECRET KEY ================");
-        `PRINT_HEX_ARRAY("  sk", sk_t, 4032)
+        //`PRINT_HEX_ARRAY("  sk", sk_t, 4032)
+	`DUMP_HEX_FILE("sk.hex", sk_t, 4032)
 
         $display("\n============ SIMULATION COMPLETE ============\n");
 
         #(CLK_PERIOD*10);
+	$system("notepad pk.hex");
+	$system("notepad sk.hex");
+
         $finish;
     end
 

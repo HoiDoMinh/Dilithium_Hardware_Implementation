@@ -1,0 +1,5 @@
+eclipse.preferences.version=1
+encoding//testbench/TB_DILITHIUM_MODULE.c=UTF-8
+encoding//testbench/tb_polyveclntt.c=UTF-8
+encoding//testbench/tb_sign.c=UTF-8
+encoding//testbench/tb_verify.c=UTF-8

@@ -1,5 +1,5 @@
 
-module polyveck_ntt (
+module polyveck_ntt #(parameter K = 6 )  (
     input clock,
     input reset,
     input start,
@@ -7,8 +7,6 @@ module polyveck_ntt (
     output signed [49151:0] v_out,
     output reg done
 );
-
-  localparam K = 6;
 
   wire signed [8191:0] v_in_temp[K - 1:0];
   reg signed [8191:0] v_out_temp[K - 1:0];

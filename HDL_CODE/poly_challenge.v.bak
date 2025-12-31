@@ -1,5 +1,3 @@
-`timescale 1ns/1ps
-
 module poly_challenge #(
     parameter N             = 256,
     parameter CTILDEBYTES   = 48,
@@ -49,7 +47,7 @@ module poly_challenge #(
         .state_s_in   (state_s_reg),
         .state_pos_in (state_pos_reg),
         .in           (seed_in),
-        .inlen        (64'd48),      // 48 bytes
+        .inlen        (64'd48),
         .state_s_out  (absorb_s_out),
         .state_pos_out(absorb_pos_out),
         .done         (absorb_done)
@@ -73,7 +71,7 @@ module poly_challenge #(
     );
 
     //shake256_squeezeblocks
-    wire [2175:0] squeeze_out;      // 2176 bit = 272 byte
+    wire [5439:0] squeeze_out;
     wire [1599:0] squeeze_s_out;
     wire          squeeze_done;
     reg           squeeze_start;
@@ -98,15 +96,13 @@ module poly_challenge #(
         end
     endgenerate
 
-
-    reg [7:0]  buffer   [0:SHAKE256_RATE-1];  // 136 byte
-    reg [63:0] signs;                         // 64-bit
-    reg [7:0]  pos;                           // index trong buffer
-    reg [8:0]  i_idx;                         // i trong for (0..256)
-    reg [7:0]  b;                            
+    reg [7:0]  buffer   [0:SHAKE256_RATE-1];
+    reg [63:0] signs;
+    reg [7:0]  pos;
+    reg [8:0]  i_idx;
+    reg [7:0]  b;
 
     integer j, k;
-
 
     localparam SIZE            = 4;
 
@@ -129,7 +125,6 @@ module poly_challenge #(
     reg [SIZE-1:0] state;
     reg [SIZE-1:0] next_state;
 
-
     always @(posedge clock or posedge reset) begin
         if (reset)
             state <= IDLE;
@@ -138,7 +133,6 @@ module poly_challenge #(
     end
 
     always @(*) begin
-
         absorb_start    = 1'b0;
         final_start     = 1'b0;
         squeeze_start   = 1'b0;
@@ -163,34 +157,29 @@ module poly_challenge #(
                 next_state   = ABSORB_WAIT;
             end
 
-            // 3: ABSORB_WAIT ? gi? absorb_start ??n khi done
             ABSORB_WAIT: begin
                 absorb_start = 1'b1;
                 if (absorb_done)
                     next_state = FINALIZE_STATE;
             end
 
-            // 4: FINALIZE ? b?t ??u finalize
             FINALIZE_STATE: begin
                 final_start = 1'b1;
                 next_state  = FINAL_WAIT;
             end
 
-            // 5: FINAL_WAIT ? gi? final_start ??n khi done
             FINAL_WAIT: begin
                 final_start = 1'b1;
                 if (final_done)
                     next_state = SQUEEZE0;
             end
 
-            // 6: SQUEEZE0 ? l?y block ??u tiên
             SQUEEZE0: begin
                 squeeze_start   = 1'b1;
                 squeeze_nblocks = 64'd1;
                 next_state      = SQUEEZE0_WAIT;
             end
 
-            // 7: SQUEEZE0_WAIT ? gi? start t?i khi done
             SQUEEZE0_WAIT: begin
                 squeeze_start   = 1'b1;
                 squeeze_nblocks = 64'd1;
@@ -198,14 +187,11 @@ module poly_challenge #(
                     next_state = INIT_CHALL;
             end
 
-            // 8: INIT_CHALL ? init c, signs, pos, i
             INIT_CHALL: begin
                 next_state = CHECK_BUF;
             end
 
-            // 9: CHECK_BUF ? gi?ng vòng for/do-while trong C
             CHECK_BUF: begin
-                // d?ng khi i_idx >= N (t?c là ?ã v??t 255)
                 if (i_idx >= N)
                     next_state = DONE_STATE;
                 else if (pos >= SHAKE256_RATE)
@@ -214,14 +200,12 @@ module poly_challenge #(
                     next_state = GET_B;
             end
 
-            // 10: NEED_SQUEEZE ? squeeze thêm block
             NEED_SQUEEZE: begin
                 squeeze_start   = 1'b1;
                 squeeze_nblocks = 64'd1;
                 next_state      = NEED_SQ_WAIT;
             end
 
-            // 11: NEED_SQ_WAIT ? ch? squeeze_done
             NEED_SQ_WAIT: begin
                 squeeze_start   = 1'b1;
                 squeeze_nblocks = 64'd1;
@@ -229,21 +213,17 @@ module poly_challenge #(
                     next_state = CHECK_BUF;
             end
 
-            // 12: GET_B ? b = buffer[pos], pos++
             GET_B: begin
                 next_state = UPDATE_COEFF;
             end
 
-            // 13: UPDATE_COEFF ? if (b <= i) then update, else l?p
             UPDATE_COEFF: begin
                 next_state = CHECK_BUF;
             end
 
-            // 14: DONE_STATE
             DONE_STATE: begin
                 done = 1'b1;
-                if (!start)
-                    next_state = IDLE;
+                next_state = IDLE;  // ? S?A: Quay v? IDLE ngay
             end
 
             default: begin
@@ -252,7 +232,7 @@ module poly_challenge #(
         endcase
     end
 
-    always @(posedge clock or posedge reset) begin
+      always @(posedge clock or posedge reset) begin
         if (reset) begin
             state_s_reg   <= 1600'd0;
             state_pos_reg <= 32'd0;
@@ -262,14 +242,28 @@ module poly_challenge #(
             b             <= 8'd0;
             for (k = 0; k < N; k = k + 1)
                 c[k] <= 32'sd0;
+                
         end else begin
             case (state)
+                // ? XÓA khi chuy?n t? DONE v? IDLE
+                IDLE: begin
+                    if (next_state == PRE_RD_INP) begin
+                        // Chu?n b? cho vòng m?i
+                        state_s_reg   <= 1600'd0;
+                        state_pos_reg <= 32'd0;
+                        signs         <= 64'd0;
+                        pos           <= 8'd0;
+                        i_idx         <= 9'd0;
+                        b             <= 8'd0;
+                        for (k = 0; k < N; k = k + 1)
+                            c[k] <= 32'sd0;
+                    end
+                end
 
- 
                 PRE_RD_INP: begin
                     if (start) begin
                         state_s_reg   <= init_s;
-                        state_pos_reg <= init_pos;   // = 0
+                        state_pos_reg <= init_pos;
                     end
                 end
 
@@ -279,7 +273,6 @@ module poly_challenge #(
                         state_pos_reg <= absorb_pos_out;
                     end
                 end
-
 
                 FINAL_WAIT: begin
                     if (final_done) begin
@@ -296,20 +289,16 @@ module poly_challenge #(
                     end
                 end
 
-   
                 INIT_CHALL: begin
-                    // c[i] = 0
                     for (k = 0; k < N; k = k + 1)
                         c[k] <= 32'sd0;
 
-                    // signs = sum buf[i] << (8*i), i=0..7 (little endian)
                     signs <= { buffer[7], buffer[6], buffer[5], buffer[4],
                                buffer[3], buffer[2], buffer[1], buffer[0] };
 
-                    pos   <= 8'd8;           // pos = 8
-                    i_idx <= N - TAU;        // i = N-TAU = 207
+                    pos   <= 8'd8;
+                    i_idx <= N - TAU;
                 end
-
 
                 NEED_SQ_WAIT: begin
                     if (squeeze_done) begin
@@ -320,16 +309,13 @@ module poly_challenge #(
                     end
                 end
 
-
                 GET_B: begin
                     b   <= buffer[pos];
                     pos <= pos + 1'b1;
                 end
 
-
                 UPDATE_COEFF: begin
                     if (b <= i_idx[7:0]) begin
- 
                         if (signs[0] == 1'b1)
                             c[b] <= -32'sd1;
                         else
@@ -350,4 +336,3 @@ module poly_challenge #(
     end
 
 endmodule
-

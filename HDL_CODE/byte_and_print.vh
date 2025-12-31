@@ -44,7 +44,7 @@
       if ((i % 52) == 51)                                             \
         $fwrite(fd, "\n");                                            \
     end                                                               \
-    $fwrite(fd, "\n"); /* final blank line like C */                  \
+    $fwrite(fd, "\n\n"); /* final blank line like C */                  \
     $fclose(fd);                                                      \
   end
 

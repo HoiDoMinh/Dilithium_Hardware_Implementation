@@ -1,33 +1,72 @@
-
-module polyvecl_chknorm(
-    input  signed [40959:0] v_in,   // 5 polys × 8192 bit
-    input  signed [31:0]    B,       // bound
-    output                  flag     // 1 = v??t ng??ng, 0 = OK
+module polyvecl_chknorm (
+    input  wire                 clock,
+    input  wire                 reset,
+    input  wire                 start,
+    input  wire signed [40959:0] v_in,
+    input  wire signed [31:0]    B,
+    output reg                  flag,  // 1 = vi ph?m, 0 = OK
+    output reg                  done
 );
 
-    localparam L=5;
+    localparam L = 5;
 
-    wire signed [8191:0] poly [0:L-1];
-    wire                 chk  [0:L-1];
+    // Registers
+    reg signed [40959:0] v_reg;
+    reg signed [31:0]    B_reg;
 
-    wire [L-1:0] chk_vec;
+    // Wires
+    wire signed [8191:0] poly_slice [0:L-1];
+    wire                 chk_slice  [0:L-1];
+    wire                 flag_comb;
 
+    // Logic T? H?p
     genvar i;
     generate
         for(i = 0; i < L; i = i + 1) begin : GEN_CHK
-            assign poly[i] = v_in[8192*i + 8191 : 8192*i];
+            assign poly_slice[i] = v_reg[8192*i + 8191 : 8192*i]; // Dùng v_reg
 
-            poly_chknorm chk_inst(
-                .a_in(poly[i]),
-                .B(B),
-                .flag(chk[i])
+            poly_chknorm chk_inst (
+                .a_in(poly_slice[i]),
+                .B(B_reg), // Dùng B_reg
+                .flag(chk_slice[i])
             );
-
-            assign chk_vec[i] = chk[i];   //packed vector
         end
     endgenerate
 
-    // N?u b?t k? poly nào fail ? flag = 1
-    assign flag = |chk_vec;
+    // OR t?t c? các c? l?i
+    assign flag_comb = |{chk_slice[0], chk_slice[1], chk_slice[2], chk_slice[3], chk_slice[4]};
+
+    // FSM
+    reg [1:0] state;
+    localparam S_IDLE = 0, S_CALC = 1, S_DONE = 2;
+
+    always @(posedge clock) begin
+        if (reset) begin
+            state <= S_IDLE;
+            done  <= 0;
+            flag  <= 0;
+            v_reg <= 0;
+            B_reg <= 0;
+        end else begin
+            case (state)
+                S_IDLE: begin
+                    done <= 0;
+                    if (start) begin
+                        v_reg <= v_in;
+                        B_reg <= B;
+                        state <= S_CALC;
+                    end
+                end
+                S_CALC: begin
+                    flag  <= flag_comb; // Ch?t k?t qu?
+                    state <= S_DONE;
+                end
+                S_DONE: begin
+                    done  <= 1;
+                    state <= S_IDLE;
+                end
+            endcase
+        end
+    end
 
 endmodule

@@ -1,0 +1,28 @@
+
+module element_montgomery (
+    input  wire                 clk,
+    input  wire signed [31:0]   a,
+    input  wire signed [31:0]   b,
+    output reg  signed [31:0]   res
+);
+    
+    // Logic Combinational cho Reduce
+    // L?u ý: B?n c?n copy logic c?a montgomery_reduce vào ?ây ho?c g?i module
+    // ?? t?i ?u timing, tôi khuyên dùng reg ? output
+    
+    wire signed [63:0] prod;
+    wire signed [31:0] t;
+    
+    assign prod = a * b;
+    
+    // Gi? s? b?n có module reduce d?ng t? h?p, ho?c vi?t logic reduce th?ng vào ?ây
+    montgomery_reduce reduce_inst (
+        .a(prod), 
+        .t(t)
+    );
+
+    always @(posedge clk) begin
+        res <= t; // Pipeline 1 stage
+    end
+
+endmodule

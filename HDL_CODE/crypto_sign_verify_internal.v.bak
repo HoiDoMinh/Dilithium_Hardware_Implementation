@@ -1,0 +1,505 @@
+`timescale 1ns/1ps
+
+module crypto_sign_verify_internal #(
+    parameter M_MAX = 64,
+    parameter PRE_MAX = 32
+) (
+    input  wire          clock,
+    input  wire          reset,
+    input  wire          start_verify,
+    
+    // Inputs
+    input  wire [26471:0]       sig,        // 3309 bytes
+    input  wire [8*M_MAX-1:0]   m,
+    input  wire [31:0]          mlen,
+    input  wire [8*PRE_MAX-1:0] pre,
+    input  wire [31:0]          prelen,
+    input  wire [15615:0]       pk,         // 1952 bytes
+    
+    // Outputs
+    output reg          verify_result,      // 0 = valid, 1 = invalid
+    output reg          done_verify
+);
+
+    // PARAMETERS & CONSTANTS
+    localparam K = 6, L = 5, N = 256;
+    localparam SEEDBYTES = 32, TRBYTES = 64, CRHBYTES = 64;
+    localparam CTILDEBYTES = 48;
+    localparam POLYW1_PACKEDBYTES = 128;
+    localparam CRYPTO_PUBLICKEYBYTES = 1952;
+    localparam CRYPTO_BYTES = 3309;
+    localparam Q = 8380417, GAMMA1 = 524288, BETA = 196;
+    
+    localparam VECL_WIDTH = L * N * 32;  // 40960 bits
+    localparam VECK_WIDTH = K * N * 32;  // 49152 bits
+    localparam POLY_WIDTH = N * 32;      // 8192 bits
+    
+    // FSM STATES
+    localparam ST_IDLE          = 4'd0;
+    localparam ST_UNPACK        = 4'd1;
+    localparam ST_CHECK_SIG     = 4'd2;
+    localparam ST_HASH_PK       = 4'd3;
+    localparam ST_HASH_MU       = 4'd4;
+    localparam ST_EXPAND_MAT    = 4'd5;
+    localparam ST_COMPUTE_AZ    = 4'd6;
+    localparam ST_COMPUTE_CT1   = 4'd7;
+    localparam ST_COMPUTE_W1    = 4'd8;
+    localparam ST_RECONSTRUCT   = 4'd9;
+    localparam ST_CHALLENGE     = 4'd10;
+    localparam ST_COMPARE       = 4'd11;
+    localparam ST_DONE          = 4'd12;
+    
+    reg [3:0] state, next_state;
+
+    // DATAPATH: STEP 0 - INPUT REVERSAL
+    wire [8*M_MAX-1:0] m_reversed;
+    wire [8*PRE_MAX-1:0] pre_reversed;
+    wire [15615:0] pk_reversed;
+    wire [26471:0] sig_reversed;
+    
+    genvar i, x, y_gen;
+    wire [8*M_MAX-1:0] m_reversed;
+    generate
+        for (i = 0; i < M_MAX; i = i + 1) begin : reverse_m
+            assign m_reversed[8*i + 7 : 8*i] = m[8*(M_MAX-1-i) + 7 : 8*(M_MAX-1-i)];
+        end
+    endgenerate
+
+    wire [8*PRE_MAX-1:0] pre_reversed;
+    generate
+        for (i = 0; i < PRE_MAX; i = i + 1) begin : reverse_pre
+            assign pre_reversed[8*i + 7 : 8*i] = pre[8*(PRE_MAX-1-i) + 7 : 8*(PRE_MAX-1-i)];
+        end
+    endgenerate
+
+    // STEP 1: UNPACK PUBLIC KEY
+    wire [255:0] rho;
+    wire signed [VECK_WIDTH-1:0] t1;
+    
+    unpack_pk unpack_pk_inst (
+        .pk_in(pk),
+        .rho_out(rho),
+        .t1_out(t1)
+    );
+
+    // STEP 2: UNPACK SIGNATURE
+    wire [CTILDEBYTES*8-1:0] c_tilde;
+    wire signed [VECL_WIDTH-1:0] z;
+    wire signed [VECK_WIDTH-1:0] h;
+    wire unpack_sig_fail;
+    
+    unpack_sig unpack_sig_inst (
+        .sig_in(sig),
+        .c_out(c_tilde), 
+        .z_out(z), 
+        .h_out(h),
+        .valid_flag(unpack_sig_fail)
+    );
+
+    // STEP 3: CHECK Z NORM
+    wire z_norm_fail;
+    wire done_z_check;
+    reg start_z_check_reg;
+    
+    polyvecl_chknorm z_norm_checker (
+        .clock(clock), .reset(reset), .start(start_z_check_reg),
+        .v_in(z), .B(GAMMA1 - BETA), 
+        .flag(z_norm_fail), .done(done_z_check)
+    );
+
+    // STEP 4: COMPUTE MU
+    // Stage 1: Hash PK -> mu_temp
+    localparam PK_INPUT_BITS = CRYPTO_PUBLICKEYBYTES * 8;
+    wire [511:0] mu_temp;
+    wire done_hash_pk;
+    reg start_hash_pk_reg;
+    
+    SHAKE256 #(.r(1088), .c(512), .outlen(512), .len(PK_INPUT_BITS)) shake256_pk (
+        .in(pk),
+        .reset(reset), .clk(clock), .start(start_hash_pk_reg),
+        .SHAKEout(mu_temp), .done(done_hash_pk)
+    );
+    
+    // Stage 2: Hash mu_temp + pre + m -> mu_final
+    localparam MU_BITS = 8 * (TRBYTES + PRE_MAX + M_MAX);
+    wire [MU_BITS-1:0] mu_input;
+    
+    generate
+        for (i = 0; i < TRBYTES; i = i + 1) 
+            assign mu_input[8*i +: 8] = mu_temp[8*i +: 8];
+        for (i = 0; i < PRE_MAX; i = i + 1) 
+            assign mu_input[8*(TRBYTES+i) +: 8] = (i < prelen) ? pre_reversed[8*i +: 8] : 8'd0;
+        for (i = 0; i < M_MAX; i = i + 1) 
+            assign mu_input[8*(TRBYTES+PRE_MAX+i) +: 8] = (i < mlen) ? m_reversed[8*i +: 8] : 8'd0;
+    endgenerate
+   
+    wire [511:0] mu;
+    wire done_mu;
+    reg start_mu_reg;
+    
+    SHAKE256 #(.r(1088), .c(512), .outlen(512), .len(MU_BITS)) shake256_mu (
+        .in(mu_input), .reset(reset), .clk(clock), .start(start_mu_reg),
+        .SHAKEout(mu), .done(done_mu)
+    );
+    // STEP 5: EXPAND MATRIX A
+    wire signed [65535:0] mat1, mat2, mat3;
+    wire signed [49151:0] mat4;
+    wire done_matrix;
+    reg start_matrix_reg;
+    
+    polyvec_matrix_expand matrix_expand_inst (
+        .clock(clock), .reset(reset), .start(start_matrix_reg),
+        .rho_in(rho),
+        .mat1(mat1), .mat2(mat2), .mat3(mat3), .mat4(mat4),
+        .done(done_matrix)
+    );
+
+    // STEP 6: COMPUTE Az (SEQUENTIAL: NTT then Mult)
+    // 6.1: Reverse z before NTT
+    wire signed [VECL_WIDTH-1:0] z_reversed_in, z_ntt_temp, z_ntt;
+    generate 
+        for (x=0; x<L; x=x+1) 
+            for (y_gen=0; y_gen<256; y_gen=y_gen+1)
+                assign z_reversed_in[8192*x+32*y_gen+31 : 8192*x+32*y_gen] = 
+                       z[8192*x+32*(255-y_gen)+31 : 8192*x+32*(255-y_gen)];
+    endgenerate
+    
+    wire done_z_ntt;
+    reg start_z_ntt_reg;
+    
+    polyvecl_ntt z_ntt_inst (
+        .clock(clock), .reset(reset), .start(start_z_ntt_reg),
+        .v_in(z_reversed_in), .v_out(z_ntt_temp), .done(done_z_ntt)
+    );
+    
+    // Reverse z_ntt output
+    generate 
+        for (x=0; x<L; x=x+1) 
+            for (y_gen=0; y_gen<256; y_gen=y_gen+1)
+                assign z_ntt[8192*x+32*y_gen+31 : 8192*x+32*y_gen] = 
+                       z_ntt_temp[8192*x+32*(255-y_gen)+31 : 8192*x+32*(255-y_gen)];
+    endgenerate
+    
+    // 6.2: Matrix * z_ntt
+    wire signed [VECK_WIDTH-1:0] Az_temp;
+    wire done_Az;
+    reg start_Az_reg;
+    
+    polyvec_matrix_pointwise_montgomery Az_mult_inst (
+        .clock(clock), .reset(reset), .start(start_Az_reg),
+        .v_in(z_ntt),
+        .mat1(mat1), .mat2(mat2), .mat3(mat3), .mat4(mat4),
+        .t_out(Az_temp), .done(done_Az)
+    );
+
+    // STEP 7: COMPUTE c*t1 (PARALLEL & MIXED)
+    
+    // 7.1: poly_challenge
+    wire signed [POLY_WIDTH-1:0] cp_temp;
+    wire done_cp;
+    reg start_cp_reg;
+    
+    poly_challenge cp_inst (
+        .clock(clock), .reset(reset), .start(start_cp_reg),
+        .seed_in(c_tilde), .c_out(cp_temp), .done(done_cp)
+    );
+    
+    // 7.2: NTT(cp)
+    wire signed [POLY_WIDTH-1:0] cp_reversed_in, cp_ntt_temp, cp_ntt;
+    generate 
+        for (x=0; x<256; x=x+1) 
+            assign cp_reversed_in[32*x+31:32*x] = cp_temp[32*(255-x)+31:32*(255-x)];
+    endgenerate
+    
+    wire done_cp_ntt;
+    reg start_cp_ntt_reg;
+    
+    poly_ntt cp_ntt_inst (
+        .clock(clock), .reset(reset), .start(start_cp_ntt_reg),
+        .poly_in(cp_reversed_in), .poly_out(cp_ntt_temp), .done(done_cp_ntt)
+    );
+    
+    generate 
+        for (x=0; x<256; x=x+1) 
+            assign cp_ntt[32*x+31:32*x] = cp_ntt_temp[32*(255-x)+31:32*(255-x)];
+    endgenerate
+    
+    // 7.3: Shift t1 and NTT(t1)
+    wire signed [VECK_WIDTH-1:0] t1_shifted;
+    polyveck_shiftl t1_shift_inst (.v_in(t1), .v_out(t1_shifted));
+    
+    wire signed [VECK_WIDTH-1:0] t1_reversed_in, t1_ntt_temp, t1_ntt;
+    generate 
+        for (x=0; x<K; x=x+1) 
+            for (y_gen=0; y_gen<256; y_gen=y_gen+1)
+                assign t1_reversed_in[8192*x+32*y_gen+31 : 8192*x+32*y_gen] = 
+                       t1_shifted[8192*x+32*(255-y_gen)+31 : 8192*x+32*(255-y_gen)];
+    endgenerate
+    
+    wire done_t1_ntt;
+    reg start_t1_ntt_reg;
+    
+    polyveck_ntt t1_ntt_inst (
+        .clock(clock), .reset(reset), .start(start_t1_ntt_reg),
+        .v_in(t1_reversed_in), .v_out(t1_ntt_temp), .done(done_t1_ntt)
+    );
+    
+    generate 
+        for (x=0; x<K; x=x+1) 
+            for (y_gen=0; y_gen<256; y_gen=y_gen+1)
+                assign t1_ntt[8192*x+32*y_gen+31 : 8192*x+32*y_gen] = 
+                       t1_ntt_temp[8192*x+32*(255-y_gen)+31 : 8192*x+32*(255-y_gen)];
+    endgenerate
+    
+    // 7.4: ct1 = cp_ntt * t1_ntt
+    wire signed [VECK_WIDTH-1:0] ct1_ntt;
+    wire done_ct1;
+    reg start_ct1_reg;
+    
+    polyveck_pointwise_poly_montgomery ct1_mult_inst (
+        .clock(clock), .reset(reset), .start(start_ct1_reg),
+        .a_in(cp_ntt), .v_in(t1_ntt), 
+        .r_out(ct1_ntt), .done(done_ct1)
+    );
+    // STEP 8-9: COMPUTE w1 = Az - ct1
+    wire signed [VECK_WIDTH-1:0] w1_sub_temp, w1_reduced;
+    polyveck_sub w1_sub_inst (.u_in(Az_temp), .v_in(ct1_ntt), .w_out(w1_sub_temp));
+    polyveck_reduce w1_reduce_inst (.v_in(w1_sub_temp), .v_out(w1_reduced));
+    
+    // Reverse before invntt
+    wire signed [VECK_WIDTH-1:0] w1_reversed_in, w1_invntt_temp, w1_invntt;
+    generate 
+        for (x=0; x<K; x=x+1) 
+            for (y_gen=0; y_gen<256; y_gen=y_gen+1)
+                assign w1_reversed_in[8192*x+32*y_gen+31 : 8192*x+32*y_gen] = 
+                       w1_reduced[8192*x+32*(255-y_gen)+31 : 8192*x+32*(255-y_gen)];
+    endgenerate
+    
+    wire done_w1_invntt;
+    reg start_w1_invntt_reg;
+    
+    polyveck_invntt_tomont w1_invntt_inst (
+        .clock(clock), .reset(reset), .start(start_w1_invntt_reg),
+        .v_in(w1_reversed_in), .v_out(w1_invntt_temp), .done(done_w1_invntt)
+    );
+    
+    generate 
+        for (x=0; x<K; x=x+1) 
+            for (y_gen=0; y_gen<256; y_gen=y_gen+1)
+                assign w1_invntt[8192*x+32*y_gen+31 : 8192*x+32*y_gen] = 
+                       w1_invntt_temp[8192*x+32*(255-y_gen)+31 : 8192*x+32*(255-y_gen)];
+    endgenerate
+
+    // STEP 10: RECONSTRUCT w1
+    wire signed [VECK_WIDTH-1:0] w1_caddq;
+    polyveck_caddq w1_caddq_inst (.v_in(w1_invntt), .v_out(w1_caddq));
+    
+    wire signed [VECK_WIDTH-1:0] w1_reconstructed;
+    wire [1535:0] h_bits; // 6 * 256 bits
+    
+    generate
+        genvar gk, gn;
+        for (gk = 0; gk < K; gk = gk + 1) begin : loop_k_extract
+            for (gn = 0; gn < N; gn = gn + 1) begin : loop_n_extract
+ 
+                localparam H_IDX = (gk * N + gn) * 32;
+                localparam HB_IDX = (gk * N + gn);
+                assign h_bits[HB_IDX] = h[H_IDX]; 
+            end
+        end
+    endgenerate
+    
+    polyveck_use_hint  w1_use_hint_inst (
+        .u_in(w1_caddq), .h_in(h_bits), .w_out(w1_reconstructed)
+    );
+    
+    wire [K*POLYW1_PACKEDBYTES*8-1:0] w1_packed;
+    polyveck_pack_w1  w1_pack_inst (
+        .w1_in(w1_reconstructed), .r_out(w1_packed)
+    );
+    // STEP 11: FINAL HASH
+    localparam C2_INPUT_BITS = 8 * (CRHBYTES + K*POLYW1_PACKEDBYTES);
+    wire [C2_INPUT_BITS-1:0] c2_input;
+    
+    generate
+        for (i = 0; i < CRHBYTES; i = i + 1) 
+            assign c2_input[8*i +: 8] = mu[8*i +: 8];
+        for (i = 0; i < K*POLYW1_PACKEDBYTES; i = i + 1) 
+            assign c2_input[8*(CRHBYTES+i) +: 8] = w1_packed[8*i +: 8];
+    endgenerate
+    
+    wire [CTILDEBYTES*8-1:0] c2;
+    wire done_c2;
+    reg start_c2_reg;
+    
+    SHAKE256 #(.r(1088), .c(512), .outlen(CTILDEBYTES*8), .len(C2_INPUT_BITS)) shake256_c2 (
+        .in(c2_input), .reset(reset), .clk(clock), .start(start_c2_reg),
+        .SHAKEout(c2), .done(done_c2)
+    );
+    // STEP 12: COMPARE & RESULT
+    reg c_match;
+    integer cmp_i;
+    
+    always @(*) begin
+        c_match = 1'b1;
+        for (cmp_i = 0; cmp_i < CTILDEBYTES; cmp_i = cmp_i + 1) begin
+            if (c_tilde[8*cmp_i +: 8] !== c2[8*cmp_i +: 8]) 
+                c_match = 1'b0;
+        end
+    end
+    // LOGIC C? NH? (FLAGS) - CRITICAL FIX
+    reg flag_z_ntt_done;
+    reg flag_cp_done, flag_cp_ntt_done, flag_t1_ntt_done;
+
+    always @(posedge clock) begin
+        if (reset) begin
+            flag_z_ntt_done   <= 1'b0;
+            flag_cp_done      <= 1'b0;
+            flag_cp_ntt_done  <= 1'b0;
+            flag_t1_ntt_done  <= 1'b0;
+        end else begin
+            // Clear flags khi r?i state ho?c khi IDLE
+            if (state == ST_IDLE) begin
+                 flag_z_ntt_done   <= 1'b0;
+                 flag_cp_done      <= 1'b0;
+                 flag_cp_ntt_done  <= 1'b0;
+                 flag_t1_ntt_done  <= 1'b0;
+            end
+            
+            // ST_COMPUTE_AZ: C?n nh? z_ntt ?ã xong ch?a
+            if (state == ST_COMPUTE_AZ && done_z_ntt) 
+                flag_z_ntt_done <= 1'b1;
+                
+            // ST_COMPUTE_CT1: C?n nh? 3 module con
+            if (state == ST_COMPUTE_CT1) begin
+                if (done_cp)      flag_cp_done     <= 1'b1;
+                if (done_cp_ntt)  flag_cp_ntt_done <= 1'b1;
+                if (done_t1_ntt)  flag_t1_ntt_done <= 1'b1;
+            end
+        end
+    end
+
+    // FSM CONTROL LOGIC (REVISED)
+ 
+    always @(posedge clock) begin
+        if (reset) begin
+            state <= ST_IDLE;
+            done_verify <= 1'b0;
+            verify_result <= 1'b1; // Default invalid
+        end else begin
+            state <= next_state;
+            done_verify <= (state == ST_DONE);
+            
+            // Latch k?t qu? ? b??c so sánh
+            if (state == ST_COMPARE) begin
+                verify_result <= c_match ? 1'b0 : 1'b1;
+            end
+            
+            // N?u l?i ngay b??c ??u thì báo Fail ngay
+            if (state == ST_CHECK_SIG && done_z_check) begin
+                if (unpack_sig_fail || z_norm_fail) 
+                    verify_result <= 1'b1;
+            end
+        end
+    end
+
+    // NEXT STATE LOGIC
+    always @(*) begin
+        next_state = state;
+        case (state)
+            ST_IDLE: if (start_verify) next_state = ST_UNPACK;
+            ST_UNPACK: next_state = ST_CHECK_SIG;
+            
+            ST_CHECK_SIG: begin
+                if (done_z_check) begin
+                    // Neu data rác (norm fail hoac unpack fail) -> DONE ngay
+                    if (unpack_sig_fail || z_norm_fail) 
+                        next_state = ST_DONE; 
+                    else 
+                        next_state = ST_HASH_PK;
+                end
+            end
+            
+            ST_HASH_PK: if (done_hash_pk) next_state = ST_HASH_MU;
+            ST_HASH_MU: if (done_mu) next_state = ST_EXPAND_MAT;
+            ST_EXPAND_MAT: if (done_matrix) next_state = ST_COMPUTE_AZ;
+            
+            ST_COMPUTE_AZ: begin
+                // ??i Az xong. (Az ch? ch?y khi Z_ntt ?ã xong nên ch? c?n check done_Az)
+                if (done_Az) next_state = ST_COMPUTE_CT1;
+            end
+            
+            ST_COMPUTE_CT1: begin
+                // Ph?i ??i b??c cu?i cùng là nhân CT1 xong
+                if (done_ct1) next_state = ST_COMPUTE_W1;
+            end
+            
+            ST_COMPUTE_W1: if (done_w1_invntt) next_state = ST_RECONSTRUCT;
+            ST_RECONSTRUCT: next_state = ST_CHALLENGE;
+            ST_CHALLENGE: if (done_c2) next_state = ST_COMPARE;
+            ST_COMPARE: next_state = ST_DONE;
+            ST_DONE: next_state = ST_DONE;
+            default: next_state = ST_IDLE;
+        endcase
+    end
+
+    // START SIGNALS (REVISED & CLEANED)
+    always @(posedge clock) begin
+        if (reset) begin
+            start_z_check_reg <= 1'b0;
+            start_hash_pk_reg <= 1'b0;
+            start_mu_reg <= 1'b0;
+            start_matrix_reg <= 1'b0;
+            start_z_ntt_reg <= 1'b0;
+            start_Az_reg <= 1'b0;
+            start_cp_reg <= 1'b0;
+            start_cp_ntt_reg <= 1'b0;
+            start_t1_ntt_reg <= 1'b0;
+            start_ct1_reg <= 1'b0;
+            start_w1_invntt_reg <= 1'b0;
+            start_c2_reg <= 1'b0;
+        end else begin
+            // Trigger 1: Vào Check Z
+            start_z_check_reg <= (state == ST_UNPACK && next_state == ST_CHECK_SIG);
+            
+            // Trigger 2: Hash PK
+            start_hash_pk_reg <= (state == ST_CHECK_SIG && next_state == ST_HASH_PK);
+            
+            // Trigger 3: Hash MU
+            start_mu_reg <= (state == ST_HASH_PK && done_hash_pk);
+            
+            // Trigger 4: Matrix Expand
+            start_matrix_reg <= (state == ST_HASH_MU && done_mu);
+            
+            // Trigger 5: Z NTT (Ch?y ngay khi có Matrix xong chuyen state)
+            start_z_ntt_reg <= (state == ST_EXPAND_MAT && done_matrix);
+            
+            // Trigger 6: Compute Az (Ch? Z NTT xong m?i ch?y)
+            start_Az_reg <= (state == ST_COMPUTE_AZ) && (done_z_ntt || (flag_z_ntt_done && !done_Az && !start_Az_reg));
+            
+            // Trigger 7: CP Challenge & T1 NTT (Ch?y ngay khi vào state CT1)
+            start_cp_reg     <= (state == ST_COMPUTE_AZ && done_Az); 
+            start_t1_ntt_reg <= (state == ST_COMPUTE_AZ && done_Az);
+            
+            // Trigger 8: CP NTT (Ch?y khi CP xong)
+            start_cp_ntt_reg <= (state == ST_COMPUTE_CT1) && (done_cp || (flag_cp_done && !done_cp_ntt && !start_cp_ntt_reg));
+            
+            // Trigger 9: Compute CT1 
+            if (state == ST_COMPUTE_CT1 && !done_ct1 && !start_ct1_reg) begin
+                if ((done_cp_ntt || flag_cp_ntt_done) && (done_t1_ntt || flag_t1_ntt_done))
+                    start_ct1_reg <= 1'b1;
+                else
+                    start_ct1_reg <= 1'b0;
+            end else begin
+                start_ct1_reg <= 1'b0;
+            end
+            
+            // Trigger 10: InvNTT W1
+            start_w1_invntt_reg <= (state == ST_COMPUTE_CT1 && done_ct1);
+            
+            // Trigger 11: Final Hash C2
+            start_c2_reg <= (state == ST_RECONSTRUCT && next_state == ST_CHALLENGE);
+        end
+    end
+
+endmodule

@@ -1,0 +1,135 @@
+
+module unpack_sig #(
+    parameter CTILDEBYTES = 48,
+    parameter L = 5,
+    parameter K = 6,
+    parameter N = 256,
+    parameter OMEGA = 55,
+    parameter POLYZ_PACKEDBYTES = 640,
+    parameter CRYPTO_BYTES = CTILDEBYTES + L*POLYZ_PACKEDBYTES + (OMEGA + K)
+)(
+    input  [CRYPTO_BYTES*8-1:0]  sig_in,
+    output [CTILDEBYTES*8-1:0]   c_out,
+    output [L*256*32-1:0]        z_out,
+    output [K*N*32-1:0]          h_out,
+    output reg                   fail   // 1 = malformed, 0 = valid
+);
+
+    genvar i;
+    integer ii, jj;
+
+    // ========================================================================
+    // STEP 1: EXTRACT CHALLENGE c (first CTILDEBYTES bytes)
+    // ========================================================================
+    // C code: for(i = 0; i < CTILDEBYTES; ++i) c[i] = sig[i];
+    
+    generate
+        for (i = 0; i < CTILDEBYTES; i = i + 1) begin : extract_c
+            assign c_out[8*i +: 8] = sig_in[8*i +: 8];
+        end
+    endgenerate
+
+    // ========================================================================
+    // STEP 2: UNPACK VECTOR z (next L*POLYZ_PACKEDBYTES bytes)
+    // ========================================================================
+    // C code: for(i = 0; i < L; ++i)
+    //           polyz_unpack(&z->vec[i], sig + CTILDEBYTES + i*POLYZ_PACKEDBYTES);
+    
+    localparam Z_OFFSET = CTILDEBYTES;
+    
+    generate
+        for (i = 0; i < L; i = i + 1) begin : unpack_z
+            
+            // Extract packed z[i] from signature
+            wire [POLYZ_PACKEDBYTES*8-1:0] z_packed;
+            assign z_packed = sig_in[(Z_OFFSET + i*POLYZ_PACKEDBYTES)*8 +: POLYZ_PACKEDBYTES*8];
+            
+            // Unpack z[i]
+            polyz_unpack polyz_unpack_inst (
+                .a_in(z_packed),
+                .r_out(z_out[i*256*32 +: 256*32])
+            );
+            
+        end
+    endgenerate
+
+    // ========================================================================
+    // STEP 3: DECODE HINT VECTOR h (last OMEGA+K bytes)
+    // ========================================================================
+    // C code: Decode h from encoded positions
+    
+    localparam H_OFFSET = CTILDEBYTES + L*POLYZ_PACKEDBYTES;
+    
+    // Extract hint encoding bytes
+    reg [7:0] hint_bytes [0:OMEGA+K-1];
+    
+    always @(*) begin
+        for (ii = 0; ii < OMEGA + K; ii = ii + 1) begin
+            hint_bytes[ii] = sig_in[(H_OFFSET + ii)*8 +: 8];
+        end
+    end
+    
+    // Decode hints into h vector
+    reg [31:0] h_temp [0:K*N-1];
+    reg [7:0] k_pos;
+    reg [7:0] prev_pos;
+    reg check_fail;
+    
+    always @(*) begin
+        // Initialize all coefficients to 0
+        for (ii = 0; ii < K*N; ii = ii + 1) begin
+            h_temp[ii] = 32'd0;
+        end
+        
+        fail = 1'b0;
+        check_fail = 1'b0;
+        k_pos = 8'd0;
+        
+        // Decode each polynomial in h
+        for (ii = 0; ii < K; ii = ii + 1) begin
+            
+            // Check: sig[OMEGA + ii] must be in range [k_pos, OMEGA]
+            if (hint_bytes[OMEGA + ii] < k_pos || hint_bytes[OMEGA + ii] > OMEGA) begin
+                check_fail = 1'b1;
+            end
+            
+            // Set hints for polynomial ii
+            prev_pos = 8'd0;
+            for (jj = k_pos; jj < OMEGA; jj = jj + 1) begin
+                if (jj < hint_bytes[OMEGA + ii]) begin
+                    
+                    // Check ordering (for strong unforgeability)
+                    if (jj > k_pos && hint_bytes[jj] <= prev_pos) begin
+                        check_fail = 1'b1;
+                    end
+                    
+                    // Set h[ii].coeffs[sig[jj]] = 1
+                    if (hint_bytes[jj] < N) begin
+                        h_temp[ii*N + hint_bytes[jj]] = 32'd1;
+                    end
+                    
+                    prev_pos = hint_bytes[jj];
+                end
+            end
+            
+            k_pos = hint_bytes[OMEGA + ii];
+        end
+        
+        // Check extra indices are zero (for strong unforgeability)
+        for (jj = k_pos; jj < OMEGA; jj = jj + 1) begin
+            if (hint_bytes[jj] != 8'd0) begin
+                check_fail = 1'b1;
+            end
+        end
+        
+        fail = check_fail;
+    end
+    
+    // Convert h_temp array to output vector
+    generate
+        for (i = 0; i < K*N; i = i + 1) begin : pack_h
+            assign h_out[i*32 +: 32] = h_temp[i];
+        end
+    endgenerate
+
+endmodule
