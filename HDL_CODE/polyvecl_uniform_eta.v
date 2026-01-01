@@ -1,5 +1,4 @@
 
-
 module polyvecl_uniform_eta (
     input clock,
     input reset,

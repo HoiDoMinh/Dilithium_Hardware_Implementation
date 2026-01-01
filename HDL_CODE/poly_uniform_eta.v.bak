@@ -1,27 +1,25 @@
-
 module poly_uniform_eta (
     input clock,
     input reset,
-    input rtr,
-    input [511:0] linear_seed,
+    input start,
+    input [511:0] seed,
     input [15:0] nonce,
-    output signed [8191:0] linear_a,
-    output reg rts
+    output signed [8191:0] a_out,
+    output reg done
 );
-
   localparam N = 256;
   localparam SHAKE256_RATE = 136;
   localparam POLY_UNIFORM_ETA_NBLOCKS = 2;
 
   //Inter Outputs
-  wire [1599:0] linear_state_s;
+  wire [1599:0] state_s;
   wire [31:0] state_pos;
   wire [2175:0] linear_buf;
   wire [1599:0] linear_state_s_out;
-
-  reg rtr_dilithium_shake256_stream_init;
-  wire rts_dilithium_shake256_stream_init;
-  wire rts_shake256_squeezeblocks;
+  
+  reg start_dilithium_shake256_stream_init;
+  wire done_dilithium_shake256_stream_init;
+  wire done_shake256_squeezeblocks;
 
   reg [63:0] nblocks = 5;
   reg [31:0] len = 256;
@@ -33,7 +31,7 @@ module poly_uniform_eta (
   //Inter Outputs
   wire [31:0] ctr;
 
-  wire rts_rej_eta;
+  wire done_rej_eta;
 
   generate
     genvar x;
@@ -42,38 +40,40 @@ module poly_uniform_eta (
     end
   endgenerate
 
-  dilithium_shake256_stream_init dilithium_shake256_stream_init (
+    dilithium_shake256_stream_init dilithium_shake256_stream_init (
       .clock(clock),
       .reset(reset),
-      .rtr(rtr_dilithium_shake256_stream_init),
-      .linear_seed(linear_seed),
+      .start(start_dilithium_shake256_stream_init),
+      .seed(seed),
       .nonce(nonce),
-      .linear_state_s(linear_state_s),
+      .state_s(state_s),
       .state_pos(state_pos),
-      .rts(rts_dilithium_shake256_stream_init)
+      .done(done_dilithium_shake256_stream_init)
   );
-
-  shake256_squeezeblocks shake256_squeezeblocks (
+  shake256_squeezeblocks #(
+        .MAX_NBLOCKS   (POLY_UNIFORM_ETA_NBLOCKS),  // = 2
+        .SHAKE256_RATE (SHAKE256_RATE) shake256_squeezeblocks_inst (
       .clock(clock),
       .reset(reset),
-      .rtr(rts_dilithium_shake256_stream_init),
-      .linear_sate_s_in(linear_state_s),
+      .start(done_dilithium_shake256_stream_init),
+      .state_s_in(state_s),
       .nblocks(nblocks),
-      .linear_out(linear_buf),
-      .linear_state_s_out(linear_state_s_out),
-      .rts(rts_shake256_squeezeblocks)
+      .out(linear_buf),
+      .state_s_out(linear_state_s_out),
+      .done(done_shake256_squeezeblocks)
   );
 
-  rej_eta rej_eta (
+
+    rej_eta rej_eta (
       .clock(clock),
       .reset(reset),
-      .rtr(rts_shake256_squeezeblocks),
-      .len(len),
-      .linear_buf(linear_buf),
-      .buflen(buflen),
-      .linear_a(linear_a),
+      .start(done_shake256_squeezeblocks),
+      .len(len),   //256
+      .buf_in(linear_buf), // 840 bytes
+      .buflen(buflen),     // 840
+      .a_out(a_out),
       .ctr(ctr),
-      .rts(rts_rej_eta)
+      .done(done_rej_eta)
   );
 
   localparam SIZE = 3;
@@ -93,42 +93,42 @@ module poly_uniform_eta (
   always @(*) begin
     case (state)
       IDLE: begin
-        rts = 0;
-        rtr_dilithium_shake256_stream_init = 0;
+        done = 0;
+        start_dilithium_shake256_stream_init = 0;
         next_state = PRE_RD_INP;
       end
       PRE_RD_INP: begin
-        rts = 0;
-        rtr_dilithium_shake256_stream_init = 0;
-        if (rtr == 1'b1) begin
+        done = 0;
+        start_dilithium_shake256_stream_init = 0;
+        if (start == 1'b1) begin
           next_state = RD_INP;
         end else begin
           next_state = PRE_RD_INP;
         end
       end
       RD_INP: begin
-        rts = 0;
-        if (rts_rej_eta) begin
+        done = 0;
+        if (done_rej_eta) begin
           next_state = RD_INP;
-          rtr_dilithium_shake256_stream_init = 0;
+          start_dilithium_shake256_stream_init = 0;
         end else begin
-          rtr_dilithium_shake256_stream_init = 1;
+          start_dilithium_shake256_stream_init = 1;
           next_state = 3;
         end
       end
       3: begin
-        if (rts_rej_eta) begin
-          rts = 1;
-          if (~rtr) begin
-            rtr_dilithium_shake256_stream_init = 0;
+        if (done_rej_eta) begin
+          done = 1;
+          if (~start) begin
+            start_dilithium_shake256_stream_init = 0;
             next_state = IDLE;
           end else begin
-            rtr_dilithium_shake256_stream_init = 1;
+            start_dilithium_shake256_stream_init = 1;
             next_state = 3;
           end
         end else begin
-          rts = 0;
-          rtr_dilithium_shake256_stream_init = 1;
+          done = 0;
+          start_dilithium_shake256_stream_init = 1;
           next_state = 3;
         end
       end

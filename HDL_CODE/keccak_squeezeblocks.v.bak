@@ -137,7 +137,7 @@ module keccak_squeezeblocks #(
         out_index <= 0;
       end
       4: begin
-        if (rts_permute) begin
+        if (done_permute) begin
          s_in_permute <= s_out;
           index <= 0;
         end

@@ -1,5 +1,5 @@
 
-module polyvecl_ntt (
+module polyvecl_ntt #(parameter L = 5)(
     input clock,
     input reset,
     input start,
@@ -7,8 +7,6 @@ module polyvecl_ntt (
     output signed [40959:0] v_out,
     output reg done
 );
-
-  localparam L = 5;
 
   wire signed [8191:0] v_in_temp[L - 1:0];
   reg signed [8191:0] v_out_temp[L - 1:0];

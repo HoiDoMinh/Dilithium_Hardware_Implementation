@@ -152,7 +152,7 @@ module crypto_sign_signature_internal #(
         assign s1_reversed_in[8192*x+32*y_gen+31 : 8192*x+32*y_gen] = s1[8192*x+32*(255-y_gen)+31 : 8192*x+32*(255-y_gen)];
     endgenerate
     
-    polyvecl_ntt #(.L(L)) polyvecl_ntt_s1 (
+    polyvecl_ntt polyvecl_ntt_s1 (
         .clock(clock), .reset(reset), .start(start_precomp_reg),
         .v_in(s1_reversed_in), .v_out(s1_ntt_temp), .done(done_s1_ntt)
     );
@@ -231,7 +231,7 @@ module crypto_sign_signature_internal #(
     endgenerate
     
     wire signed [VECL_WIDTH-1:0] y_ntt_temp, y_ntt;
-    polyvecl_ntt #(.L(L)) polyvecl_ntt_y (
+    polyvecl_ntt  polyvecl_ntt_y (
         .clock(clock), .reset(reset), .start(done_y),
         .v_in(y_reversed_in), .v_out(y_ntt_temp), .done(done_y_ntt)
     );

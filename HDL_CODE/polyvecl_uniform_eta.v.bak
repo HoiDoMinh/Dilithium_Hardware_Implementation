@@ -86,7 +86,7 @@ module polyvecl_uniform_eta (
         done = 0;
         if (done_poly_uniform_eta) begin
           start_poly_uniform_eta = 0;
-          if (i + 1 < K) begin
+          if (i + 1 < L) begin
             next_state = 3;
           end else begin
             next_state = 5;

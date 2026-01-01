@@ -1,5 +1,5 @@
 
-module polyvecl_ntt (
+module polyvecl_ntt #(parameter L = 5)  (
     input clock,
     input reset,
     input start,
@@ -7,8 +7,6 @@ module polyvecl_ntt (
     output signed [40959:0] v_out,
     output reg done
 );
-
-  localparam L = 5;
 
   wire signed [8191:0] v_in_temp[L - 1:0];
   reg signed [8191:0] v_out_temp[L - 1:0];
@@ -25,7 +23,7 @@ module polyvecl_ntt (
       .start  (start_ntt),
       .inp  (v_in_reg),
       .out  (v_out_wire),
-      .done  (rts_ntt)
+      .done  (done_ntt)
   );
 
   generate
@@ -80,7 +78,7 @@ module polyvecl_ntt (
       end
       4: begin
         done = 0;
-        if (rts_ntt) begin
+        if (done_ntt) begin
           if (index + 1 < L) begin
             next_state = 3;
           end else begin
@@ -116,7 +114,7 @@ module polyvecl_ntt (
         v_in_reg <= v_in_temp[index];
       end
       4: begin
-        if (rts_ntt) begin
+        if (done_ntt) begin
           v_out_temp[index] <= v_out_wire;
           index <= index + 1;
         end

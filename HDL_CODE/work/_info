@@ -98,16 +98,6 @@ R3
 n@_opt16
 R4
 R0
-T_opt17
-!s110 1766130423
-Vl>BQIAjUc6MU:m:OQGzR23
-04 13 4 work tb_polyz_pack fast 0
-=1-983468c18a9c-694502f7-2be-3e78
-R2
-R3
-n@_opt17
-R4
-R0
 T_opt2
 !s110 1762615216
 Ve`e?M7iP3W^4=4_W=BVC61
@@ -231,23 +221,44 @@ r1
 Z13 o-work work -L mtiAvm -L mtiRnm -L mtiOvm -L mtiUvm -L mtiUPF -L infact
 R3
 vcrypto_sign_signature_internal
-!s110 1765854627
+!s110 1767285423
 !i10b 1
-!s100 J[Nk=[7=?>]Wz`8h=8S`Z1
-Ih5D7Y^O14O?PWKo=OFVZQ0
+!s100 4?lZ48cOla<<O@4bL_=Yo0
+IJS@K2`0bF00Pe<mzF3n1g3
 R8
-R12
-w1765853192
-8D:/DATA/DOAN/vivado_doan/dilithium_verilogcode/crypto_sign_signature_internal .v
-FD:/DATA/DOAN/vivado_doan/dilithium_verilogcode/crypto_sign_signature_internal .v
-L0 1
+R9
+w1767189915
+8D:\DATA\DOAN\vivado_doan\dilithium_verilogcode\crypto_sign_signature_internal .v
+FD:\DATA\DOAN\vivado_doan\dilithium_verilogcode\crypto_sign_signature_internal .v
+L0 3
 R10
 r1
 !s85 0
 31
-!s108 1765854627.000000
-!s107 D:/DATA/DOAN/vivado_doan/dilithium_verilogcode/crypto_sign_signature_internal .v|
-!s90 -reportprogress|300|-work|work|-vopt|-stats=none|D:/DATA/DOAN/vivado_doan/dilithium_verilogcode/crypto_sign_signature_internal .v|
+!s108 1767285423.000000
+!s107 D:\DATA\DOAN\vivado_doan\dilithium_verilogcode\crypto_sign_signature_internal .v|
+!s90 -reportprogress|300|-work|work|-vopt|-stats=none|D:\DATA\DOAN\vivado_doan\dilithium_verilogcode\crypto_sign_signature_internal .v|
+!i113 0
+R13
+R3
+vcrypto_sign_verify_internal
+!s110 1767281550
+!i10b 1
+!s100 0jnE8Mo]Ca?Ndi0dLQ=Y53
+IYh9EPRY2h?7ML6>joc`^;2
+R8
+R9
+w1767190446
+8D:/DATA/DOAN/vivado_doan/dilithium_verilogcode/crypto_sign_verify_internal.v
+FD:/DATA/DOAN/vivado_doan/dilithium_verilogcode/crypto_sign_verify_internal.v
+L0 3
+R10
+r1
+!s85 0
+31
+!s108 1767281549.000000
+!s107 D:/DATA/DOAN/vivado_doan/dilithium_verilogcode/crypto_sign_verify_internal.v|
+!s90 -reportprogress|300|-work|work|-vopt|-stats=none|D:/DATA/DOAN/vivado_doan/dilithium_verilogcode/crypto_sign_verify_internal.v|
 !i113 0
 R13
 R3
@@ -1978,6 +1989,27 @@ R31
 !i113 0
 R13
 R3
+vshake256
+!s110 1762662986
+!i10b 1
+!s100 H=YGAa=f3CM]gK[ilhTX43
+IgSD1nfLPF[jXe0K;Z@noB1
+R8
+R12
+w1762662636
+Z39 8D:/DATA/DOAN/vivado_doan/dilithium_verilogcode/SHAKE_256.v
+Z40 FD:/DATA/DOAN/vivado_doan/dilithium_verilogcode/SHAKE_256.v
+L0 1
+R10
+r1
+!s85 0
+31
+!s108 1762662986.000000
+Z41 !s107 D:/DATA/DOAN/vivado_doan/dilithium_verilogcode/SHAKE_256.v|
+Z42 !s90 -reportprogress|300|-work|work|-vopt|-stats=none|D:/DATA/DOAN/vivado_doan/dilithium_verilogcode/SHAKE_256.v|
+!i113 0
+R13
+R3
 vSHAKE256
 R18
 !i10b 1
@@ -2000,27 +2032,6 @@ R25
 R13
 R3
 n@s@h@a@k@e256
-vshake256
-!s110 1762662986
-!i10b 1
-!s100 H=YGAa=f3CM]gK[ilhTX43
-IgSD1nfLPF[jXe0K;Z@noB1
-R8
-R12
-w1762662636
-Z39 8D:/DATA/DOAN/vivado_doan/dilithium_verilogcode/SHAKE_256.v
-Z40 FD:/DATA/DOAN/vivado_doan/dilithium_verilogcode/SHAKE_256.v
-L0 1
-R10
-r1
-!s85 0
-31
-!s108 1762662986.000000
-Z41 !s107 D:/DATA/DOAN/vivado_doan/dilithium_verilogcode/SHAKE_256.v|
-Z42 !s90 -reportprogress|300|-work|work|-vopt|-stats=none|D:/DATA/DOAN/vivado_doan/dilithium_verilogcode/SHAKE_256.v|
-!i113 0
-R13
-R3
 vshake256_absorb
 R30
 !i10b 1
@@ -2652,27 +2663,6 @@ R19
 !i113 0
 R13
 R3
-vtb_shake256
-!s110 1762663018
-!i10b 1
-!s100 W2h2fPlABB^a9JVGkhB2?2
-IA>RfGLgY4bOb6hfkQO3RU2
-R8
-R12
-w1762663017
-Z43 8D:/DATA/DOAN/vivado_doan/dilithium_verilogcode/tb_SHAKE_256.v
-Z44 FD:/DATA/DOAN/vivado_doan/dilithium_verilogcode/tb_SHAKE_256.v
-L0 3
-R10
-r1
-!s85 0
-31
-!s108 1762663018.000000
-Z45 !s107 D:/DATA/DOAN/vivado_doan/dilithium_verilogcode/tb_SHAKE_256.v|
-Z46 !s90 -reportprogress|300|-work|work|-vopt|-stats=none|D:/DATA/DOAN/vivado_doan/dilithium_verilogcode/tb_SHAKE_256.v|
-!i113 0
-R13
-R3
 vtb_SHAKE256
 R18
 !i10b 1
@@ -2695,6 +2685,27 @@ R25
 R13
 R3
 ntb_@s@h@a@k@e256
+vtb_shake256
+!s110 1762663018
+!i10b 1
+!s100 W2h2fPlABB^a9JVGkhB2?2
+IA>RfGLgY4bOb6hfkQO3RU2
+R8
+R12
+w1762663017
+Z43 8D:/DATA/DOAN/vivado_doan/dilithium_verilogcode/tb_SHAKE_256.v
+Z44 FD:/DATA/DOAN/vivado_doan/dilithium_verilogcode/tb_SHAKE_256.v
+L0 3
+R10
+r1
+!s85 0
+31
+!s108 1762663018.000000
+Z45 !s107 D:/DATA/DOAN/vivado_doan/dilithium_verilogcode/tb_SHAKE_256.v|
+Z46 !s90 -reportprogress|300|-work|work|-vopt|-stats=none|D:/DATA/DOAN/vivado_doan/dilithium_verilogcode/tb_SHAKE_256.v|
+!i113 0
+R13
+R3
 vtb_SHAKE_256
 R20
 !i10b 1

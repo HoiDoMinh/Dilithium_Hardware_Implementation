@@ -1,6 +1,5 @@
 
 //a=a1?*2^D+a0?                 D=13    
-
 module power2round(
     input signed [31:0] a,
     output signed [31:0] a0,

@@ -2,7 +2,7 @@
 module polyveck_caddq(
     input signed [49151:0] v_in,
     output signed [49151:0] v_out
-	);
+);
     
     localparam K = 6;
     

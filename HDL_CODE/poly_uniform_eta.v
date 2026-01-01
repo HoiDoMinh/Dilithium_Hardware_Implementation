@@ -50,7 +50,10 @@ module poly_uniform_eta (
       .state_pos(state_pos),
       .done(done_dilithium_shake256_stream_init)
   );
-  shake256_squeezeblocks shake256_squeezeblocks (
+  shake256_squeezeblocks #(
+        .MAX_NBLOCKS   (POLY_UNIFORM_ETA_NBLOCKS),  // = 2
+        .SHAKE256_RATE (SHAKE256_RATE) )
+       shake256_squeezeblocks_inst (
       .clock(clock),
       .reset(reset),
       .start(done_dilithium_shake256_stream_init),
@@ -60,6 +63,7 @@ module poly_uniform_eta (
       .state_s_out(linear_state_s_out),
       .done(done_shake256_squeezeblocks)
   );
+
 
     rej_eta rej_eta (
       .clock(clock),

@@ -8,19 +8,18 @@ module keccak_absorb #(
     input [1599:0] s_in,
     input [31:0] pos,
     input [31:0] r,
-    input [in_len * 8 - 1:0] linear_in,
+    input [in_len * 8 - 1:0] in,
     input [63:0] inlen,
     output [1599:0] s_out,
     output reg [31:0] i,
     output reg done
 );
-
-  wire [7:0] in[0:in_len - 1];
+  wire [7:0] in_t[0:in_len - 1];
   wire [63:0] sin_t[0:24];
-  wire [63:0] s_permute[0:24];
+  wire [63:0] s_permute_t[0:24];
   reg [63:0] s[0:24];
 
-  wire [1599:0] linear_s_permute;
+  wire [1599:0] s_permute;
 
   reg [63:0] inlen_reg;
   reg [31:0] pos_reg;
@@ -31,13 +30,13 @@ module keccak_absorb #(
     genvar x;
     for (x = 0; x < 25; x = x + 1) begin
       assign sin_t[x] = s_in[64*x+63:64*x];
-      assign s_permute[x] = linear_s_permute[64*x+63:64*x];
+      assign s_permute_t[x] = s_permute[64*x+63:64*x];
     end
   endgenerate
 
   generate
     for (x = 0; x < in_len; x = x + 1) begin
-      assign in[x] = linear_in[8*x+7:8*x];
+      assign in_t[x] = in[8*x+7:8*x];
     end
   endgenerate
 
@@ -49,7 +48,7 @@ module keccak_absorb #(
 
   KeccakF1600_StatePermute KeccakF1600_StatePermute (
       .Ain  (s_out),
-      .Aout (linear_s_permute),
+      .Aout (s_permute),
       .clk  (clock),
       .reset(reset),
       .start(start_permute),
@@ -178,7 +177,7 @@ module keccak_absorb #(
       end
       6:
       if (index < r) begin
-        s[index/8] <= s[index/8] ^ (in[in_index] << (8 * (index % 8)));
+        s[index/8] <= s[index/8] ^ (in_t[in_index] << (8 * (index % 8)));
         index <= index + 1;
         in_index <= in_index + 1;
       end
@@ -188,7 +187,7 @@ module keccak_absorb #(
       end
       8:
       if (done_permute) begin
-        s[index] <= s_permute[index];
+        s[index] <= s_permute_t[index];
         index <= index + 1;
       end
       9:
@@ -197,7 +196,7 @@ module keccak_absorb #(
         index   <= 0;
       end
       10: begin
-        s[index/8] <= s[index/8] ^ (in[in_index] << (8 * (index % 8)));
+        s[index/8] <= s[index/8] ^ (in_t[in_index] << (8 * (index % 8)));
         index <= index + 1;
         in_index <= in_index + 1;
       end

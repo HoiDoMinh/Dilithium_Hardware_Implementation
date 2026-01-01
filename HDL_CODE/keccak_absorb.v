@@ -1,4 +1,3 @@
-
 module keccak_absorb #(
     parameter in_len = 32
 ) (
@@ -14,7 +13,6 @@ module keccak_absorb #(
     output reg [31:0] i,
     output reg done
 );
-
   wire [7:0] in_t[0:in_len - 1];
   wire [63:0] sin_t[0:24];
   wire [63:0] s_permute_t[0:24];
@@ -64,6 +62,7 @@ module keccak_absorb #(
 
   reg [SIZE-1:0] state;
   reg [SIZE-1:0] next_state;
+  
   //fsm change state
   always @(posedge clock) begin
     if (reset == 1'b1) begin
@@ -156,55 +155,76 @@ module keccak_absorb #(
     endcase
   end
 
+  // ============================================
+  // FIX: RESET s[] array khi nh?n reset signal
+  // ============================================
+  integer k;
+  
   always @(posedge clock) begin
-    case (state)
-      RD_INP: begin
-        index <= 0;
-        in_index <= 0;
+    if (reset) begin
+      // ? FIX: Clear t?t c? khi reset
+      for (k = 0; k < 25; k = k + 1) begin
+        s[k] <= 64'd0;
       end
-      3: begin
-        s[index] <= sin_t[index];
-        index <= index + 1;
-      end
-      4: begin
-        if (~(index < 25)) begin
-          inlen_reg <= inlen;
-          pos_reg   <= pos;
+      index <= 9'd0;
+      in_index <= 6'd0;
+      inlen_reg <= 64'd0;
+      pos_reg <= 32'd0;
+    end
+    else begin
+      case (state)
+        RD_INP: begin
+          index <= 0;
+          in_index <= 0;
+          // ? FIX: Clear s[] array tr??c khi copy s_in
+          for (k = 0; k < 25; k = k + 1) begin
+            s[k] <= 64'd0;
+          end
         end
-      end
-      5: begin
-        index <= pos_reg;
-        in_index <= 0;
-      end
-      6:
-      if (index < r) begin
-        s[index/8] <= s[index/8] ^ (in_t[in_index] << (8 * (index % 8)));
-        index <= index + 1;
-        in_index <= in_index + 1;
-      end
-      7: begin
-        inlen_reg <= inlen_reg - (r - pos_reg);
-        index <= 0;
-      end
-      8:
-      if (done_permute) begin
-        s[index] <= s_permute_t[index];
-        index <= index + 1;
-      end
-      9:
-      if (~(index < 25)) begin
-        pos_reg <= 0;
-        index   <= 0;
-      end
-      10: begin
-        s[index/8] <= s[index/8] ^ (in_t[in_index] << (8 * (index % 8)));
-        index <= index + 1;
-        in_index <= in_index + 1;
-      end
-      11: begin
-        if (~(index < pos_reg + inlen)) i <= index;
-      end
-    endcase
+        3: begin
+          s[index] <= sin_t[index];
+          index <= index + 1;
+        end
+        4: begin
+          if (~(index < 25)) begin
+            inlen_reg <= inlen;
+            pos_reg   <= pos;
+          end
+        end
+        5: begin
+          index <= pos_reg;
+          in_index <= 0;
+        end
+        6:
+        if (index < r) begin
+          s[index/8] <= s[index/8] ^ (in_t[in_index] << (8 * (index % 8)));
+          index <= index + 1;
+          in_index <= in_index + 1;
+        end
+        7: begin
+          inlen_reg <= inlen_reg - (r - pos_reg);
+          index <= 0;
+        end
+        8:
+        if (done_permute) begin
+          s[index] <= s_permute_t[index];
+          index <= index + 1;
+        end
+        9:
+        if (~(index < 25)) begin
+          pos_reg <= 0;
+          index   <= 0;
+        end
+        10: begin
+          s[index/8] <= s[index/8] ^ (in_t[in_index] << (8 * (index % 8)));
+          index <= index + 1;
+          in_index <= in_index + 1;
+        end
+        11: begin
+          if (~(index < pos_reg + inlen)) i <= index;
+        end
+      endcase
+    end
   end
 
 endmodule

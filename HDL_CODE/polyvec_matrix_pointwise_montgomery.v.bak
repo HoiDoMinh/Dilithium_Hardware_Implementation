@@ -4,7 +4,7 @@ module polyvec_matrix_pointwise_montgomery (
     input reset,
     input start,
     input signed [40959:0] v_in,   // polyvecl v (5 dathuc × 8192b)
-    input signed [65535:0] mat1,
+    input signed [65535:0] mat1,   // matrix 6*5
     input signed [65535:0] mat2,
     input signed [65535:0] mat3,
     input signed [49151:0] mat4,
@@ -44,7 +44,7 @@ module polyvec_matrix_pointwise_montgomery (
   reg [2:0] i;
 
   always @(*)
-    case (i)
+    case (i)   //i la hang cua ma tran(6 hang)
       0: u_temp <= mat1[40959:0];
       1: u_temp <= {mat2[16383:0], mat1[65535:40960]};
       2: u_temp <= mat2[57343:16384];

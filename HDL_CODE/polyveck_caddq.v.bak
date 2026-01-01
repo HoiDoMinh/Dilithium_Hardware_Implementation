@@ -13,7 +13,7 @@ module polyveck_caddq(
         genvar x;
         for (x = 0; x < K; x = x + 1) begin
 		    assign v_in_temp[x] = v_in[8192 * x + 8191:8192 * x];
-		    poly_caddq poly_caddq(.a_in(v_in_temp[x]), .a_out(v_out_temp[x]))
+		    poly_caddq poly_caddq(.a_in(v_in_temp[x]), .a_out(v_out_temp[x]));
 		    assign v_out[8192 * x + 8191:8192 * x] = v_out_temp[x];
 		end
 	endgenerate

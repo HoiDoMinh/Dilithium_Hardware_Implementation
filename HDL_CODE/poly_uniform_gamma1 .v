@@ -45,10 +45,7 @@ module poly_uniform_gamma1 (
         .state_pos(state_pos),
         .done     (done_dilithium_shake256_stream_init)
     );
-    shake256_squeezeblocks #(
-        .MAX_NBLOCKS   (POLY_UNIFORM_GAMMA1_NBLOCKS),  // 5
-        .SHAKE256_RATE (SHAKE256_RATE)                 // 136
-    ) shake256_squeezeblocks_inst (
+    shake256_squeezeblocks shake256_squeezeblocks_inst (
         .clock       (clock),
         .reset       (reset),
         .start       (done_dilithium_shake256_stream_init),

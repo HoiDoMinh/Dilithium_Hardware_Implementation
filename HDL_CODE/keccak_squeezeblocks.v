@@ -1,4 +1,3 @@
-
 module keccak_squeezeblocks #(
     parameter outlen = 2176
 ) (
@@ -12,17 +11,13 @@ module keccak_squeezeblocks #(
     output [1599:0] s_out,
     output reg done
 );
-
   reg start_permute;
   wire done_permute;
-
   reg [63:0] nblocks_reg;
   wire [63:0] sin_t[0:24];
-
   reg [7:0] out_t[0:outlen / 8 - 1];
-
   reg [1599:0] s_in_permute;
-
+  
   KeccakF1600_StatePermute KeccakF1600_StatePermute (
       .Ain  (s_in_permute),
       .Aout (s_out),
@@ -31,30 +26,29 @@ module keccak_squeezeblocks #(
       .start(start_permute),
       .done (done_permute)
   );
-
+  
   generate
     genvar x;
     for (x = 0; x < outlen / 8 - 1; x = x + 1) begin
       assign out[8*x+7:8*x] = out_t[x];
     end
   endgenerate
-
+  
   generate
     for (x = 0; x < 25; x = x + 1) begin
       assign sin_t[x] = s_out[64*x+63:64*x];
     end
   endgenerate
-
+  
   reg [4:0] index;
   reg [9:0] out_index;
-
+  
   localparam SIZE = 3;
   localparam IDLE = 3'd0, PRE_RD_INP = 3'd1, RD_INP = 3'd2;
-
+  
   reg [SIZE-1:0] state;
   reg [SIZE-1:0] next_state;
-
-
+  
   always @(posedge clock) begin
     if (reset == 1'b1) begin
       state <= IDLE;
@@ -62,7 +56,7 @@ module keccak_squeezeblocks #(
       state <= next_state;
     end
   end
-
+  
   always @(*) begin
     case (state)
       IDLE: begin
@@ -127,40 +121,66 @@ module keccak_squeezeblocks #(
       end
     endcase
   end
-
+  
+  // ============================================
+  // FIX: RESET out_t[] array
+  // ============================================
+  integer k;
+  
   always @(posedge clock) begin
-    case (state)
-      RD_INP: begin
-        nblocks_reg <= nblocks;
-        index <= 0;
-        s_in_permute <= s_in;
-        out_index <= 0;
+    if (reset) begin
+      // ? FIX: Clear khi reset
+      nblocks_reg <= 64'd0;
+      index <= 5'd0;
+      s_in_permute <= 1600'd0;
+      out_index <= 10'd0;
+      for (k = 0; k < outlen / 8; k = k + 1) begin
+        out_t[k] <= 8'd0;
       end
-      4: begin
-        if (done_permute) begin
-         s_in_permute <= s_out;
+    end
+    else begin
+      case (state)
+        RD_INP: begin
+          nblocks_reg <= nblocks;
           index <= 0;
+          s_in_permute <= s_in;
+          out_index <= 0;
+          // ? FIX: Clear out_t[] tr??c khi squeeze
+          for (k = 0; k < outlen / 8; k = k + 1) begin
+            out_t[k] <= 8'd0;
+          end
         end
-      end
-      5: begin
-        index <= index + 1;
-        out_t[out_index+index*8+0] <= sin_t[index][7:0];
-        out_t[out_index+index*8+1] <= sin_t[index][15:8];
-        out_t[out_index+index*8+2] <= sin_t[index][23:16];
-        out_t[out_index+index*8+3] <= sin_t[index][31:24];
-        out_t[out_index+index*8+4] <= sin_t[index][39:32];
-        out_t[out_index+index*8+5] <= sin_t[index][47:40];
-        out_t[out_index+index*8+6] <= sin_t[index][55:48];
-        out_t[out_index+index*8+7] <= sin_t[index][63:56];
-      end
-      6: begin
-        if (~(index < r / 8)) begin
-          out_index   <= out_index + r;
-          nblocks_reg <= nblocks_reg - 1;
+        
+        4: begin
+          if (done_permute) begin
+            s_in_permute <= s_out;
+            index <= 0;
+          end
         end
-      end
-      7: begin
-      end
-    endcase
+        
+        5: begin
+          index <= index + 1;
+          out_t[out_index+index*8+0] <= sin_t[index][7:0];
+          out_t[out_index+index*8+1] <= sin_t[index][15:8];
+          out_t[out_index+index*8+2] <= sin_t[index][23:16];
+          out_t[out_index+index*8+3] <= sin_t[index][31:24];
+          out_t[out_index+index*8+4] <= sin_t[index][39:32];
+          out_t[out_index+index*8+5] <= sin_t[index][47:40];
+          out_t[out_index+index*8+6] <= sin_t[index][55:48];
+          out_t[out_index+index*8+7] <= sin_t[index][63:56];
+        end
+        
+        6: begin
+          if (~(index < r / 8)) begin
+            out_index   <= out_index + r;
+            nblocks_reg <= nblocks_reg - 1;
+          end
+        end
+        
+        7: begin
+        end
+      endcase
+    end
   end
+  
 endmodule
