@@ -7,7 +7,7 @@ module polyvecl_invntt_tomont (
     input signed [40959:0] v_in,
     output signed [40959:0] v_out,
     output reg done
-);
+  );
 
   localparam L = 5;
 
@@ -21,17 +21,18 @@ module polyvecl_invntt_tomont (
   wire done_invntt;
 
   parallel_invntt_tomont_32bit parallel_invntt_tomont_32bit (
-      .clock(clock),
-      .reset(reset),
-      .start  (start_invntt),
-      .inp  (v_in_reg),
-      .out  (v_out_wire),
-      .done  (done_invntt)
-  );
+                                 .clock(clock),
+                                 .reset(reset),
+                                 .start  (start_invntt),
+                                 .inp  (v_in_reg),
+                                 .out  (v_out_wire),
+                                 .done  (done_invntt)
+                               );
 
   generate
     genvar x;
-    for (x = 0; x < L; x = x + 1) begin
+    for (x = 0; x < L; x = x + 1)
+    begin
       assign v_in_temp[x] = v_in[8192*x+8191:8192*x];
       assign v_out[8192*x+8191:8192*x] = v_out_temp[x];
     end
@@ -45,79 +46,108 @@ module polyvecl_invntt_tomont (
 
   reg [2:0] index;
 
-  always @(posedge clock) begin
-    if (reset == 1'b1) begin
+  always @(posedge clock)
+  begin
+    if (reset == 1'b1)
+    begin
       state <= IDLE;
-    end else begin
+    end
+    else
+    begin
       state <= next_state;
     end
   end
 
-  always @(*) begin
+  always @(*)
+  begin
     case (state)
-      IDLE: begin
+      IDLE:
+      begin
         done = 0;
         start_invntt = 0;
         next_state = PRE_RD_INP;
       end
-      PRE_RD_INP: begin
+      PRE_RD_INP:
+      begin
         done = 0;
         start_invntt = 0;
-        if (start == 1'b1) begin
+        if (start == 1'b1)
+        begin
           next_state = RD_INP;
-        end else begin
+        end
+        else
+        begin
           next_state = PRE_RD_INP;
         end
       end
-      RD_INP: begin
+      RD_INP:
+      begin
         done = 0;
         start_invntt = 0;
         next_state = 3;
       end
-      3: begin
+      3:
+      begin
         done = 0;
         start_invntt = 1;
         next_state = 4;
       end
-      4: begin
+      4:
+      begin
         done = 0;
-        if (done_invntt) begin
-          if (index + 1 < L) begin
+        if (done_invntt)
+        begin
+          if (index + 1 < L)
+          begin
             next_state = 3;
-          end else begin
+          end
+          else
+          begin
             next_state = 5;
           end
           start_invntt = 0;
-        end else begin
+        end
+        else
+        begin
           next_state = 4;
           start_invntt = 1;
         end
       end
-      5: begin
+      5:
+      begin
         done = 1;
         start_invntt = 0;
-        if (~start) begin
+        if (~start)
+        begin
           next_state = IDLE;
-        end else begin
+        end
+        else
+        begin
           next_state = 5;
         end
       end
-      default: begin
+      default:
+      begin
         next_state = IDLE;
       end
     endcase
   end
 
-  always @(posedge clock) begin
+  always @(posedge clock)
+  begin
     case (state)
-      RD_INP: begin
+      RD_INP:
+      begin
         index <= 0;
       end
-      3: begin
+      3:
+      begin
         v_in_reg <= v_in_temp[index];
       end
-      4: begin
-        if (done_invntt) begin
+      4:
+      begin
+        if (done_invntt)
+        begin
           v_out_temp[index] <= v_out_wire;
           index <= index + 1;
         end
